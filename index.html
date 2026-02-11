@@ -52,11 +52,11 @@
 
     <div class="space-y-6">
         <header class="gradient-header text-white p-8 rounded-3xl shadow-xl">
-          <div class="flex justify-between items-center">
+          <div class="flex justify-between items-center text-white">
             <div>
-              <h1 class="text-2xl font-bold uppercase tracking-tight text-white">TPN COMMERCIAL ORDER</h1>
-              <p class="text-lg font-medium text-white">ระบบคำนวณสารอาหารแบบสำเร็จรูป</p>
-              <p class="text-sm uppercase text-white">Srinagarind Hospital</p>
+              <h1 class="text-2xl font-bold uppercase tracking-tight" style="color: white !important;">TPN COMMERCIAL ORDER</h1>
+              <p class="text-lg font-medium" style="color: white !important;">ระบบคำนวณสารอาหารแบบสำเร็จรูป</p>
+              <p class="text-sm uppercase" style="color: white !important;">Srinagarind Hospital</p>
             </div>
             <button onclick="location.reload()" class="text-xs bg-white/20 px-3 py-1 rounded-lg hover:bg-white/30 transition-all text-white border border-white/20">🔄 เริ่มใหม่</button>
           </div>
@@ -84,7 +84,7 @@
             </div>
           </div>
           <div class="pt-4 border-t border-emerald-50 text-center">
-            <label class="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-widest">Route</label>
+            <label class="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-widest text-center">Route</label>
             <div class="grid grid-cols-2 gap-4">
                 <input type="radio" name="route" id="route-central" value="Central Line" class="hidden route-radio" checked>
                 <label for="route-central" class="flex items-center justify-center p-3 border-2 border-emerald-50 rounded-xl cursor-pointer font-bold text-emerald-800 transition-all">🟣 Central</label>
@@ -200,7 +200,7 @@
     const userMap = {
       'OP': 'ภญ.อรปภา ชัยเลิศวาณิช', 'SK': 'ภญ.ศิริโชค คุณวงศ์กฤต', 'NC': 'ภญ.ณัฐวรรณ ฉ่ำมณี',
       'TT': 'ภญ.ศิริรัตน์ อิ่มเอมกมล', 'MP': 'ภญ.หนึ่งฤทัย พรหมหาราช', 'PC': 'ภญ.พิชญานิล ชาธรรมา',
-      'CK': 'ภญ.ชนม์นิภา กันหากุล', 'KM': 'ภญ.ธณัฐภรณ์ เจริญกิจตระกูล', 'ST': 'ภญ.สุวิมล ธรรมกุล', 
+      'CK': 'ภญ.ชนม์นิภา กันหากุล', 'KM': 'ภญ.ธณัฐภรณ์ เจริญกิจจตระกูล', 'ST': 'ภญ.สุวิมล ธรรมกุล', 
       'LS': 'ภญ.ลักษิกา จิตรชื่น', 'SO': 'ภญ.อิสรา โสภัย'
     };
 
@@ -275,7 +275,7 @@
       const s = document.getElementById('productSelect');
       const o = s.options[s.selectedIndex];
       document.getElementById('prodVol').textContent = o.getAttribute('data-vol') || 0;
-      document.getElementById('prodKcal').textContent = o.getAttribute('data-kcal) || 0;
+      document.getElementById('prodKcal').textContent = o.getAttribute('data-kcal') || 0;
       calculateAll();
     }
 
