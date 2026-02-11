@@ -51,12 +51,12 @@
     </nav>
 
     <div class="space-y-6">
-        <header class="gradient-header text-white p-8 rounded-3xl shadow-xl">
+        <header class="gradient-header p-8 rounded-3xl shadow-xl">
           <div class="flex justify-between items-center text-white">
             <div>
-              <h1 class="text-2xl font-bold uppercase tracking-tight" style="color: white !important;">TPN COMMERCIAL ORDER</h1>
-              <p class="text-lg font-medium" style="color: white !important;">ระบบคำนวณสารอาหารแบบสำเร็จรูป</p>
-              <p class="text-sm uppercase" style="color: white !important;">Srinagarind Hospital</p>
+              <h1 class="text-2xl font-bold uppercase tracking-tight text-white">TPN COMMERCIAL ORDER</h1>
+              <p class="text-lg font-medium text-white">ระบบคำนวณสารอาหารแบบสำเร็จรูป</p>
+              <p class="text-sm uppercase text-white">Srinagarind Hospital</p>
             </div>
             <button onclick="location.reload()" class="text-xs bg-white/20 px-3 py-1 rounded-lg hover:bg-white/30 transition-all text-white border border-white/20">🔄 เริ่มใหม่</button>
           </div>
@@ -103,7 +103,7 @@
         </section>
 
         <section class="bg-white p-6 rounded-2xl card-shadow space-y-4 border-t-8 border-emerald-600">
-          <h2 class="section-title" style="color:#065f46 text-center">📦 เลือกผลิตภัณฑ์และจำนวน</h2>
+          <h2 class="section-title" style="color:#065f46 text-center text-emerald-800">📦 เลือกผลิตภัณฑ์และจำนวน</h2>
           <select id="productSelect" class="w-full p-4 border-2 border-emerald-100 rounded-xl bg-emerald-50 text-xl font-black text-emerald-900 outline-none text-center" onchange="updateProductDetails()">
             <option value="">-- คลิกเลือกสารอาหาร --</option>
             <option value="smof_c_1477" data-vol="1477" data-kcal="1600">SMOF kabiven (C-line) 1,477 ml / 1600 kcal</option>
@@ -149,8 +149,8 @@
             <div class="space-y-3">
               <label class="block text-xl font-black text-gray-800 flex justify-between uppercase px-2">Vitamins <span id="vit-max-msg" class="text-xs text-red-500 font-black invisible uppercase tracking-tighter self-center">MAX REACHED</span></label>
               <div class="flex gap-2">
-                <button onclick="selectVitamin('cernevit')" id="btn-cernevit" class="flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-white">Cernevit</button>
-                <button onclick="selectVitamin('soluvit')" id="btn-soluvit" class="flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-white">Soluvit-N</button>
+                <button onclick="selectVitamin('cernevit')" id="btn-cernevit" class="flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-white text-gray-400">Cernevit</button>
+                <button onclick="selectVitamin('soluvit')" id="btn-soluvit" class="flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-white text-gray-400">Soluvit-N</button>
               </div>
               <input type="number" id="vitVol" class="w-full p-4 border-2 border-gray-100 rounded-2xl text-3xl font-black text-emerald-700 bg-gray-50 outline-none text-center" oninput="calculateAll()">
               <p id="vit-hint" class="text-[10px] font-bold text-gray-400 uppercase italic"></p>
@@ -249,8 +249,8 @@
       const vitHint = document.getElementById('vit-hint');
       currentVitType = type;
       
-      document.getElementById('btn-cernevit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-white";
-      document.getElementById('btn-soluvit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-white";
+      document.getElementById('btn-cernevit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-white text-gray-400";
+      document.getElementById('btn-soluvit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-white text-gray-400";
 
       if (type === 'cernevit') {
         document.getElementById('btn-cernevit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-emerald-600 text-white shadow-md";
