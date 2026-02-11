@@ -2,120 +2,156 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <title>TPN Print | Srinagarind Hospital</title>
+  <title>TPN Master Print | Srinagarind Hospital</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700;800&display=swap" rel="stylesheet">
   <style>
-    * { font-family: 'Sarabun', sans-serif; color: #000; line-height: 1.2; }
+    * { font-family: 'Sarabun', sans-serif; color: #000; line-height: 1.2; font-weight: 700; }
+    
     @media print {
       @page { margin: 0; size: auto; }
       body { background: #fff; margin: 0; padding: 0; }
       .no-print { display: none !important; }
-      .sticker { box-shadow: none !important; border: 1px solid #000 !important; margin: 0 auto !important; page-break-after: always; }
-      #pn-sticker { zoom: 0.95; }
+      /* เอาเส้นขอบนอกออก (border: none) และขยับลง 3mm */
+      .sticker { 
+        box-shadow: none !important; 
+        border: none !important; 
+        margin: 3mm auto 0 auto !important; 
+        page-break-after: always; 
+      }
     }
-    /* PN Big Label (8.5 x 12.9 cm) */
+
+    /* ฉลาก PN Big Label - ขยายความกว้างขึ้น 7% */
     .sticker-pn { 
-      width: 8.5cm; height: 12.9cm; 
-      padding: 1.4cm 0.5cm 0.5cm 0.5cm; 
-      box-sizing: border-box; background: white; 
-      border: 1px solid #000; margin: 10px auto; 
-      display: flex; flex-direction: column; 
+      width: 9.1cm; /* เดิม 8.5cm * 1.07 */
+      height: 12.9cm; 
+      padding: 1.45cm 0.2cm 0.4cm 0.2cm; 
+      box-sizing: border-box; 
+      background: white; 
+      position: relative;
+      display: flex; 
+      flex-direction: column; 
     }
-    /* ฉลากหน้าถุง (3.5 x 2.48 in) */
+
+    /* ฉลากหน้าถุง - ขยายความกว้างขึ้น 7% และขยับลง 3mm */
     .sticker-bag { 
-      width: 3.5in; height: 2.48in; 
-      padding: 1.2cm 0.3in 0.1in 0.3in; 
-      box-sizing: border-box; background: white; 
-      border: 1px solid #000; margin: 10px auto; 
+      width: 3.75in; /* เดิม 3.5in * 1.07 */
+      height: 2.48in; 
+      padding: 1.1cm 0.2in 0.1in 0.2in; 
+      box-sizing: border-box; 
+      background: white; 
+      margin: 3mm auto 0 auto !important;
     }
+
     .pn-table { width: 100%; font-size: 15px; border-collapse: collapse; border: 2px solid #000; flex-grow: 1; }
-    .pn-table td { border: 1px solid #000; padding: 5px 8px; font-weight: 700; } 
+    .pn-table td { border: 1px solid #000; padding: 5px 8px; vertical-align: middle; } 
     .pn-table th { border: 2px solid #000; padding: 5px; font-size: 14px; font-weight: 800; background: #eee; }
-    .header-info { font-size: 16px; font-weight: 800; border-bottom: 2px solid #000; margin-bottom: 5px; }
-    .footer-container { display: flex; justify-content: space-between; align-items: flex-end; border-top: 2px solid #000; padding-top: 8px; margin-top: 5px; }
-    .rate-box { border: 3px solid #000; padding: 4px 10px; font-size: 20px; font-weight: 900; background: #fff; }
+
+    .header-info { font-size: 16px; font-weight: 800; border-bottom: 2.5px solid #000; margin-bottom: 5px; padding-bottom: 2px; }
+    .footer-container { display: flex; justify-content: space-between; align-items: flex-end; width: 100%; margin-top: 8px; border-top: 2px solid #000; padding-top: 8px; }
+    .rate-box { border: 3px solid #000; padding: 4px 10px; font-size: 20px; font-weight: 900; }
+    .exp-text { font-size: 12px; text-align: right; font-weight: 800; }
   </style>
 </head>
-<body class="bg-slate-100 p-4">
+<body class="bg-slate-100 min-h-screen">
 
-  <div class="max-w-xl mx-auto no-print text-center mb-6">
-    <button onclick="window.print()" class="bg-blue-600 text-white py-4 px-12 rounded-2xl font-black text-2xl shadow-xl active:scale-95">🖨️ สั่งพิมพ์ฉลาก</button>
+  <div class="max-w-xl mx-auto py-8 no-print text-center">
+    <h1 class="text-2xl font-black text-emerald-900 mb-4">🖨️ ตรวจสอบฉลาก (เวอร์ชันขยายเต็มแผ่น)</h1>
+    <button onclick="window.print()" class="bg-emerald-600 text-white py-4 px-12 rounded-2xl font-black text-2xl shadow-xl hover:bg-emerald-700 transition-all active:scale-95">
+      สั่งพิมพ์ฉลาก
+    </button>
   </div>
 
-  <div id="labels-container"></div>
+  <div id="print-content">
+    <div id="pn-sticker-container"></div>
+    <div id="bag-sticker-container"></div>
+  </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const params = new URLSearchParams(window.location.search);
-      const o = Object.fromEntries(params.entries());
-      if (o.hn) render(o);
+      const data = Object.fromEntries(params.entries());
+      if (data.hn) renderLabels(data);
     });
 
-    function formatThaiDate(dStr) {
-      if (!dStr) return "-";
-      const d = new Date(dStr);
-      const m = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
-      return `${d.getDate()} ${m[d.getMonth()]} ${d.getFullYear()+543}`;
+    function formatThaiDate(dateStr) {
+      if (!dateStr) return "-";
+      const d = new Date(dateStr);
+      const months = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+      return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear() + 543}`;
     }
 
-    function render(o) {
-      const exp = new Date(o.orderDate); exp.setDate(exp.getDate() + 1);
-      const qty = parseInt(o.quantity) || 1;
-      let html = '';
+    // ฟังก์ชันตรวจสอบค่า 0 หรือว่าง สำหรับซ่อนแถว
+    function createRow(label, value) {
+      const val = parseFloat(value);
+      if (!value || isNaN(val) || val === 0) return '';
+      return `<tr><td>${label}</td><td class="text-right">${value}</td></tr>`;
+    }
 
-      for(let i=1; i<=qty; i++) {
-        html += `
-          <div class="sticker sticker-pn" id="pn-sticker">
+    function renderLabels(o) {
+      const expDate = new Date(o.orderDate);
+      expDate.setDate(expDate.getDate() + 1);
+
+      const qty = parseInt(o.quantity) || 1;
+      let pnHTML = '';
+      for (let i = 1; i <= qty; i++) {
+        pnHTML += `
+          <div class="sticker sticker-pn">
             <div class="header-info flex justify-between">
               <span>HN: ${o.hn} - ${o.patientName}</span>
-              <span>${i}/${qty}</span>
+              <span>ถุงที่: ${i}/${qty}</span>
             </div>
-            <div class="flex justify-between text-[15px] font-extrabold mb-1">
+            <div class="flex justify-between text-[15px] font-bold mb-2">
               <span>Ward: ${o.ward}</span>
               <span>Route: ${o.route}</span>
             </div>
             <table class="pn-table">
-              <thead><tr><th align="left">รายการสารอาหาร</th><th width="30%">ml</th></tr></thead>
+              <thead>
+                <tr><th style="text-align:left;">รายการสารอาหาร</th><th style="width:25%;">ml</th></tr>
+              </thead>
               <tbody>
-                <tr><td>1. ${o.productName}</td><td align="right">${o.productVol}</td></tr>
-                <tr><td>2. Addamel-N</td><td align="right">${o.addamel}</td></tr>
-                <tr><td>3. Vitamins (${o.vitType})</td><td align="right">${o.vitVol}</td></tr>
-                <tr><td>4. B-Complex (B-CO)</td><td align="right">${o.bco}</td></tr>
-                <tr><td>5. Vitalipid Adult</td><td align="right">${o.vitalipid}</td></tr>
-                ${o.other1Name ? `<tr><td>6. ${o.other1Name}</td><td align="right">${o.other1Vol}</td></tr>` : ''}
-                ${o.other2Name ? `<tr><td>7. ${o.other2Name}</td><td align="right">${o.other2Vol}</td></tr>` : ''}
-                ${o.other3Name ? `<tr><td>8. ${o.other3Name}</td><td align="right">${o.other3Vol}</td></tr>` : ''}
-                ${o.other4Name ? `<tr><td>9. ${o.other4Name}</td><td align="right">${o.other4Vol}</td></tr>` : ''}
-                <tr style="background:#eee;"><td align="right">Total Volume</td><td align="right">${o.totalVol}</td></tr>
+                ${createRow(`1. ${o.productName}`, o.productVol)}
+                ${createRow('2. Addamel-N', o.addamel)}
+                ${createRow(`3. Vitamins (${o.vitType})`, o.vitVol)}
+                ${createRow('4. B-Complex (B-CO)', o.bco)}
+                ${createRow('5. Vitalipid Adult', o.vitalipid)}
+                ${createRow(`6. ${o.other1Name}`, o.other1Vol)}
+                ${createRow(`7. ${o.other2Name}`, o.other2Vol)}
+                ${createRow(`8. ${o.other3Name}`, o.other3Vol)}
+                ${createRow(`9. ${o.other4Name}`, o.other4Vol)}
+                <tr style="background:#eee; font-weight:800;">
+                  <td class="text-right">Total Volume</td>
+                  <td class="text-right">${o.totalVol}</td>
+                </tr>
               </tbody>
             </table>
             <div class="footer-container">
               <div class="text-[14px] font-bold">
-                <div>BW: ${o.bw} kg | Cal: ${o.productKcal}</div>
-                <div>Prep: ${formatThaiDate(o.orderDate)}</div>
-                <div class="text-[11px] italic mt-2">By: ${o.recordedBy}</div>
+                <div>BW: ${o.bw} kg | Energy: ${o.productKcal} kcal</div>
+                <div>Prepared: ${formatThaiDate(o.orderDate)}</div>
+                <div class="text-[11px] italic mt-1 font-medium">Recorded By: ${o.recordedBy}</div>
               </div>
               <div class="text-right">
                 <div class="rate-box inline-block mb-1">Rate: ${o.rate} ml/hr</div>
-                <div class="text-[13px] font-black uppercase">EXP: ${formatThaiDate(exp)} 18:00</div>
+                <div class="exp-text uppercase">EXP: ${formatThaiDate(expDate)} 18:00</div>
               </div>
             </div>
           </div>
         `;
       }
+      document.getElementById('pn-sticker-container').innerHTML = pnHTML;
 
-      html += `
+      document.getElementById('bag-sticker-container').innerHTML = `
         <div class="sticker sticker-bag flex flex-col items-center justify-center text-center">
-          <div style="font-size: 52px; font-weight: 900;">${o.ward}</div>
-          <div style="border-top: 4px solid #000; border-bottom: 4px solid #000; width: 100%; padding: 5px 0; margin: 5px 0;">
-            <span style="font-size: 24px; font-weight: 900;">${o.patientName}</span>
+          <div style="font-size: 52px; font-weight: 900; line-height: 1;">${o.ward}</div>
+          <div style="border-top: 4px solid #000; border-bottom: 4px solid #000; width: 100%; padding: 8px 0; margin: 8px 0;">
+            <span style="font-size: 26px; font-weight: 900; display: block; line-height: 1.1;">${o.patientName}</span>
           </div>
-          <div style="font-size: 20px; font-weight: 800;">HN: ${o.hn}</div>
-          <div style="font-size: 15px; font-weight: 800; margin-top: 5px;">เตรียม: ${formatThaiDate(o.orderDate)} (เก็บ 2-8° C)</div>
+          <div style="font-size: 22px; font-weight: 800; margin-bottom: 4px;">HN: ${o.hn}</div>
+          <div style="font-size: 16px; font-weight: 700;">วันที่เตรียม: ${formatThaiDate(o.orderDate)}</div>
+          <div style="font-size: 15px; font-weight: 800; color: #000; margin-top: 6px;">(เก็บในตู้เย็น 2-8° C)</div>
         </div>
       `;
-      document.getElementById('labels-container').innerHTML = html;
     }
   </script>
 </body>
