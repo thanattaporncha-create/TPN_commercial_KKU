@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Sarabun', sans-serif; background-color: #f0f4f0; }
-    .gradient-header { background: linear-gradient(135deg, #065f46 0%, #10 b981 100%); }
+    .gradient-header { background: linear-gradient(135deg, #065f46 0%, #10b981 100%); }
     .card-shadow { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); }
     .section-title { border-left: 5px solid #10b981; padding-left: 12px; font-weight: 800; color: #000000; font-size: 1.1rem; }
     .ward-dropdown { max-height: 250px; overflow-y: auto; z-index: 100; }
@@ -54,11 +54,11 @@
         <header class="gradient-header text-white p-8 rounded-3xl shadow-xl">
           <div class="flex justify-between items-center">
             <div>
-              <h1 class="text-2xl font-bold uppercase tracking-tight">TPN COMMERCIAL ORDER</h1>
-              <p class="text-lg opacity-90 font-medium">ระบบคำนวณสารอาหารแบบสำเร็จรูป</p>
-              <p class="text-sm opacity-80 uppercase">Srinagarind Hospital</p>
+              <h1 class="text-2xl font-bold uppercase tracking-tight text-white">TPN COMMERCIAL ORDER</h1>
+              <p class="text-lg font-medium text-white">ระบบคำนวณสารอาหารแบบสำเร็จรูป</p>
+              <p class="text-sm uppercase text-white">Srinagarind Hospital</p>
             </div>
-            <button onclick="location.reload()" class="text-xs bg-white/20 px-3 py-1 rounded-lg hover:bg-white/30 transition-all">🔄 เริ่มใหม่</button>
+            <button onclick="location.reload()" class="text-xs bg-white/20 px-3 py-1 rounded-lg hover:bg-white/30 transition-all text-white border border-white/20">🔄 เริ่มใหม่</button>
           </div>
         </header>
 
@@ -96,7 +96,7 @@
 
         <section class="bg-white p-6 rounded-2xl card-shadow">
           <h2 class="section-title mb-4">⚖️ น้ำหนักคนไข้</h2>
-          <div class="relative max-w-xs">
+          <div class="relative max-w-xs mx-auto md:mx-0">
             <input type="number" id="bw" step="0.1" placeholder="0.0" class="w-full p-4 border-2 border-emerald-100 rounded-2xl pr-16 text-3xl font-black text-emerald-700 outline-none" oninput="calculateAll()">
             <span class="absolute right-4 top-5 text-emerald-300 font-black text-xl">kg</span>
           </div>
@@ -146,7 +146,7 @@
               <label class="block text-xl font-black text-gray-800 uppercase">Addamel-N (ml)</label>
               <input type="number" id="addamel" value="10" class="w-full p-4 border-2 border-gray-100 rounded-2xl text-3xl font-black text-emerald-700 bg-gray-50 outline-none text-center" oninput="calculateAll()">
             </div>
-            <div class="space-y-3 text-center">
+            <div class="space-y-3">
               <label class="block text-xl font-black text-gray-800 flex justify-between uppercase px-2">Vitamins <span id="vit-max-msg" class="text-xs text-red-500 font-black invisible uppercase tracking-tighter self-center">MAX REACHED</span></label>
               <div class="flex gap-2">
                 <button onclick="selectVitamin('cernevit')" id="btn-cernevit" class="flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-white">Cernevit</button>
@@ -159,14 +159,14 @@
               <label class="block text-xl font-black text-gray-800 flex justify-between uppercase px-2">B-CO (ml) <span class="text-xs text-red-500 font-black tracking-tighter self-center uppercase">MAX 2 ml</span></label>
               <input type="number" id="bco" value="2" class="w-full p-4 border-2 border-gray-100 rounded-2xl text-3xl font-black text-emerald-700 bg-gray-50 outline-none text-center" oninput="checkBcoLimit()">
             </div>
-            <div class="space-y-2 text-center">
+            <div class="space-y-2">
               <label class="block text-xl font-black text-gray-800 uppercase">Vitalipid Adult (ml)</label>
               <input type="number" id="vitalipid" value="10" class="w-full p-4 border-2 border-gray-100 rounded-2xl text-3xl font-black text-emerald-700 bg-gray-50 outline-none text-center" oninput="calculateAll()">
             </div>
           </div>
 
-          <div class="space-y-4 pt-8 border-t border-emerald-50">
-            <span class="text-xl font-black text-gray-800 italic block text-center uppercase tracking-widest">+ Others</span>
+          <div class="space-y-4 pt-8 border-t border-emerald-50 text-left">
+            <span class="text-xl font-black text-gray-800 italic block uppercase tracking-widest mb-4">Add สารอื่นๆ</span>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="other-additives">
               <div class="flex gap-3"><input type="text" placeholder="ชื่อสาร 1" class="flex-1 p-3 border border-gray-100 rounded-xl font-bold"><input type="number" placeholder="ml" class="w-24 p-3 border border-gray-100 rounded-xl text-center font-black text-emerald-700 other-vol" oninput="calculateAll()"></div>
               <div class="flex gap-3"><input type="text" placeholder="ชื่อสาร 2" class="flex-1 p-3 border border-gray-100 rounded-xl font-bold"><input type="number" placeholder="ml" class="w-24 p-3 border border-gray-100 rounded-xl text-center font-black text-emerald-700 other-vol" oninput="calculateAll()"></div>
@@ -275,7 +275,7 @@
       const s = document.getElementById('productSelect');
       const o = s.options[s.selectedIndex];
       document.getElementById('prodVol').textContent = o.getAttribute('data-vol') || 0;
-      document.getElementById('prodKcal').textContent = o.getAttribute('data-kcal') || 0;
+      document.getElementById('prodKcal').textContent = o.getAttribute('data-kcal) || 0;
       calculateAll();
     }
 
