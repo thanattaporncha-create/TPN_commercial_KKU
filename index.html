@@ -103,7 +103,8 @@
         </section>
 
         <section class="bg-white p-6 rounded-2xl card-shadow space-y-4 border-t-8 border-emerald-600">
-          <h2 class="section-title" style="color:#065f46 text-center">📦 เลือกผลิตภัณฑ์</h2>
+          <h2 class="section-title" style="color:#065f46 text-center">📦 เลือกผลิตภัณฑ์และจำนวน</h2>
+          
           <select id="productSelect" class="w-full p-4 border-2 border-emerald-100 rounded-xl bg-emerald-50 text-xl font-black text-emerald-900 outline-none text-center" onchange="updateProductDetails()">
             <option value="">-- คลิกเลือกสารอาหาร --</option>
             <option value="smof_c_1477" data-vol="1477" data-kcal="1600">SMOF kabiven (C-line) 1,477 ml / 1600 kcal</option>
@@ -115,6 +116,17 @@
             <option value="nutri_vr" data-vol="1250" data-kcal="1475">Nutriflex lipid VR 1,250 ml / 1475 kcal</option>
             <option value="bfluid" data-vol="1000" data-kcal="420">B-Fluid 1,000 ml / 420 kcal</option>
           </select>
+
+          <div class="bg-emerald-50 p-4 rounded-2xl border border-emerald-100 space-y-3">
+             <label class="block text-xs font-black text-emerald-600 uppercase text-center tracking-widest">จำนวนถุงที่เบิก (Total Bags for Stock)</label>
+             <div class="flex items-center justify-center gap-6">
+                <button onclick="adjustBag(-1)" class="w-12 h-12 rounded-full bg-white shadow-md border-2 border-emerald-200 text-2xl font-bold text-emerald-600 hover:bg-emerald-50 active:scale-90 transition-all">-</button>
+                <div class="text-4xl font-black text-emerald-900 w-16 text-center" id="bagDisplay">1</div>
+                <button onclick="adjustBag(1)" class="w-12 h-12 rounded-full bg-white shadow-md border-2 border-emerald-200 text-2xl font-bold text-emerald-600 hover:bg-emerald-50 active:scale-90 transition-all">+</button>
+             </div>
+             <input type="hidden" id="bagCount" value="1">
+          </div>
+
           <div class="grid grid-cols-2 gap-4">
             <div class="p-4 bg-emerald-50 rounded-2xl text-center border border-emerald-100">
                 <span class="text-xs font-black text-emerald-600 uppercase">Volume:</span>
@@ -179,7 +191,7 @@
     const userMap = {
       'OP': 'ภญ.อรปภา ชัยเลิศวาณิช', 'SK': 'ภญ.ศิริโชค คุณวงศ์กฤต', 'NC': 'ภญ.ณัฐวรรณ ฉ่ำมณี',
       'TT': 'ภญ.ศิริรัตน์ อิ่มเอมกมล', 'MP': 'ภญ.หนึ่งฤทัย พรหมหาราช', 'PC': 'ภญ.พิชญานิล ชาธรรมา',
-      'CK': 'ภญ.ชนม์นิภา กันหากุล', 'KM': 'ภญ.ธณัฐภรณ์ เจริญกิจตระกูล', 'ST': 'ภญ.สุวิมล ธรรมกุล', 
+      'CK': 'ภญ.ชนม์นิภา กันหากุล', 'KM': 'ภญ.ธณัฐภรณ์ เจริญกิจจตระกูล', 'ST': 'ภญ.สุวิมล ธรรมกุล', 
       'LS': 'ภญ.ลักษิกา จิตรชื่น', 'SO': 'ภญ.อิสรา โสภัย'
     };
 
@@ -187,7 +199,6 @@
       if (e) e.preventDefault();
       const u = document.getElementById('username').value.trim().toUpperCase();
       const p = document.getElementById('password').value.trim().toUpperCase();
-      
       if (u === p && userMap[u]) {
         sessionStorage.setItem('tpnUser', userMap[u]);
         showMainApp();
@@ -212,16 +223,25 @@
     function filterWards() { const val = document.getElementById('wardInput').value.toLowerCase(); renderWards(wards.filter(w => w.toLowerCase().includes(val))); }
     function selectWard(w) { document.getElementById('wardInput').value = w; document.getElementById('wardList').classList.add('hidden'); }
     
+    // ฟังก์ชันเพิ่ม/ลดจำนวนถุง
+    function adjustBag(n) {
+        const bagDisplay = document.getElementById('bagDisplay');
+        const bagInput = document.getElementById('bagCount');
+        let current = parseInt(bagInput.value);
+        let newValue = current + n;
+        if (newValue < 1) newValue = 1; // ไม่ให้ต่ำกว่า 1
+        bagInput.value = newValue;
+        bagDisplay.textContent = newValue;
+    }
+
     let currentVitType = '';
     function selectVitamin(type) {
       const vitVol = document.getElementById('vitVol');
       const vitalipid = document.getElementById('vitalipid');
       const vitHint = document.getElementById('vit-hint');
       currentVitType = type;
-      
-      document.getElementById('btn-cernevit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-white";
-      document.getElementById('btn-soluvit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-white";
-
+      document.getElementById('btn-cernevit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-white text-gray-400";
+      document.getElementById('btn-soluvit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-white text-gray-400";
       if (type === 'cernevit') {
         document.getElementById('btn-cernevit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-emerald-600 text-white";
         vitVol.value = 5; vitHint.innerHTML = "⚠️ MAX CERNEVIT = 5 ML";
@@ -253,22 +273,29 @@
       const v = (id) => parseFloat(document.getElementById(id).value) || 0;
       const prodVol = parseFloat(document.getElementById('prodVol').textContent) || 0;
       const vitVol = v('vitVol');
-      
       const vitMaxMsg = document.getElementById('vit-max-msg');
       if ((currentVitType==='cernevit' && vitVol>5) || (currentVitType==='soluvit' && vitVol>10)) vitMaxMsg.classList.remove('invisible');
       else vitMaxMsg.classList.add('invisible');
-
       const grandTotal = prodVol + v('addamel') + vitVol + v('bco') + v('vitalipid');
       document.getElementById('totalVolDisplay').textContent = grandTotal.toLocaleString();
-
       const rh = document.getElementById('rateHint');
       if (grandTotal > 0) rh.textContent = `✅ แนะนำ: ${(grandTotal/24).toFixed(1)} ml/hr`;
     }
 
     function saveOrder() {
       const hn = document.getElementById('hn').value;
+      const bags = document.getElementById('bagCount').value;
+      const product = document.getElementById('productSelect').options[document.getElementById('productSelect').selectedIndex].text;
+      
       if (!hn) { alert("⚠️ ลืมใส่ HN ค่ะ"); return; }
-      alert("✅ บันทึกเรียบร้อยโดย: " + sessionStorage.getItem('tpnUser'));
+      if (document.getElementById('productSelect').value === "") { alert("⚠️ ลืมเลือกผลิตภัณฑ์ค่ะ"); return; }
+
+      // ข้อความยืนยันเพื่อให้ขิมตรวจสอบก่อนบันทึก/ตัดสต็อก
+      const confirmMsg = `ยืนยันการบันทึก:\n- ผลิตภัณฑ์: ${product}\n- จำนวน: ${bags} ถุง\n- ผู้บันทึก: ${sessionStorage.getItem('tpnUser')}`;
+      
+      if(confirm(confirmMsg)) {
+          alert("✅ บันทึกเรียบร้อย และพร้อมตัดสต็อกจำนวน " + bags + " ถุงค่ะ");
+      }
     }
 
     window.onload = () => { if (sessionStorage.getItem('tpnUser')) showMainApp(); };
