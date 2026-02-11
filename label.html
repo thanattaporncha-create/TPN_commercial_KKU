@@ -12,7 +12,7 @@
       @page { margin: 0; size: auto; }
       body { background: #fff; margin: 0; padding: 0; }
       .no-print { display: none !important; }
-      /* เอาเส้นขอบนอกออก (border: none) และขยับลง 3mm */
+      .print-area:not(.active) { display: none !important; }
       .sticker { 
         box-shadow: none !important; 
         border: none !important; 
@@ -21,9 +21,11 @@
       }
     }
 
-    /* ฉลาก PN Big Label - ขยายความกว้างขึ้น 7% */
+    [contenteditable="true"]:hover { background: #fff9c4; outline: 1px dashed #ccc; cursor: text; }
+
+    /* ฉลาก PN Big Label */
     .sticker-pn { 
-      width: 9.1cm; /* เดิม 8.5cm * 1.07 */
+      width: 9.1cm; 
       height: 12.9cm; 
       padding: 1.45cm 0.2cm 0.4cm 0.2cm; 
       box-sizing: border-box; 
@@ -33,39 +35,51 @@
       flex-direction: column; 
     }
 
-    /* ฉลากหน้าถุง - ขยายความกว้างขึ้น 7% และขยับลง 3mm */
+    /* ฉลากหน้าถุง */
     .sticker-bag { 
-      width: 3.75in; /* เดิม 3.5in * 1.07 */
+      width: 3.75in; 
       height: 2.48in; 
       padding: 1.1cm 0.2in 0.1in 0.2in; 
       box-sizing: border-box; 
       background: white; 
-      margin: 3mm auto 0 auto !important;
     }
 
     .pn-table { width: 100%; font-size: 15px; border-collapse: collapse; border: 2px solid #000; flex-grow: 1; }
-    .pn-table td { border: 1px solid #000; padding: 5px 8px; vertical-align: middle; } 
+    .pn-table td { border: 1px solid #000; padding: 4px 8px; vertical-align: middle; } 
     .pn-table th { border: 2px solid #000; padding: 5px; font-size: 14px; font-weight: 800; background: #eee; }
 
     .header-info { font-size: 16px; font-weight: 800; border-bottom: 2.5px solid #000; margin-bottom: 5px; padding-bottom: 2px; }
     .footer-container { display: flex; justify-content: space-between; align-items: flex-end; width: 100%; margin-top: 8px; border-top: 2px solid #000; padding-top: 8px; }
-    .rate-box { border: 3px solid #000; padding: 4px 10px; font-size: 20px; font-weight: 900; }
-    .exp-text { font-size: 12px; text-align: right; font-weight: 800; }
+    .rate-box { border: 2.5px solid #000; padding: 2px 8px; font-size: 16px; font-weight: 900; }
+    .exp-text { font-size: 11.5px; text-align: right; font-weight: 800; }
   </style>
 </head>
 <body class="bg-slate-100 min-h-screen">
 
-  <div class="max-w-xl mx-auto py-8 no-print text-center">
-    <h1 class="text-2xl font-black text-emerald-900 mb-4">🖨️ ตรวจสอบฉลาก (เวอร์ชันขยายเต็มแผ่น)</h1>
-    <button onclick="window.print()" class="bg-emerald-600 text-white py-4 px-12 rounded-2xl font-black text-2xl shadow-xl hover:bg-emerald-700 transition-all active:scale-95">
-      สั่งพิมพ์ฉลาก
-    </button>
+  <div class="max-w-xl mx-auto py-8 px-4 no-print text-center">
+    <h1 class="text-2xl font-black text-emerald-900 mb-6">🖨️ เลือกฉลากที่ต้องการพิมพ์</h1>
+    
+    <div class="grid grid-cols-2 gap-4 mb-8">
+      <div id="card-pn" onclick="selectSection('pn')" class="bg-white p-6 rounded-3xl border-4 border-emerald-100 cursor-pointer transition-all hover:scale-105 shadow-sm">
+        <div class="text-3xl mb-2">📄</div>
+        <h3 class="font-black text-lg">TPN LABEL</h3>
+        <p class="text-xs text-gray-400 mt-1 uppercase font-bold">ฉลากใหญ่ / รายการสารอาหาร</p>
+      </div>
+      <div id="card-bag" onclick="selectSection('bag')" class="bg-white p-6 rounded-3xl border-4 border-emerald-100 cursor-pointer transition-all hover:scale-105 shadow-sm">
+        <div class="text-3xl mb-2">🏷️</div>
+        <h3 class="font-black text-lg">หน้าถุง</h3>
+        <p class="text-xs text-gray-400 mt-1 uppercase font-bold">ฉลากเล็ก / ชื่อคนไข้</p>
+      </div>
+    </div>
+
+    <div id="action-btns" class="hidden">
+      <button onclick="window.print()" class="bg-emerald-600 text-white py-5 px-14 rounded-3xl font-black text-2xl shadow-xl hover:bg-emerald-700 transition-all transform active:scale-95">🖨️ สั่งพิมพ์ฉลาก</button>
+      <p class="text-xs text-gray-400 mt-4 italic font-medium">* คุณสามารถคลิกแก้ไขข้อความบนฉลากได้โดยตรง</p>
+    </div>
   </div>
 
-  <div id="print-content">
-    <div id="pn-sticker-container"></div>
-    <div id="bag-sticker-container"></div>
-  </div>
+  <div id="pn-area" class="print-area"></div>
+  <div id="bag-area" class="print-area"></div>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -74,6 +88,16 @@
       if (data.hn) renderLabels(data);
     });
 
+    function selectSection(type) {
+      document.querySelectorAll('.print-area').forEach(el => el.classList.remove('active'));
+      document.getElementById(`${type}-area`).classList.add('active');
+      
+      document.querySelectorAll('.bg-white').forEach(el => el.classList.replace('border-emerald-500', 'border-emerald-100'));
+      document.getElementById(`card-${type}`).classList.replace('border-emerald-100', 'border-emerald-500');
+      
+      document.getElementById('action-btns').classList.remove('hidden');
+    }
+
     function formatThaiDate(dateStr) {
       if (!dateStr) return "-";
       const d = new Date(dateStr);
@@ -81,39 +105,54 @@
       return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear() + 543}`;
     }
 
-    // ฟังก์ชันตรวจสอบค่า 0 หรือว่าง สำหรับซ่อนแถว
     function createRow(label, value) {
       const val = parseFloat(value);
       if (!value || isNaN(val) || val === 0) return '';
-      return `<tr><td>${label}</td><td class="text-right">${value}</td></tr>`;
+      // Mapping ชื่อวิตามินและ B-Complex
+      let displayLabel = label;
+      if (label.includes('Vitamins (soluvit)')) displayLabel = '3. Soluvit-N';
+      if (label.includes('Vitamins (cernevit)')) displayLabel = '3. Cernevit';
+      if (label.includes('B-Complex (B-CO)')) displayLabel = '4. B-Complex';
+
+      return `<tr><td>${displayLabel}</td><td class="text-right">${value}</td></tr>`;
+    }
+
+    function splitProductName(name) {
+      // แยกชื่อโปรดักซ์ออกจากสเปก (ใช้ " ml / " เป็นจุดตัด)
+      if (name.includes(' ml / ')) {
+        const parts = name.split(/(?= \d)/); // แยกก่อนถึงตัวเลขตัวแรก
+        return `<div class="leading-tight">${parts[0]}</div><div class="text-[12px] font-medium leading-none mt-0.5">${parts.slice(1).join('')}</div>`;
+      }
+      return name;
     }
 
     function renderLabels(o) {
       const expDate = new Date(o.orderDate);
       expDate.setDate(expDate.getDate() + 1);
+      const routeDisplay = o.route.includes('Central') ? 'C-line' : 'P-line';
 
       const qty = parseInt(o.quantity) || 1;
       let pnHTML = '';
       for (let i = 1; i <= qty; i++) {
         pnHTML += `
           <div class="sticker sticker-pn">
-            <div class="header-info flex justify-between">
+            <div class="header-info flex justify-between" contenteditable="true">
               <span>HN: ${o.hn} - ${o.patientName}</span>
               <span>ถุงที่: ${i}/${qty}</span>
             </div>
-            <div class="flex justify-between text-[15px] font-bold mb-2">
+            <div class="flex justify-between text-[15px] font-bold mb-2" contenteditable="true">
               <span>Ward: ${o.ward}</span>
-              <span>Route: ${o.route}</span>
+              <span>Route: ${routeDisplay}</span>
             </div>
             <table class="pn-table">
               <thead>
-                <tr><th style="text-align:left;">รายการสารอาหาร</th><th style="width:25%;">ml</th></tr>
+                <tr><th style="text-align:left;">รายการสารอาหาร</th><th style="width:25%;">ปริมาตร</th></tr>
               </thead>
-              <tbody>
-                ${createRow(`1. ${o.productName}`, o.productVol)}
+              <tbody contenteditable="true">
+                <tr><td>1. ${splitProductName(o.productName)}</td><td class="text-right">${o.productVol}</td></tr>
                 ${createRow('2. Addamel-N', o.addamel)}
-                ${createRow(`3. Vitamins (${o.vitType})`, o.vitVol)}
-                ${createRow('4. B-Complex (B-CO)', o.bco)}
+                ${createRow(`Vitamins (${o.vitType})`, o.vitVol)}
+                ${createRow('B-Complex (B-CO)', o.bco)}
                 ${createRow('5. Vitalipid Adult', o.vitalipid)}
                 ${createRow(`6. ${o.other1Name}`, o.other1Vol)}
                 ${createRow(`7. ${o.other2Name}`, o.other2Vol)}
@@ -125,24 +164,23 @@
                 </tr>
               </tbody>
             </table>
-            <div class="footer-container">
+            <div class="footer-container" contenteditable="true">
               <div class="text-[14px] font-bold">
-                <div>BW: ${o.bw} kg | Energy: ${o.productKcal} kcal</div>
-                <div>Prepared: ${formatThaiDate(o.orderDate)}</div>
-                <div class="text-[11px] italic mt-1 font-medium">Recorded By: ${o.recordedBy}</div>
+                <div>Energy: ${o.productKcal} kcal</div>
+                <div>เตรียมวันที่ ${formatThaiDate(o.orderDate)}</div>
               </div>
-              <div class="text-right">
+              <div class="text-right flex flex-col items-end">
                 <div class="rate-box inline-block mb-1">Rate: ${o.rate} ml/hr</div>
-                <div class="exp-text uppercase">EXP: ${formatThaiDate(expDate)} 18:00</div>
+                <div class="exp-text">หมดอายุ ${formatThaiDate(expDate)} เวลา 18:00 น.</div>
               </div>
             </div>
           </div>
         `;
       }
-      document.getElementById('pn-sticker-container').innerHTML = pnHTML;
+      document.getElementById('pn-area').innerHTML = pnHTML;
 
-      document.getElementById('bag-sticker-container').innerHTML = `
-        <div class="sticker sticker-bag flex flex-col items-center justify-center text-center">
+      document.getElementById('bag-area').innerHTML = `
+        <div class="sticker sticker-bag flex flex-col items-center justify-center text-center" contenteditable="true">
           <div style="font-size: 52px; font-weight: 900; line-height: 1;">${o.ward}</div>
           <div style="border-top: 4px solid #000; border-bottom: 4px solid #000; width: 100%; padding: 8px 0; margin: 8px 0;">
             <span style="font-size: 26px; font-weight: 900; display: block; line-height: 1.1;">${o.patientName}</span>
