@@ -6,7 +6,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700;800&display=swap" rel="stylesheet">
   <style>
-    /* ล็อคระยะขอบและสัดส่วนเดิมไว้ 100% ตามที่คุณขิมพอใจ */
+    /* ล็อคระยะขอบและสัดส่วนเดิมไว้ 100% */
     * { font-family: 'Sarabun', sans-serif; color: #000; line-height: 1.15; font-weight: 700; }
     
     @media print {
@@ -25,15 +25,14 @@
 
     [contenteditable="true"]:hover { background: #fff9c4; outline: 1px dashed #ccc; cursor: text; }
 
-    /* ฉลาก PN Big Label - ยกส่วนล่างขึ้น 1cm ตามสั่ง */
+    /* ฉลาก PN Big Label - ล็อคขนาดให้เป๊ะ */
     .sticker-pn { 
       width: 9.1cm; 
       height: 12.9cm; 
-      padding: 1.45cm 0.3cm 1.5cm 0.3cm; 
+      padding: 1.45cm 0.3cm 0.5cm 0.3cm; 
       box-sizing: border-box; 
       background: white; 
-      display: flex; 
-      flex-direction: column;
+      position: relative; /* ใช้เป็นจุดอ้างอิงให้ Footer */
     }
 
     .sticker-bag { 
@@ -44,27 +43,29 @@
       background: white; 
     }
 
-    /* ตารางขยายตัวอักษรและเพิ่มหน่วย (ml) */
-    .pn-table { width: 100%; font-size: 16px; border-collapse: collapse; border: 2px solid #000; margin-bottom: 8px; }
-    .pn-table td { border: 1px solid #000; padding: 4.5px 6px; vertical-align: middle; } 
+    /* ตาราง - บังคับไม่ให้ดัน Footer */
+    .pn-table { width: 100%; font-size: 16px; border-collapse: collapse; border: 2px solid #000; }
+    .pn-table td { border: 1px solid #000; padding: 4px 6px; vertical-align: middle; } 
     .pn-table th { border: 2px solid #000; padding: 5px; font-size: 15px; font-weight: 800; background: #eee; }
 
     .header-info { font-size: 15.5px; font-weight: 800; border-bottom: 2.5px solid #000; margin-bottom: 4px; padding-bottom: 2px; }
     
-    /* Footer - ปรับให้ Energy อยู่ระนาบเดียวกับ Rate และชิดเส้นขีด */
+    /* Footer - ล็อคตำแหน่งไว้ที่ 1.5cm จากขอบล่างเสมอ เพื่อไม่ให้ตกหน้า */
     .footer-container { 
+      position: absolute;
+      bottom: 1.5cm; /* ยกขึ้นจากขอบล่างตามสั่ง */
+      left: 0.3cm;
+      right: 0.3cm;
       display: grid; 
       grid-template-columns: 1fr 1fr; 
       align-items: start; 
-      width: 100%; 
-      margin-top: auto; 
       border-top: 2px solid #000; 
-      padding-top: 8px; /* เว้นระยะจากเส้นขีดเล็กน้อย */
+      padding-top: 8px;
     }
     
     .rate-box { border: 2.5px solid #000; padding: 2px 8px; font-size: 18px; font-weight: 900; background: #fff; display: inline-block; }
     .exp-text { font-size: 12px; text-align: right; font-weight: 800; line-height: 1.2; margin-top: 4px; }
-    .energy-text { font-size: 15px; font-weight: 800; align-self: start; }
+    .energy-text { font-size: 15px; font-weight: 800; }
   </style>
 </head>
 <body class="bg-slate-50 min-h-screen">
