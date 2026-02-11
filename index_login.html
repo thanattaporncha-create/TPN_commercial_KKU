@@ -26,14 +26,14 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
         </svg>
       </div>
-      <h1 class="text-2xl font-black text-emerald-900 mb-6 uppercase">TPN LOGIN</h1>
-      <div class="space-y-4">
-        <input type="text" id="username" placeholder="Username" class="w-full p-4 border-2 border-emerald-50 rounded-2xl focus:border-emerald-500 outline-none font-bold text-center uppercase tracking-widest text-emerald-700 bg-emerald-50/30">
-        <input type="password" id="password" placeholder="Password" class="w-full p-4 border-2 border-emerald-50 rounded-2xl focus:border-emerald-500 outline-none font-bold text-center tracking-widest text-emerald-700 bg-emerald-50/30">
-        <button onclick="handleLogin()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white p-5 rounded-2xl font-black text-xl shadow-xl transition-all transform active:scale-95">
+      <h1 class="text-2xl font-black text-emerald-900 mb-6 uppercase tracking-tighter">TPN LOGIN SYSTEM</h1>
+      <form onsubmit="handleLogin(event)" class="space-y-4">
+        <input type="text" id="username" placeholder="Username" required class="w-full p-4 border-2 border-emerald-50 rounded-2xl focus:border-emerald-500 outline-none font-bold text-center uppercase tracking-widest text-emerald-700 bg-emerald-50/30">
+        <input type="password" id="password" placeholder="Password" required class="w-full p-4 border-2 border-emerald-50 rounded-2xl focus:border-emerald-500 outline-none font-bold text-center tracking-widest text-emerald-700 bg-emerald-50/30">
+        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white p-5 rounded-2xl font-black text-xl shadow-xl transition-all transform active:scale-95">
           เข้าสู่ระบบ 🚀
         </button>
-      </div>
+      </form>
     </div>
   </div>
 
@@ -42,11 +42,11 @@
         <div class="flex items-center gap-2">
             <span class="text-xs font-bold text-gray-400 uppercase tracking-tighter">ผู้บันทึก:</span>
             <span id="displayUserName" class="text-sm font-black text-emerald-700 px-3 py-1 bg-white border border-emerald-100 rounded-xl shadow-sm"></span>
-            <button onclick="logout()" class="text-[10px] font-black text-red-400 hover:text-red-600 uppercase ml-2">Logout</button>
+            <button onclick="logout()" class="text-[10px] font-black text-red-400 hover:text-red-600 uppercase ml-2 underline">Logout</button>
         </div>
         <div class="flex gap-2">
-            <button onclick="alert('หน้า Dashboard กำลังพัฒนา')" class="px-4 py-2 bg-white rounded-xl text-emerald-800 font-black text-xs shadow-sm border border-emerald-50 hover:bg-emerald-50">📊 Dashboard</button>
-            <button onclick="alert('หน้า Stock กำลังพัฒนา')" class="px-4 py-2 bg-white rounded-xl text-emerald-800 font-black text-xs shadow-sm border border-emerald-50 hover:bg-emerald-50">📦 Stock</button>
+            <button class="px-4 py-2 bg-white rounded-xl text-emerald-800 font-black text-xs shadow-sm border border-emerald-50 hover:bg-emerald-50">📊 Dashboard</button>
+            <button class="px-4 py-2 bg-white rounded-xl text-emerald-800 font-black text-xs shadow-sm border border-emerald-50 hover:bg-emerald-50">📦 Stock</button>
         </div>
     </nav>
 
@@ -56,7 +56,7 @@
             <div>
               <h1 class="text-2xl font-bold uppercase tracking-tight">TPN COMMERCIAL ORDER</h1>
               <p class="text-lg opacity-90 font-medium">ระบบคำนวณสารอาหารแบบสำเร็จรูป</p>
-              <p class="text-sm opacity-80">โรงพยาบาลศรีนครินทร์ ขอนแก่น</p>
+              <p class="text-sm opacity-80 uppercase">Srinagarind Hospital</p>
             </div>
             <button onclick="location.reload()" class="text-xs bg-white/20 px-3 py-1 rounded-lg hover:bg-white/30 transition-all">🔄 เริ่มใหม่</button>
           </div>
@@ -67,24 +67,24 @@
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <label class="block text-sm font-bold text-gray-600 mb-1">วันที่ Order</label>
-              <input type="date" id="orderDate" class="w-full p-2.5 border rounded-xl bg-gray-50 focus:ring-2 ring-emerald-500">
+              <input type="date" id="orderDate" class="w-full p-2.5 border rounded-xl bg-gray-50 outline-none">
             </div>
             <div>
               <label class="block text-sm font-bold text-gray-600 mb-1">HN</label>
-              <input type="text" id="hn" placeholder="ระบุ HN" class="w-full p-2.5 border rounded-xl focus:ring-2 ring-emerald-500">
+              <input type="text" id="hn" placeholder="ระบุ HN" class="w-full p-2.5 border rounded-xl outline-none">
             </div>
             <div>
               <label class="block text-sm font-bold text-gray-600 mb-1">ชื่อ-นามสกุล</label>
-              <input type="text" id="patientName" placeholder="ชื่อคนไข้" class="w-full p-2.5 border rounded-xl focus:ring-2 ring-emerald-500">
+              <input type="text" id="patientName" placeholder="ชื่อคนไข้" class="w-full p-2.5 border rounded-xl outline-none">
             </div>
             <div class="relative">
               <label class="block text-sm font-bold text-gray-600 mb-1">Ward</label>
-              <input type="text" id="wardInput" placeholder="ค้นหาหรือระบุเอง..." class="w-full p-2.5 border rounded-xl focus:ring-2 ring-emerald-500" onfocus="showWards()" oninput="filterWards()" autocomplete="off">
+              <input type="text" id="wardInput" placeholder="ค้นหา..." class="w-full p-2.5 border rounded-xl outline-none" onfocus="showWards()" oninput="filterWards()" autocomplete="off">
               <div id="wardList" class="hidden absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-2xl ward-dropdown"></div>
             </div>
           </div>
           <div class="pt-4 border-t border-emerald-50">
-            <label class="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-widest">ช่องทางการให้ (Route)</label>
+            <label class="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-widest text-center">Route</label>
             <div class="grid grid-cols-2 gap-4">
                 <input type="radio" name="route" id="route-central" value="Central Line" class="hidden route-radio" checked>
                 <label for="route-central" class="flex items-center justify-center p-3 border-2 border-emerald-50 rounded-xl cursor-pointer font-bold text-emerald-800 transition-all">🟣 Central</label>
@@ -97,15 +97,15 @@
         <section class="bg-white p-6 rounded-2xl card-shadow">
           <h2 class="section-title mb-4">⚖️ น้ำหนักคนไข้</h2>
           <div class="relative max-w-xs">
-            <input type="number" id="bw" step="0.1" placeholder="0.0" class="w-full p-4 border-2 border-emerald-100 rounded-2xl pr-16 text-3xl font-black text-emerald-700 focus:border-emerald-500 outline-none" oninput="calculateAll()">
+            <input type="number" id="bw" step="0.1" placeholder="0.0" class="w-full p-4 border-2 border-emerald-100 rounded-2xl pr-16 text-3xl font-black text-emerald-700 outline-none" oninput="calculateAll()">
             <span class="absolute right-4 top-5 text-emerald-300 font-black text-xl">kg</span>
           </div>
         </section>
 
         <section class="bg-white p-6 rounded-2xl card-shadow space-y-4 border-t-8 border-emerald-600">
-          <h2 class="section-title" style="color:#065f46">📦 เลือกผลิตภัณฑ์</h2>
-          <select id="productSelect" class="w-full p-4 border-2 border-emerald-100 rounded-xl bg-emerald-50 text-xl font-black text-emerald-900 outline-none" onchange="updateProductDetails()">
-            <option value="">-- คลิกเลือกสารอาหารที่นี่ --</option>
+          <h2 class="section-title" style="color:#065f46 text-center">📦 เลือกผลิตภัณฑ์</h2>
+          <select id="productSelect" class="w-full p-4 border-2 border-emerald-100 rounded-xl bg-emerald-50 text-xl font-black text-emerald-900 outline-none text-center" onchange="updateProductDetails()">
+            <option value="">-- คลิกเลือกสารอาหาร --</option>
             <option value="smof_c_1477" data-vol="1477" data-kcal="1600">SMOF kabiven (C-line) 1,477 ml / 1600 kcal</option>
             <option value="smof_c_986" data-vol="986" data-kcal="1100">SMOF kabiven (C-line) 986 ml / 1100 kcal</option>
             <option value="smof_p_1904" data-vol="1904" data-kcal="1300">SMOF kabiven (P-line) 1,904 ml / 1300 kcal</option>
@@ -117,11 +117,11 @@
           </select>
           <div class="grid grid-cols-2 gap-4">
             <div class="p-4 bg-emerald-50 rounded-2xl text-center border border-emerald-100">
-                <span class="text-xs font-black text-emerald-600">VOLUME:</span>
+                <span class="text-xs font-black text-emerald-600 uppercase">Volume:</span>
                 <div class="text-2xl font-black text-emerald-900"><span id="prodVol">0</span> ml</div>
             </div>
             <div class="p-4 bg-yellow-50 rounded-2xl text-center border border-yellow-100">
-                <span class="text-xs font-black text-yellow-600">ENERGY:</span>
+                <span class="text-xs font-black text-yellow-600 uppercase">Energy:</span>
                 <div class="text-2xl font-black text-yellow-900"><span id="prodKcal">0</span> kcal</div>
             </div>
           </div>
@@ -129,74 +129,70 @@
 
         <section class="bg-white p-8 rounded-2xl card-shadow space-y-6">
           <h2 class="section-title">🧪 ADDITIVES</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-center">
             <div class="space-y-2">
-              <label class="block text-xl font-black text-gray-800">Addamel-N (ml)</label>
-              <input type="number" id="addamel" value="10" class="w-full p-4 border-2 border-gray-100 rounded-2xl text-3xl font-black text-emerald-700 bg-gray-50 focus:border-emerald-500 outline-none" oninput="calculateAll()">
+              <label class="block text-xl font-black text-gray-800 uppercase">Addamel-N (ml)</label>
+              <input type="number" id="addamel" value="10" class="w-full p-4 border-2 border-gray-100 rounded-2xl text-3xl font-black text-emerald-700 bg-gray-50 outline-none text-center" oninput="calculateAll()">
             </div>
             <div class="space-y-3">
-              <label class="block text-xl font-black text-gray-800 flex justify-between">Vitamins (ml) <span id="vit-max-msg" class="text-xs text-red-500 font-black invisible">MAX REACHED</span></label>
-              <div class="flex gap-2 mb-2">
-                <button onclick="selectVitamin('cernevit')" id="btn-cernevit" class="flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase transition-all shadow-sm">Cernevit</button>
-                <button onclick="selectVitamin('soluvit')" id="btn-soluvit" class="flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase transition-all shadow-sm">Soluvit-N</button>
+              <label class="block text-xl font-black text-gray-800 flex justify-between uppercase">Vitamins <span id="vit-max-msg" class="text-xs text-red-500 font-black invisible uppercase tracking-tighter">MAX REACHED</span></label>
+              <div class="flex gap-2">
+                <button onclick="selectVitamin('cernevit')" id="btn-cernevit" class="flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-white">Cernevit</button>
+                <button onclick="selectVitamin('soluvit')" id="btn-soluvit" class="flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-white">Soluvit-N</button>
               </div>
-              <input type="number" id="vitVol" class="w-full p-4 border-2 border-gray-100 rounded-2xl text-3xl font-black text-emerald-700 bg-gray-50 outline-none" oninput="calculateAll()">
+              <input type="number" id="vitVol" class="w-full p-4 border-2 border-gray-100 rounded-2xl text-3xl font-black text-emerald-700 bg-gray-50 outline-none text-center" oninput="calculateAll()">
               <p id="vit-hint" class="text-[10px] font-bold text-gray-400 uppercase italic"></p>
             </div>
-            <div class="space-y-2">
-              <label class="block text-xl font-black text-gray-800 flex justify-between">B-CO (ml) <span class="text-xs text-red-500 font-black">MAX 2 ml</span></label>
-              <input type="number" id="bco" value="2" class="w-full p-4 border-2 border-gray-100 rounded-2xl text-3xl font-black text-emerald-700 bg-gray-50 outline-none" oninput="checkBcoLimit()">
-            </div>
-            <div class="space-y-2">
-              <label class="block text-xl font-black text-gray-800">Vitalipid-N Adult (ml)</label>
-              <input type="number" id="vitalipid" value="10" class="w-full p-4 border-2 border-gray-100 rounded-2xl text-3xl font-black text-emerald-700 bg-gray-50 outline-none" oninput="calculateAll()">
-            </div>
           </div>
-          <div class="space-y-4 pt-8 border-t border-emerald-50">
-            <span class="text-xl font-black text-gray-800 italic">+ Others</span>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="other-additives">
-              <div class="flex gap-3"><input type="text" placeholder="ชื่อสาร 1" class="flex-1 p-3 border border-gray-100 rounded-xl font-bold"><input type="number" placeholder="ml" class="w-24 p-3 border border-gray-100 rounded-xl text-center font-black text-emerald-700 other-vol" oninput="calculateAll()"></div>
-              <div class="flex gap-3"><input type="text" placeholder="ชื่อสาร 2" class="flex-1 p-3 border border-gray-100 rounded-xl font-bold"><input type="number" placeholder="ml" class="w-24 p-3 border border-gray-100 rounded-xl text-center font-black text-emerald-700 other-vol" oninput="calculateAll()"></div>
-            </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-center">
+            <div class="space-y-2">
+                <label class="block text-xl font-black text-gray-800 flex justify-between uppercase">B-CO (ml) <span class="text-xs text-red-500 font-black tracking-tighter self-center uppercase">MAX 2 ml</span></label>
+                <input type="number" id="bco" value="2" class="w-full p-4 border-2 border-gray-100 rounded-2xl text-3xl font-black text-emerald-700 bg-gray-50 outline-none text-center" oninput="checkBcoLimit()">
+              </div>
+              <div class="space-y-2">
+                <label class="block text-xl font-black text-gray-800 uppercase">Vitalipid Adult (ml)</label>
+                <input type="number" id="vitalipid" value="10" class="w-full p-4 border-2 border-gray-100 rounded-2xl text-3xl font-black text-emerald-700 bg-gray-50 outline-none text-center" oninput="calculateAll()">
+              </div>
           </div>
         </section>
 
         <section class="bg-emerald-900 text-white p-8 rounded-3xl shadow-2xl border-b-[12px] border-emerald-700">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10 text-center">
                 <div class="space-y-1">
-                    <span class="text-emerald-400 font-bold uppercase text-xs">Total Volume (ml)</span>
+                    <span class="text-emerald-400 font-bold uppercase text-xs tracking-widest">Total Volume (ml)</span>
                     <div class="text-6xl font-black"><span id="totalVolDisplay">0</span> <small class="text-2xl text-emerald-300">ml</small></div>
                 </div>
                 <div class="bg-white/5 p-6 rounded-2xl border border-white/20">
                     <div class="text-yellow-400 text-base font-black mb-3 italic tracking-wide" id="rateHint">👉 กรุณาเลือก Product...</div>
                     <div class="flex items-center gap-4">
-                        <input type="number" id="manualRate" placeholder="0.0" class="w-full bg-emerald-700 text-white text-4xl font-black p-4 rounded-2xl outline-none">
+                        <input type="number" id="manualRate" placeholder="0.0" class="w-full bg-emerald-700 text-white text-4xl font-black p-4 rounded-2xl outline-none text-center">
                         <span class="text-2xl font-black">ml/hr</span>
                     </div>
                 </div>
             </div>
             <button id="saveBtn" onclick="saveOrder()" class="w-full bg-emerald-500 hover:bg-emerald-400 p-8 rounded-3xl text-3xl font-black shadow-xl transition-all">💾 บันทึกและพิมพ์ฉลาก</button>
         </section>
-        <p class="text-center text-emerald-800 text-[10px] py-10 uppercase font-black tracking-[0.2em]">Srinagarind Hospital • Pharmacy Dept</p>
     </div>
   </div>
 
   <script>
-    // 🛡️ ระบบ Login
     const userMap = {
       'OP': 'ภญ.อรปภา ชัยเลิศวาณิช', 'SK': 'ภญ.ศิริโชคคุณวงศ์กฤต', 'NC': 'ภญ.ณัฐวรรณ ฉ่ำมณี',
       'TT': 'ภญ.ศิริรัตน์ อิ่มเอมกมล', 'MP': 'ภญ.หนึ่งฤทัย พรหมหาราช', 'PC': 'ภญ.พิชญานิล ชาธรรมา',
-      'CK': 'ภญ.ชนม์นิภา กันหากุล', 'KM': 'ภญ.ธณัฐภรณ์ เจริญกิจจตระกูล', 'ST': 'ภญ.สุวิมล ธรรมกุล', 'LS': 'ภญ.ลักษิกา จิตรชื่น', 'SO': 'ภญ.สมหญิง รักดี'
+      'CK': 'ภญ.ชนม์นิภา กันหากุล', 'KM': 'ภญ.ธณัฐภรณ์ เจริญกิจจตระกูล', 'ST': 'ภญ.สุวิมล ธรรมกุล', 
+      'LS': 'ภญ.ลักษิกา จิตรชื่น', 'SO': 'ภญ.สมหญิง รักดี'
     };
 
-    function handleLogin() {
-      const u = document.getElementById('username').value.toUpperCase();
-      const p = document.getElementById('password').value.toUpperCase();
+    function handleLogin(e) {
+      if (e) e.preventDefault();
+      const u = document.getElementById('username').value.trim().toUpperCase();
+      const p = document.getElementById('password').value.trim().toUpperCase();
+      
       if (u === p && userMap[u]) {
         sessionStorage.setItem('tpnUser', userMap[u]);
         showMainApp();
       } else {
-        alert('❌ รหัสผิดพลาดนะคะ');
+        alert('❌ รหัสผิดพลาดนะคะ ตรวจสอบรหัส ' + u + ' อีกครั้งค่ะ');
       }
     }
 
@@ -208,16 +204,11 @@
       calculateAll();
     }
 
-    function logout() {
-      sessionStorage.clear();
-      location.reload();
-    }
+    function logout() { sessionStorage.clear(); location.reload(); }
 
-    // 🧪 ระบบคำนวณ (เหมือนเดิมที่คุณขิมชอบ)
     const wards = ["2ค", "2ง", "3ก", "3ค", "3ง", "3ฉ", "4ก", "4ค", "5ข", "6ก", "6ข", "AE1", "AE2", "AE3", "CCU", "CVT-ICU", "HOME PN", "IMC2ง", "IMC3ข", "IMC4ข", "MICU 1", "MICU 2", "NICU", "PICU", "SCTU", "SICU 1", "SICU 2", "สว.1/11", "สว.1/9A"];
-
     function showWards() { document.getElementById('wardList').classList.remove('hidden'); renderWards(wards); }
-    function renderWards(items) { document.getElementById('wardList').innerHTML = items.map(w => `<div class="p-4 hover:bg-emerald-50 cursor-pointer border-b font-black text-gray-700" onclick="selectWard('${w}')">${w}</div>`).join(''); }
+    function renderWards(items) { document.getElementById('wardList').innerHTML = items.map(w => `<div class="p-4 hover:bg-emerald-50 cursor-pointer border-b font-black text-gray-700 text-center" onclick="selectWard('${w}')">${w}</div>`).join(''); }
     function filterWards() { const val = document.getElementById('wardInput').value.toLowerCase(); renderWards(wards.filter(w => w.toLowerCase().includes(val))); }
     function selectWard(w) { document.getElementById('wardInput').value = w; document.getElementById('wardList').classList.add('hidden'); }
     
@@ -228,15 +219,15 @@
       const vitHint = document.getElementById('vit-hint');
       currentVitType = type;
       
-      document.getElementById('btn-cernevit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-white text-gray-400";
-      document.getElementById('btn-soluvit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-white text-gray-400";
+      document.getElementById('btn-cernevit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-white";
+      document.getElementById('btn-soluvit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-white";
 
       if (type === 'cernevit') {
-        document.getElementById('btn-cernevit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-emerald-600 text-white shadow-md";
+        document.getElementById('btn-cernevit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-emerald-600 text-white";
         vitVol.value = 5; vitHint.innerHTML = "⚠️ MAX CERNEVIT = 5 ML";
         vitalipid.value = 0; vitalipid.readOnly = true; vitalipid.classList.add('opacity-30', 'bg-gray-200');
       } else {
-        document.getElementById('btn-soluvit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-yellow-400 text-black shadow-md";
+        document.getElementById('btn-soluvit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-yellow-400 text-black";
         vitVol.value = 10; vitHint.innerHTML = "⚠️ MAX SOLUVIT-N = 10 ML";
         vitalipid.value = 10; vitalipid.readOnly = false; vitalipid.classList.remove('opacity-30', 'bg-gray-200');
       }
@@ -251,46 +242,35 @@
     }
 
     function updateProductDetails() {
-      const select = document.getElementById('productSelect');
-      const option = select.options[select.selectedIndex];
-      document.getElementById('prodVol').textContent = option.getAttribute('data-vol') || 0;
-      document.getElementById('prodKcal').textContent = option.getAttribute('data-kcal') || 0;
+      const s = document.getElementById('productSelect');
+      const o = s.options[s.selectedIndex];
+      document.getElementById('prodVol').textContent = o.getAttribute('data-vol') || 0;
+      document.getElementById('prodKcal').textContent = o.getAttribute('data-kcal') || 0;
       calculateAll();
     }
 
     function calculateAll() {
+      const v = (id) => parseFloat(document.getElementById(id).value) || 0;
       const prodVol = parseFloat(document.getElementById('prodVol').textContent) || 0;
-      const addamel = parseFloat(document.getElementById('addamel').value) || 0;
-      const vitVol = parseFloat(document.getElementById('vitVol').value) || 0;
-      const bco = parseFloat(document.getElementById('bco').value) || 0;
-      const vitalipid = parseFloat(document.getElementById('vitalipid').value) || 0;
+      const vitVol = v('vitVol');
       
       const vitMaxMsg = document.getElementById('vit-max-msg');
       if ((currentVitType==='cernevit' && vitVol>5) || (currentVitType==='soluvit' && vitVol>10)) vitMaxMsg.classList.remove('invisible');
       else vitMaxMsg.classList.add('invisible');
 
-      let otherTotal = 0;
-      document.querySelectorAll('.other-vol').forEach(i => otherTotal += parseFloat(i.value) || 0);
-
-      const grandTotal = prodVol + addamel + vitVol + bco + vitalipid + otherTotal;
+      const grandTotal = prodVol + v('addamel') + vitVol + v('bco') + v('vitalipid');
       document.getElementById('totalVolDisplay').textContent = grandTotal.toLocaleString();
 
-      const rateHint = document.getElementById('rateHint');
-      if (grandTotal > 0) {
-        const rate = (grandTotal / 24).toFixed(1);
-        rateHint.textContent = `✅ แนะนำ: ${rate} ml/hr (Total/24)`;
-        rateHint.style.color = "#bef264";
-      }
+      const rh = document.getElementById('rateHint');
+      if (grandTotal > 0) rh.textContent = `✅ แนะนำ: ${(grandTotal/24).toFixed(1)} ml/hr`;
     }
 
     function saveOrder() {
       const hn = document.getElementById('hn').value;
       if (!hn) { alert("⚠️ ลืมใส่ HN ค่ะ"); return; }
-      alert("✅ บันทึกสำเร็จ!");
-      // window.location.href = `print.html?hn=${hn}`;
+      alert("✅ บันทึกเรียบร้อยโดย: " + sessionStorage.getItem('tpnUser'));
     }
 
-    // เช็คค้าง Login
     window.onload = () => { if (sessionStorage.getItem('tpnUser')) showMainApp(); };
   </script>
 </body>
