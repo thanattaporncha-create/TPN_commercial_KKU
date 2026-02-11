@@ -6,75 +6,92 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700;800&display=swap" rel="stylesheet">
   <style>
-    * { font-family: 'Sarabun', sans-serif; color: #000; line-height: 1.2; font-weight: 700; }
+    /* CSS พื้นฐาน - ควบคุมให้คงที่ห้ามขยับตำแหน่ง */
+    * { font-family: 'Sarabun', sans-serif; color: #000; line-height: 1.15; font-weight: 700; }
     
     @media print {
       @page { margin: 0; size: auto; }
       body { background: #fff; margin: 0; padding: 0; }
       .no-print { display: none !important; }
       .print-area:not(.active) { display: none !important; }
+      /* เอาเส้นขอบนอกออกและขยับลง 3mm ตามสั่ง */
       .sticker { 
         box-shadow: none !important; 
         border: none !important; 
         margin: 3mm auto 0 auto !important; 
         page-break-after: always; 
+        overflow: hidden; 
       }
     }
 
+    /* ตั้งค่าให้ Preview แก้ไขได้ทุกจุด */
     [contenteditable="true"]:hover { background: #fff9c4; outline: 1px dashed #ccc; cursor: text; }
 
-    /* ฉลาก PN Big Label */
+    /* ฉลาก PN Big Label - ขยายข้าง 7% */
     .sticker-pn { 
       width: 9.1cm; 
       height: 12.9cm; 
-      padding: 1.45cm 0.2cm 0.4cm 0.2cm; 
+      padding: 1.45cm 0.3cm 0.3cm 0.3cm; 
       box-sizing: border-box; 
       background: white; 
-      position: relative;
       display: flex; 
-      flex-direction: column; 
+      flex-direction: column;
+      justify-content: flex-start;
     }
 
-    /* ฉลากหน้าถุง */
+    /* ฉลากหน้าถุง - ขยายข้าง 7% */
     .sticker-bag { 
       width: 3.75in; 
       height: 2.48in; 
-      padding: 1.1cm 0.2in 0.1in 0.2in; 
+      padding: 1.1cm 0.25in 0.1in 0.25in; 
       box-sizing: border-box; 
       background: white; 
     }
 
-    .pn-table { width: 100%; font-size: 15px; border-collapse: collapse; border: 2px solid #000; flex-grow: 1; }
-    .pn-table td { border: 1px solid #000; padding: 4px 8px; vertical-align: middle; } 
-    .pn-table th { border: 2px solid #000; padding: 5px; font-size: 14px; font-weight: 800; background: #eee; }
+    /* ตาราง - หัวตารางเปลี่ยนเป็น "ปริมาตร" */
+    .pn-table { width: 100%; font-size: 14.5px; border-collapse: collapse; border: 2px solid #000; margin-bottom: 2px; }
+    .pn-table td { border: 1px solid #000; padding: 3px 6px; vertical-align: middle; } 
+    .pn-table th { border: 2px solid #000; padding: 4px; font-size: 13.5px; font-weight: 800; background: #eee; }
 
-    .header-info { font-size: 16px; font-weight: 800; border-bottom: 2.5px solid #000; margin-bottom: 5px; padding-bottom: 2px; }
-    .footer-container { display: flex; justify-content: space-between; align-items: flex-end; width: 100%; margin-top: 8px; border-top: 2px solid #000; padding-top: 8px; }
-    .rate-box { border: 2.5px solid #000; padding: 2px 8px; font-size: 16px; font-weight: 900; }
-    .exp-text { font-size: 11.5px; text-align: right; font-weight: 800; }
+    .header-info { font-size: 15.5px; font-weight: 800; border-bottom: 2.5px solid #000; margin-bottom: 4px; padding-bottom: 2px; }
+    
+    .footer-container { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: flex-end; 
+      width: 100%; 
+      margin-top: auto; 
+      border-top: 2px solid #000; 
+      padding-top: 5px; 
+    }
+    
+    /* Rate ขนาดพอดีบรรทัดเดียว */
+    .rate-box { border: 2.5px solid #000; padding: 2px 8px; font-size: 16px; font-weight: 900; background: #fff; }
+    .exp-text { font-size: 11px; text-align: right; font-weight: 800; line-height: 1.1; }
+    .prep-text { font-size: 13px; font-weight: 800; }
   </style>
 </head>
-<body class="bg-slate-100 min-h-screen">
+<body class="bg-slate-50 min-h-screen">
 
   <div class="max-w-xl mx-auto py-8 px-4 no-print text-center">
-    <h1 class="text-2xl font-black text-emerald-900 mb-6">🖨️ เลือกฉลากที่ต้องการพิมพ์</h1>
+    <h1 class="text-2xl font-black text-emerald-900 mb-6 uppercase tracking-tighter">เลือกฉลากเพื่อสั่งพิมพ์</h1>
     
     <div class="grid grid-cols-2 gap-4 mb-8">
       <div id="card-pn" onclick="selectSection('pn')" class="bg-white p-6 rounded-3xl border-4 border-emerald-100 cursor-pointer transition-all hover:scale-105 shadow-sm">
         <div class="text-3xl mb-2">📄</div>
-        <h3 class="font-black text-lg">TPN LABEL</h3>
-        <p class="text-xs text-gray-400 mt-1 uppercase font-bold">ฉลากใหญ่ / รายการสารอาหาร</p>
+        <h3 class="font-black text-lg text-emerald-900">TPN COMMERCIAL</h3>
+        <p class="text-xs text-gray-400 mt-1 uppercase font-bold">ฉลากใหญ่ / บันทึกข้อมูล</p>
       </div>
       <div id="card-bag" onclick="selectSection('bag')" class="bg-white p-6 rounded-3xl border-4 border-emerald-100 cursor-pointer transition-all hover:scale-105 shadow-sm">
         <div class="text-3xl mb-2">🏷️</div>
-        <h3 class="font-black text-lg">หน้าถุง</h3>
+        <h3 class="font-black text-lg text-emerald-900">ฉลากหน้าถุง</h3>
         <p class="text-xs text-gray-400 mt-1 uppercase font-bold">ฉลากเล็ก / ชื่อคนไข้</p>
       </div>
     </div>
 
     <div id="action-btns" class="hidden">
-      <button onclick="window.print()" class="bg-emerald-600 text-white py-5 px-14 rounded-3xl font-black text-2xl shadow-xl hover:bg-emerald-700 transition-all transform active:scale-95">🖨️ สั่งพิมพ์ฉลาก</button>
-      <p class="text-xs text-gray-400 mt-4 italic font-medium">* คุณสามารถคลิกแก้ไขข้อความบนฉลากได้โดยตรง</p>
+      <button onclick="window.print()" class="bg-slate-900 text-white py-5 px-14 rounded-3xl font-black text-2xl shadow-xl hover:bg-black transition-all transform active:scale-95">🖨️ สั่งพิมพ์ฉลาก</button>
+      <p class="text-xs text-gray-400 mt-4 italic font-medium">* ข้อมูลทุกจุดสามารถคลิกเพื่อแก้ไขได้ก่อนสั่งพิมพ์</p>
     </div>
   </div>
 
@@ -92,8 +109,10 @@
       document.querySelectorAll('.print-area').forEach(el => el.classList.remove('active'));
       document.getElementById(`${type}-area`).classList.add('active');
       
-      document.querySelectorAll('.bg-white').forEach(el => el.classList.replace('border-emerald-500', 'border-emerald-100'));
-      document.getElementById(`card-${type}`).classList.replace('border-emerald-100', 'border-emerald-500');
+      document.querySelectorAll('.bg-white').forEach(el => {
+          el.style.borderColor = '#ecfdf5'; 
+      });
+      document.getElementById(`card-${type}`).style.borderColor = '#10b981'; 
       
       document.getElementById('action-btns').classList.remove('hidden');
     }
@@ -105,23 +124,28 @@
       return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear() + 543}`;
     }
 
+    // ฟังก์ชันตรวจสอบค่า 0 และ Mapping ชื่อสารอาหาร
     function createRow(label, value) {
       const val = parseFloat(value);
       if (!value || isNaN(val) || val === 0) return '';
-      // Mapping ชื่อวิตามินและ B-Complex
+      
       let displayLabel = label;
-      if (label.includes('Vitamins (soluvit)')) displayLabel = '3. Soluvit-N';
-      if (label.includes('Vitamins (cernevit)')) displayLabel = '3. Cernevit';
-      if (label.includes('B-Complex (B-CO)')) displayLabel = '4. B-Complex';
+      if (label.includes('soluvit')) displayLabel = '3. Soluvit-N';
+      else if (label.includes('cernevit')) displayLabel = '3. Cernevit';
+      else if (label.includes('bco')) displayLabel = '4. B-Complex';
 
       return `<tr><td>${displayLabel}</td><td class="text-right">${value}</td></tr>`;
     }
 
+    // ฟังก์ชันแยกบรรทัดชื่อผลิตภัณฑ์ไม่ให้เลข 1 ตกบรรทัด
     function splitProductName(name) {
-      // แยกชื่อโปรดักซ์ออกจากสเปก (ใช้ " ml / " เป็นจุดตัด)
       if (name.includes(' ml / ')) {
-        const parts = name.split(/(?= \d)/); // แยกก่อนถึงตัวเลขตัวแรก
-        return `<div class="leading-tight">${parts[0]}</div><div class="text-[12px] font-medium leading-none mt-0.5">${parts.slice(1).join('')}</div>`;
+        const match = name.match(/(\d{1,3}(,\d{3})* ml \/ \d+ kcal)/);
+        if (match) {
+          const spec = match[0];
+          const productName = name.replace(spec, '').trim();
+          return `<div class="leading-tight">${productName}</div><div class="text-[11.5px] font-medium leading-none mt-0.5">${spec}</div>`;
+        }
       }
       return name;
     }
@@ -129,6 +153,7 @@
     function renderLabels(o) {
       const expDate = new Date(o.orderDate);
       expDate.setDate(expDate.getDate() + 1);
+      // เปลี่ยน Route เป็น C-line / P-line
       const routeDisplay = o.route.includes('Central') ? 'C-line' : 'P-line';
 
       const qty = parseInt(o.quantity) || 1;
@@ -138,9 +163,9 @@
           <div class="sticker sticker-pn">
             <div class="header-info flex justify-between" contenteditable="true">
               <span>HN: ${o.hn} - ${o.patientName}</span>
-              <span>ถุงที่: ${i}/${qty}</span>
+              <span>${i}/${qty}</span>
             </div>
-            <div class="flex justify-between text-[15px] font-bold mb-2" contenteditable="true">
+            <div class="flex justify-between text-[14.5px] font-bold mb-1.5" contenteditable="true">
               <span>Ward: ${o.ward}</span>
               <span>Route: ${routeDisplay}</span>
             </div>
@@ -151,13 +176,13 @@
               <tbody contenteditable="true">
                 <tr><td>1. ${splitProductName(o.productName)}</td><td class="text-right">${o.productVol}</td></tr>
                 ${createRow('2. Addamel-N', o.addamel)}
-                ${createRow(`Vitamins (${o.vitType})`, o.vitVol)}
-                ${createRow('B-Complex (B-CO)', o.bco)}
+                ${createRow(o.vitType === 'soluvit' ? 'soluvit' : 'cernevit', o.vitVol)}
+                ${createRow('bco', o.bco)}
                 ${createRow('5. Vitalipid Adult', o.vitalipid)}
-                ${createRow(`6. ${o.other1Name}`, o.other1Vol)}
-                ${createRow(`7. ${o.other2Name}`, o.other2Vol)}
-                ${createRow(`8. ${o.other3Name}`, o.other3Vol)}
-                ${createRow(`9. ${o.other4Name}`, o.other4Vol)}
+                ${createRow(`${o.other1Name}`, o.other1Vol)}
+                ${createRow(`${o.other2Name}`, o.other2Vol)}
+                ${createRow(`${o.other3Name}`, o.other3Vol)}
+                ${createRow(`${o.other4Name}`, o.other4Vol)}
                 <tr style="background:#eee; font-weight:800;">
                   <td class="text-right">Total Volume</td>
                   <td class="text-right">${o.totalVol}</td>
@@ -166,8 +191,8 @@
             </table>
             <div class="footer-container" contenteditable="true">
               <div class="text-[14px] font-bold">
-                <div>Energy: ${o.productKcal} kcal</div>
-                <div>เตรียมวันที่ ${formatThaiDate(o.orderDate)}</div>
+                <div class="text-xs text-gray-500 mb-1">Energy: ${o.productKcal} kcal</div>
+                <div class="prep-text">เตรียมวันที่ ${formatThaiDate(o.orderDate)}</div>
               </div>
               <div class="text-right flex flex-col items-end">
                 <div class="rate-box inline-block mb-1">Rate: ${o.rate} ml/hr</div>
@@ -186,7 +211,7 @@
             <span style="font-size: 26px; font-weight: 900; display: block; line-height: 1.1;">${o.patientName}</span>
           </div>
           <div style="font-size: 22px; font-weight: 800; margin-bottom: 4px;">HN: ${o.hn}</div>
-          <div style="font-size: 16px; font-weight: 700;">วันที่เตรียม: ${formatThaiDate(o.orderDate)}</div>
+          <div style="font-size: 16px; font-weight: 700;">เตรียมวันที่: ${formatThaiDate(o.orderDate)}</div>
           <div style="font-size: 15px; font-weight: 800; color: #000; margin-top: 6px;">(เก็บในตู้เย็น 2-8° C)</div>
         </div>
       `;
