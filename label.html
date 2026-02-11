@@ -6,7 +6,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700;800&display=swap" rel="stylesheet">
   <style>
-    /* CSS พื้นฐาน - ควบคุมให้คงที่ห้ามขยับตำแหน่ง */
     * { font-family: 'Sarabun', sans-serif; color: #000; line-height: 1.15; font-weight: 700; }
     
     @media print {
@@ -14,7 +13,6 @@
       body { background: #fff; margin: 0; padding: 0; }
       .no-print { display: none !important; }
       .print-area:not(.active) { display: none !important; }
-      /* เอาเส้นขอบนอกออกและขยับลง 3mm ตามสั่ง */
       .sticker { 
         box-shadow: none !important; 
         border: none !important; 
@@ -24,14 +22,13 @@
       }
     }
 
-    /* ตั้งค่าให้ Preview แก้ไขได้ทุกจุด */
     [contenteditable="true"]:hover { background: #fff9c4; outline: 1px dashed #ccc; cursor: text; }
 
-    /* ฉลาก PN Big Label - ขยายข้าง 7% */
+    /* ฉลาก PN Big Label */
     .sticker-pn { 
       width: 9.1cm; 
       height: 12.9cm; 
-      padding: 1.45cm 0.3cm 0.3cm 0.3cm; 
+      padding: 1.45cm 0.3cm 0.8cm 0.3cm; /* เพิ่ม Padding bottom เป็น 0.8cm (ยกขึ้น 5mm จากเดิม) */
       box-sizing: border-box; 
       background: white; 
       display: flex; 
@@ -39,7 +36,7 @@
       justify-content: flex-start;
     }
 
-    /* ฉลากหน้าถุง - ขยายข้าง 7% */
+    /* ฉลากหน้าถุง */
     .sticker-bag { 
       width: 3.75in; 
       height: 2.48in; 
@@ -48,7 +45,6 @@
       background: white; 
     }
 
-    /* ตาราง - หัวตารางเปลี่ยนเป็น "ปริมาตร" */
     .pn-table { width: 100%; font-size: 14.5px; border-collapse: collapse; border: 2px solid #000; margin-bottom: 2px; }
     .pn-table td { border: 1px solid #000; padding: 3px 6px; vertical-align: middle; } 
     .pn-table th { border: 2px solid #000; padding: 4px; font-size: 13.5px; font-weight: 800; background: #eee; }
@@ -63,9 +59,9 @@
       margin-top: auto; 
       border-top: 2px solid #000; 
       padding-top: 5px; 
+      margin-bottom: 5px; /* ดัน Footer ขึ้นจากขอบล่างของกล่อง Padding */
     }
     
-    /* Rate ขนาดพอดีบรรทัดเดียว */
     .rate-box { border: 2.5px solid #000; padding: 2px 8px; font-size: 16px; font-weight: 900; background: #fff; }
     .exp-text { font-size: 11px; text-align: right; font-weight: 800; line-height: 1.1; }
     .prep-text { font-size: 13px; font-weight: 800; }
@@ -91,7 +87,6 @@
 
     <div id="action-btns" class="hidden">
       <button onclick="window.print()" class="bg-slate-900 text-white py-5 px-14 rounded-3xl font-black text-2xl shadow-xl hover:bg-black transition-all transform active:scale-95">🖨️ สั่งพิมพ์ฉลาก</button>
-      <p class="text-xs text-gray-400 mt-4 italic font-medium">* ข้อมูลทุกจุดสามารถคลิกเพื่อแก้ไขได้ก่อนสั่งพิมพ์</p>
     </div>
   </div>
 
@@ -108,12 +103,8 @@
     function selectSection(type) {
       document.querySelectorAll('.print-area').forEach(el => el.classList.remove('active'));
       document.getElementById(`${type}-area`).classList.add('active');
-      
-      document.querySelectorAll('.bg-white').forEach(el => {
-          el.style.borderColor = '#ecfdf5'; 
-      });
+      document.querySelectorAll('.bg-white').forEach(el => { el.style.borderColor = '#ecfdf5'; });
       document.getElementById(`card-${type}`).style.borderColor = '#10b981'; 
-      
       document.getElementById('action-btns').classList.remove('hidden');
     }
 
@@ -124,40 +115,32 @@
       return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear() + 543}`;
     }
 
-    // ฟังก์ชันตรวจสอบค่า 0 และ Mapping ชื่อสารอาหาร
     function createRow(label, value) {
       const val = parseFloat(value);
       if (!value || isNaN(val) || val === 0) return '';
-      
       let displayLabel = label;
       if (label.includes('soluvit')) displayLabel = '3. Soluvit-N';
       else if (label.includes('cernevit')) displayLabel = '3. Cernevit';
       else if (label.includes('bco')) displayLabel = '4. B-Complex';
-
       return `<tr><td>${displayLabel}</td><td class="text-right">${value}</td></tr>`;
     }
 
-    // ฟังก์ชันแยกบรรทัดชื่อผลิตภัณฑ์ไม่ให้เลข 1 ตกบรรทัด
+    // แก้ไขให้ SMOF อยู่บรรทัดเดียวกับลำดับที่ 1
     function splitProductName(name) {
-  // ตรวจสอบรูปแบบปริมาตรและแคลอรี่ (เช่น 1,477 ml / 1600 kcal)
-  const match = name.match(/(\d{1,3}(,\d{3})* ml \/ \d+ kcal)/);
-  
-  if (match) {
-    const spec = match[0];
-    // ดึงส่วนชื่อสินค้าออกมาโดยตัดส่วน spec ออก
-    const productName = name.replace(spec, '').trim();
-    
-    // ใช้ <span> เพื่อให้อยู่บรรทัดเดียวกัน และใช้ <br> เพื่อคุมจังหวะการขึ้นบรรทัดใหม่ของ spec
-    return `<span class="inline-block">${productName}</span>
-            <br>
-            <span class="text-[11.5px] font-medium leading-none opacity-80">${spec}</span>`;
-  }
-  return name;
-}
+      if (name.includes(' ml / ')) {
+        const match = name.match(/(\d{1,3}(,\d{3})* ml \/ \d+ kcal)/);
+        if (match) {
+          const spec = match[0];
+          const productName = name.replace(spec, '').trim();
+          return `<span>${productName}</span><br><span style="font-size: 11px; font-weight: 500; opacity: 0.9;">${spec}</span>`;
+        }
+      }
+      return `<span>${name}</span>`;
+    }
+
     function renderLabels(o) {
       const expDate = new Date(o.orderDate);
       expDate.setDate(expDate.getDate() + 1);
-      // เปลี่ยน Route เป็น C-line / P-line
       const routeDisplay = o.route.includes('Central') ? 'C-line' : 'P-line';
 
       const qty = parseInt(o.quantity) || 1;
