@@ -238,7 +238,11 @@
       display.textContent = newValue;
     }
 
-    const wards = ["2ค", "2ง", "3ก", "3ค", "3ง", "3ฉ", "4ก", "4ค", "5ข", "6ก", "6ข", "AE1", "AE2", "AE3", "CCU", "CVT-ICU", "HOME PN", "IMC2ง", "IMC3ข", "IMC4ข", "MICU 1", "MICU 2", "NICU", "PICU", "SCTU", "SICU 1", "SICU 2", "สว.1/11", "สว.1/9A"];
+    const wards = [""2ค", "2ง", "3ก", "3ค", "3ง", "3ฉ", "4ก", "4ค", "5ข", "6ก", "6ข", 
+  "AE1", "AE2", "AE3", "CCU", "CVT-ICU", "HOME PN", "IMC2ง", "IMC3ข", "IMC4ข", 
+  "MICU 1", "MICU 2", "NICU", "PICU", "PICU ศสก.", "SCTU", "SICU 1", "SICU 2", 
+  "กว.6/1", "กว.6/2", "กว.7/1", "กว.7/2", "สว.1/11", "สว.1/12", "สว.1/13", 
+  "สว.1/14", "สว.1/15", "สว.1/8B", "สว.1/8C", "สว.1/9A", "สว.1/9B", "สว.1/9C"];
     function showWards() { document.getElementById('wardList').classList.remove('hidden'); renderWards(wards); }
     function renderWards(items) { document.getElementById('wardList').innerHTML = items.map(w => `<div class="p-4 hover:bg-emerald-50 cursor-pointer border-b font-black text-gray-700 text-center" onclick="selectWard('${w}')">${w}</div>`).join(''); }
     function filterWards() { const val = document.getElementById('wardInput').value.toLowerCase(); renderWards(wards.filter(w => w.toLowerCase().includes(val))); }
