@@ -139,17 +139,21 @@
 
     // ฟังก์ชันแยกบรรทัดชื่อผลิตภัณฑ์ไม่ให้เลข 1 ตกบรรทัด
     function splitProductName(name) {
-      if (name.includes(' ml / ')) {
-        const match = name.match(/(\d{1,3}(,\d{3})* ml \/ \d+ kcal)/);
-        if (match) {
-          const spec = match[0];
-          const productName = name.replace(spec, '').trim();
-          return `<div class="leading-tight">${productName}</div><div class="text-[11.5px] font-medium leading-none mt-0.5">${spec}</div>`;
-        }
-      }
-      return name;
-    }
-
+  // ตรวจสอบรูปแบบปริมาตรและแคลอรี่ (เช่น 1,477 ml / 1600 kcal)
+  const match = name.match(/(\d{1,3}(,\d{3})* ml \/ \d+ kcal)/);
+  
+  if (match) {
+    const spec = match[0];
+    // ดึงส่วนชื่อสินค้าออกมาโดยตัดส่วน spec ออก
+    const productName = name.replace(spec, '').trim();
+    
+    // ใช้ <span> เพื่อให้อยู่บรรทัดเดียวกัน และใช้ <br> เพื่อคุมจังหวะการขึ้นบรรทัดใหม่ของ spec
+    return `<span class="inline-block">${productName}</span>
+            <br>
+            <span class="text-[11.5px] font-medium leading-none opacity-80">${spec}</span>`;
+  }
+  return name;
+}
     function renderLabels(o) {
       const expDate = new Date(o.orderDate);
       expDate.setDate(expDate.getDate() + 1);
