@@ -6,7 +6,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700;800&display=swap" rel="stylesheet">
   <style>
-    /* ล็อคระยะขอบและสัดส่วนเดิมไว้ 100% */
     * { font-family: 'Sarabun', sans-serif; color: #000; line-height: 1.15; font-weight: 700; }
     
     @media print {
@@ -25,14 +24,16 @@
 
     [contenteditable="true"]:hover { background: #fff9c4; outline: 1px dashed #ccc; cursor: text; }
 
-    /* ฉลาก PN Big Label - ล็อคขนาดให้เป๊ะ */
+    /* ฉลาก PN Big Label - ปรับเป็น Flex เพื่อให้เนื้อหาไหลตามกันแต่ไม่ทับกัน */
     .sticker-pn { 
       width: 9.1cm; 
       height: 12.9cm; 
       padding: 1.45cm 0.3cm 0.5cm 0.3cm; 
       box-sizing: border-box; 
       background: white; 
-      position: relative; /* ใช้เป็นจุดอ้างอิงให้ Footer */
+      display: flex; 
+      flex-direction: column;
+      position: relative;
     }
 
     .sticker-bag { 
@@ -43,24 +44,22 @@
       background: white; 
     }
 
-    /* ตาราง - บังคับไม่ให้ดัน Footer */
-    .pn-table { width: 100%; font-size: 16px; border-collapse: collapse; border: 2px solid #000; }
-    .pn-table td { border: 1px solid #000; padding: 4px 6px; vertical-align: middle; } 
-    .pn-table th { border: 2px solid #000; padding: 5px; font-size: 15px; font-weight: 800; background: #eee; }
+    /* ตารางแบบยืดหยุ่น */
+    .pn-table { width: 100%; font-size: 15px; border-collapse: collapse; border: 2px solid #000; }
+    .pn-table td { border: 1px solid #000; padding: 2.5px 6px; vertical-align: middle; } 
+    .pn-table th { border: 2px solid #000; padding: 4px; font-size: 14px; font-weight: 800; background: #eee; }
 
     .header-info { font-size: 15.5px; font-weight: 800; border-bottom: 2.5px solid #000; margin-bottom: 4px; padding-bottom: 2px; }
     
-    /* Footer - ล็อคตำแหน่งไว้ที่ 1.5cm จากขอบล่างเสมอ เพื่อไม่ให้ตกหน้า */
+    /* Footer - ปรับให้ไหลต่อจากตาราง (ไม่ใช้ Absolute แล้วเพื่อแก้ปัญหาซ้อนทับ) */
     .footer-container { 
-      position: absolute;
-      bottom: 1.5cm; /* ยกขึ้นจากขอบล่างตามสั่ง */
-      left: 0.3cm;
-      right: 0.3cm;
       display: grid; 
       grid-template-columns: 1fr 1fr; 
       align-items: start; 
+      width: 100%; 
+      margin-top: auto; /* ดันลงล่างสุดเท่าที่พื้นที่แผ่นจะอำนวย */
       border-top: 2px solid #000; 
-      padding-top: 8px;
+      padding-top: 6px;
     }
     
     .rate-box { border: 2.5px solid #000; padding: 2px 8px; font-size: 18px; font-weight: 900; background: #fff; display: inline-block; }
@@ -72,22 +71,18 @@
 
   <div class="max-w-xl mx-auto py-8 px-4 no-print text-center">
     <h1 class="text-2xl font-black text-emerald-900 mb-6 uppercase tracking-tighter">เลือกฉลากเพื่อสั่งพิมพ์</h1>
-    
     <div class="grid grid-cols-2 gap-4 mb-8">
       <div id="card-pn" onclick="selectSection('pn')" class="bg-white p-6 rounded-3xl border-4 border-emerald-100 cursor-pointer transition-all hover:scale-105 shadow-sm">
         <div class="text-3xl mb-2">📄</div>
         <h3 class="font-black text-lg text-emerald-900">TPN COMMERCIAL</h3>
-        <p class="text-xs text-gray-400 mt-1 uppercase font-bold">ฉลากใหญ่ / บันทึกข้อมูล</p>
       </div>
       <div id="card-bag" onclick="selectSection('bag')" class="bg-white p-6 rounded-3xl border-4 border-emerald-100 cursor-pointer transition-all hover:scale-105 shadow-sm">
         <div class="text-3xl mb-2">🏷️</div>
         <h3 class="font-black text-lg text-emerald-900">ฉลากหน้าถุง</h3>
-        <p class="text-xs text-gray-400 mt-1 uppercase font-bold">ฉลากเล็ก / ชื่อคนไข้</p>
       </div>
     </div>
-
     <div id="action-btns" class="hidden">
-      <button onclick="window.print()" class="bg-slate-900 text-white py-5 px-14 rounded-3xl font-black text-2xl shadow-xl hover:bg-black transition-all transform active:scale-95">🖨️ สั่งพิมพ์ฉลาก</button>
+      <button onclick="window.print()" class="bg-slate-900 text-white py-5 px-14 rounded-3xl font-black text-2xl shadow-xl">🖨️ สั่งพิมพ์ฉลาก</button>
     </div>
   </div>
 
@@ -95,6 +90,8 @@
   <div id="bag-area" class="print-area"></div>
 
   <script>
+    let currentRowNum = 1;
+
     document.addEventListener('DOMContentLoaded', () => {
       const params = new URLSearchParams(window.location.search);
       const data = Object.fromEntries(params.entries());
@@ -116,15 +113,20 @@
       return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear() + 543}`;
     }
 
-    function createRow(label, value) {
+    // ฟังก์ชันรันลำดับเลขอัตโนมัติ
+    function createAutoRow(label, value) {
       const val = parseFloat(value);
       if (!value || isNaN(val) || val === 0) return '';
+      
       let displayLabel = label;
-      if (label.includes('soluvit')) displayLabel = '3. Soluvit-N';
-      else if (label.includes('cernevit')) displayLabel = '3. ◆ Cernevit ◆';
-      else if (label.includes('bco')) displayLabel = '4. B-Complex';
-      else if (label.includes('Vitalipid')) displayLabel = '5. Vitalipid-N Adult';
-      return `<tr><td>${displayLabel}</td><td class="text-right">${value}</td></tr>`;
+      if (label.includes('soluvit')) displayLabel = 'Soluvit-N';
+      else if (label.includes('cernevit')) displayLabel = '◆ Cernevit ◆';
+      else if (label.includes('bco')) displayLabel = 'B-Complex';
+      else if (label.includes('Vitalipid')) displayLabel = 'Vitalipid-N Adult';
+
+      const row = `<tr><td>${currentRowNum}. ${displayLabel}</td><td class="text-right">${value}</td></tr>`;
+      currentRowNum++;
+      return row;
     }
 
     function splitProductName(name) {
@@ -133,7 +135,7 @@
         if (match) {
           const spec = match[0];
           const productName = name.replace(spec, '').trim();
-          return `<span>${productName}</span><br><span style="font-size: 12px; font-weight: 800; color: #000;">${spec}</span>`;
+          return `<span>${productName}</span><br><span style="font-size: 11.5px; font-weight: 800;">${spec}</span>`;
         }
       }
       return `<span>${name}</span>`;
@@ -143,10 +145,11 @@
       const expDate = new Date(o.orderDate);
       expDate.setDate(expDate.getDate() + 1);
       const routeDisplay = o.route.includes('Central') ? 'C-line' : 'P-line';
-
       const qty = parseInt(o.quantity) || 1;
       let pnHTML = '';
+
       for (let i = 1; i <= qty; i++) {
+        currentRowNum = 1; // Reset เลขแถวใหม่ทุกถุง
         pnHTML += `
           <div class="sticker sticker-pn">
             <div class="header-info flex justify-between" contenteditable="true">
@@ -163,14 +166,15 @@
               </thead>
               <tbody contenteditable="true">
                 <tr><td>1. ${splitProductName(o.productName)}</td><td class="text-right">${o.productVol}</td></tr>
-                ${createRow('2. Addamel-N', o.addamel)}
-                ${createRow(o.vitType === 'soluvit' ? 'soluvit' : 'cernevit', o.vitVol)}
-                ${createRow('bco', o.bco)}
-                ${createRow('Vitalipid Adult', o.vitalipid)}
-                ${createRow(`${o.other1Name}`, o.other1Vol)}
-                ${createRow(`${o.other2Name}`, o.other2Vol)}
-                ${createRow(`${o.other3Name}`, o.other3Vol)}
-                ${createRow(`${o.other4Name}`, o.other4Vol)}
+                ${(() => { currentRowNum = 2; return ''; })()}
+                ${createAutoRow('Addamel-N', o.addamel)}
+                ${createAutoRow(o.vitType === 'soluvit' ? 'soluvit' : 'cernevit', o.vitVol)}
+                ${createAutoRow('bco', o.bco)}
+                ${createAutoRow('Vitalipid Adult', o.vitalipid)}
+                ${createAutoRow(`${o.other1Name}`, o.other1Vol)}
+                ${createAutoRow(`${o.other2Name}`, o.other2Vol)}
+                ${createAutoRow(`${o.other3Name}`, o.other3Vol)}
+                ${createAutoRow(`${o.other4Name}`, o.other4Vol)}
                 <tr style="background:#eee; font-weight:800;">
                   <td class="text-right">Total Volume (ml)</td>
                   <td class="text-right">${o.totalVol}</td>
