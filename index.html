@@ -103,7 +103,7 @@
         </section>
 
         <section class="bg-white p-6 rounded-2xl card-shadow space-y-4 border-t-8 border-emerald-600">
-          <h2 class="section-title" style="color:#065f46 text-center text-emerald-800">📦 เลือกผลิตภัณฑ์และจำนวน</h2>
+          <h2 class="section-title" style="color:#065f46; text-center; text-emerald-800">📦 เลือกผลิตภัณฑ์และจำนวน</h2>
           <select id="productSelect" class="w-full p-4 border-2 border-emerald-100 rounded-xl bg-emerald-50 text-xl font-black text-emerald-900 outline-none text-center" onchange="updateProductDetails()">
             <option value="">-- คลิกเลือกสารอาหาร --</option>
             <option value="smof_c_1477" data-vol="1477" data-kcal="1600">SMOF kabiven (C-line) 1,477 ml / 1600 kcal</option>
@@ -140,7 +140,6 @@
 
         <section class="bg-white p-8 rounded-2xl card-shadow space-y-6">
           <h2 class="section-title">🧪 ADDITIVES</h2>
-          
           <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-center">
             <div class="space-y-2">
               <label class="block text-xl font-black text-gray-800 uppercase">Addamel-N (ml)</label>
@@ -238,11 +237,13 @@
       display.textContent = newValue;
     }
 
+    // แก้ไข Syntax ตรงนี้เรียบร้อยแล้วค่ะ
     const wards = ["2ค", "2ง", "3ก", "3ค", "3ง", "3ฉ", "4ก", "4ค", "5ข", "6ก", "6ข", 
-  "AE1", "AE2", "AE3", "CCU", "CVT-ICU", "HOME PN", "IMC2ง", "IMC3ข", "IMC4ข", 
-  "MICU 1", "MICU 2", "NICU", "PICU", "PICU ศสก.", "SCTU", "SICU 1", "SICU 2", 
-  "กว.6/1", "กว.6/2", "กว.7/1", "กว.7/2", "สว.1/11", "สว.1/12", "สว.1/13", 
-  "สว.1/14", "สว.1/15", "สว.1/8B", "สว.1/8C", "สว.1/9A", "สว.1/9B", "สว.1/9C"];
+      "AE1", "AE2", "AE3", "CCU", "CVT-ICU", "HOME PN", "IMC2ง", "IMC3ข", "IMC4ข", 
+      "MICU 1", "MICU 2", "NICU", "PICU", "PICU ศสก.", "SCTU", "SICU 1", "SICU 2", 
+      "กว.6/1", "กว.6/2", "กว.7/1", "กว.7/2", "สว.1/11", "สว.1/12", "สว.1/13", 
+      "สว.1/14", "สว.1/15", "สว.1/8B", "สว.1/8C", "สว.1/9A", "สว.1/9B", "สว.1/9C"];
+
     function showWards() { document.getElementById('wardList').classList.remove('hidden'); renderWards(wards); }
     function renderWards(items) { document.getElementById('wardList').innerHTML = items.map(w => `<div class="p-4 hover:bg-emerald-50 cursor-pointer border-b font-black text-gray-700 text-center" onclick="selectWard('${w}')">${w}</div>`).join(''); }
     function filterWards() { const val = document.getElementById('wardInput').value.toLowerCase(); renderWards(wards.filter(w => w.toLowerCase().includes(val))); }
@@ -311,7 +312,6 @@
       const v = (id) => document.getElementById(id).value;
       const t = (id) => document.getElementById(id).textContent;
       
-      // รวบรวมข้อมูลทั้งหมด
       const formData = new URLSearchParams();
       formData.append("action", "saveOrder");
       formData.append("orderDate", v('orderDate'));
@@ -342,21 +342,20 @@
       formData.append("recordedBy", sessionStorage.getItem('tpnUser'));
 
       saveBtn.disabled = true;
-      saveBtn.innerHTML = "⏳ กำลังบันทึกและตัดสต็อก...";
+      saveBtn.innerHTML = "⏳ กำลังบันทึก...";
 
       try {
         await fetch(SCRIPT_URL, {
           method: 'POST',
-          mode: 'no-cors', // สำคัญสำหรับ Google Apps Script
+          mode: 'no-cors', 
           body: formData
         });
         
-        // เมื่อบันทึกสำเร็จ (หรือส่งสำเร็จ) ให้เปิดหน้าฉลาก
         const params = formData.toString();
         window.open(`label.html?${params}`, '_blank');
         
         alert("✅ บันทึกข้อมูลเรียบร้อยแล้วค่ะ!");
-        location.reload(); // เคลียร์หน้าจอเพื่อรับคนใหม่
+        location.reload(); 
       } catch (e) {
         alert("❌ เกิดข้อผิดพลาด: " + e.message);
         saveBtn.disabled = false;
