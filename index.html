@@ -168,10 +168,10 @@
           <div class="space-y-4 pt-8 border-t border-emerald-50 text-left">
             <span class="text-xl font-black text-gray-800 italic block uppercase tracking-widest mb-4">Add สารอื่นๆ</span>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="other-additives">
-              <div class="flex gap-3"><input type="text" placeholder="ชื่อสาร 1" class="flex-1 p-3 border border-gray-100 rounded-xl font-bold"><input type="number" placeholder="ml" class="w-24 p-3 border border-gray-100 rounded-xl text-center font-black text-emerald-700 other-vol" oninput="calculateAll()"></div>
-              <div class="flex gap-3"><input type="text" placeholder="ชื่อสาร 2" class="flex-1 p-3 border border-gray-100 rounded-xl font-bold"><input type="number" placeholder="ml" class="w-24 p-3 border border-gray-100 rounded-xl text-center font-black text-emerald-700 other-vol" oninput="calculateAll()"></div>
-              <div class="flex gap-3"><input type="text" placeholder="ชื่อสาร 3" class="flex-1 p-3 border border-gray-100 rounded-xl font-bold"><input type="number" placeholder="ml" class="w-24 p-3 border border-gray-100 rounded-xl text-center font-black text-emerald-700 other-vol" oninput="calculateAll()"></div>
-              <div class="flex gap-3"><input type="text" placeholder="ชื่อสาร 4" class="flex-1 p-3 border border-gray-100 rounded-xl font-bold"><input type="number" placeholder="ml" class="w-24 p-3 border border-gray-100 rounded-xl text-center font-black text-emerald-700 other-vol" oninput="calculateAll()"></div>
+              <div class="flex gap-3"><input type="text" id="o1-name" placeholder="ชื่อสาร 1" class="flex-1 p-3 border border-gray-100 rounded-xl font-bold"><input type="number" id="o1-vol" placeholder="ml" class="w-24 p-3 border border-gray-100 rounded-xl text-center font-black text-emerald-700 other-vol" oninput="calculateAll()"></div>
+              <div class="flex gap-3"><input type="text" id="o2-name" placeholder="ชื่อสาร 2" class="flex-1 p-3 border border-gray-100 rounded-xl font-bold"><input type="number" id="o2-vol" placeholder="ml" class="w-24 p-3 border border-gray-100 rounded-xl text-center font-black text-emerald-700 other-vol" oninput="calculateAll()"></div>
+              <div class="flex gap-3"><input type="text" id="o3-name" placeholder="ชื่อสาร 3" class="flex-1 p-3 border border-gray-100 rounded-xl font-bold"><input type="number" id="o3-vol" placeholder="ml" class="w-24 p-3 border border-gray-100 rounded-xl text-center font-black text-emerald-700 other-vol" oninput="calculateAll()"></div>
+              <div class="flex gap-3"><input type="text" id="o4-name" placeholder="ชื่อสาร 4" class="flex-1 p-3 border border-gray-100 rounded-xl font-bold"><input type="number" id="o4-vol" placeholder="ml" class="w-24 p-3 border border-gray-100 rounded-xl text-center font-black text-emerald-700 other-vol" oninput="calculateAll()"></div>
             </div>
           </div>
         </section>
@@ -197,6 +197,8 @@
   </div>
 
   <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxbIEmqZPcm9X8Cz6Cvt1QOclqxnSN53fWxE02uXYvF-5Y8K28O5nI7XJ_BxSXxEXq3/exec";
+
     const userMap = {
       'OP': 'ภญ.อรปภา ชัยเลิศวาณิช', 'SK': 'ภญ.ศิริโชค คุณวงศ์กฤต', 'NC': 'ภญ.ณัฐวรรณ ฉ่ำมณี',
       'TT': 'ภญ.ศิริรัตน์ อิ่มเอมกมล', 'MP': 'ภญ.หนึ่งฤทัย พรหมหาราช', 'PC': 'ภญ.พิชญานิล ชาธรรมา',
@@ -248,10 +250,8 @@
       const vitalipid = document.getElementById('vitalipid');
       const vitHint = document.getElementById('vit-hint');
       currentVitType = type;
-      
       document.getElementById('btn-cernevit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-white text-gray-400";
       document.getElementById('btn-soluvit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-white text-gray-400";
-
       if (type === 'cernevit') {
         document.getElementById('btn-cernevit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-emerald-600 text-white shadow-md";
         vitVol.value = 5; vitHint.innerHTML = "⚠️ MAX CERNEVIT = 5 ML";
@@ -283,34 +283,81 @@
       const v = (id) => parseFloat(document.getElementById(id).value) || 0;
       const prodVol = parseFloat(document.getElementById('prodVol').textContent) || 0;
       const vitVol = v('vitVol');
-      
       const vitMaxMsg = document.getElementById('vit-max-msg');
       if ((currentVitType==='cernevit' && vitVol>5) || (currentVitType==='soluvit' && vitVol>10)) vitMaxMsg.classList.remove('invisible');
       else vitMaxMsg.classList.add('invisible');
-
       let otherTotal = 0;
-      document.querySelectorAll('.other-vol').forEach(input => {
-        otherTotal += parseFloat(input.value) || 0;
-      });
-
+      document.querySelectorAll('.other-vol').forEach(input => { otherTotal += parseFloat(input.value) || 0; });
       const grandTotal = prodVol + v('addamel') + vitVol + v('bco') + v('vitalipid') + otherTotal;
       document.getElementById('totalVolDisplay').textContent = grandTotal.toLocaleString();
-
       const rh = document.getElementById('rateHint');
-      if (grandTotal > 0) {
-        rh.textContent = `✅ แนะนำ: ${(grandTotal/24).toFixed(1)} ml/hr`;
-        rh.style.color = "#bef264";
-      } else {
-        rh.textContent = `👉 กรุณาเลือก Product...`;
-        rh.style.color = "#facc15";
-      }
+      if (grandTotal > 0) { rh.textContent = `✅ แนะนำ: ${(grandTotal/24).toFixed(1)} ml/hr`; rh.style.color = "#bef264"; }
+      else { rh.textContent = `👉 กรุณาเลือก Product...`; rh.style.color = "#facc15"; }
     }
 
-    function saveOrder() {
+    async function saveOrder() {
+      const saveBtn = document.getElementById('saveBtn');
       const hn = document.getElementById('hn').value;
-      const bags = document.getElementById('bagCount').value;
-      if (!hn) { alert("⚠️ ลืมใส่ HN ค่ะ"); return; }
-      alert(`✅ บันทึกเรียบร้อยโดย: ${sessionStorage.getItem('tpnUser')}\nจำนวนที่เบิก: ${bags} ถุง`);
+      const pName = document.getElementById('patientName').value;
+      if (!hn || !pName) { alert("⚠️ กรุณาระบุ HN และชื่อคนไข้ค่ะ"); return; }
+      
+      const productSelect = document.getElementById('productSelect');
+      if (productSelect.value === "") { alert("⚠️ กรุณาเลือกผลิตภัณฑ์ค่ะ"); return; }
+
+      const v = (id) => document.getElementById(id).value;
+      const t = (id) => document.getElementById(id).textContent;
+      
+      // รวบรวมข้อมูลทั้งหมด
+      const formData = new URLSearchParams();
+      formData.append("action", "saveOrder");
+      formData.append("orderDate", v('orderDate'));
+      formData.append("hn", hn);
+      formData.append("patientName", pName);
+      formData.append("ward", v('wardInput'));
+      formData.append("route", document.querySelector('input[name="route"]:checked').value);
+      formData.append("bw", v('bw'));
+      formData.append("productName", productSelect.options[productSelect.selectedIndex].text);
+      formData.append("productVol", t('prodVol'));
+      formData.append("productKcal", t('prodKcal'));
+      formData.append("quantity", v('bagCount'));
+      formData.append("addamel", v('addamel'));
+      formData.append("vitType", currentVitType);
+      formData.append("vitVol", v('vitVol'));
+      formData.append("bco", v('bco'));
+      formData.append("vitalipid", v('vitalipid'));
+      formData.append("other1Name", v('o1-name'));
+      formData.append("other1Vol", v('o1-vol'));
+      formData.append("other2Name", v('o2-name'));
+      formData.append("other2Vol", v('o2-vol'));
+      formData.append("other3Name", v('o3-name'));
+      formData.append("other3Vol", v('o3-vol'));
+      formData.append("other4Name", v('o4-name'));
+      formData.append("other4Vol", v('o4-vol'));
+      formData.append("totalVol", t('totalVolDisplay'));
+      formData.append("rate", v('manualRate') || (parseFloat(t('totalVolDisplay').replace(/,/g,''))/24).toFixed(1));
+      formData.append("recordedBy", sessionStorage.getItem('tpnUser'));
+
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = "⏳ กำลังบันทึกและตัดสต็อก...";
+
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors', // สำคัญสำหรับ Google Apps Script
+          body: formData
+        });
+        
+        // เมื่อบันทึกสำเร็จ (หรือส่งสำเร็จ) ให้เปิดหน้าฉลาก
+        const params = formData.toString();
+        window.open(`label.html?${params}`, '_blank');
+        
+        alert("✅ บันทึกข้อมูลเรียบร้อยแล้วค่ะ!");
+        location.reload(); // เคลียร์หน้าจอเพื่อรับคนใหม่
+      } catch (e) {
+        alert("❌ เกิดข้อผิดพลาด: " + e.message);
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = "💾 บันทึกและพิมพ์ฉลาก";
+      }
     }
 
     window.onload = () => { if (sessionStorage.getItem('tpnUser')) showMainApp(); };
