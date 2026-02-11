@@ -24,16 +24,14 @@
 
     [contenteditable="true"]:hover { background: #fff9c4; outline: 1px dashed #ccc; cursor: text; }
 
-    /* ฉลาก PN Big Label - ยกส่วนล่างขึ้น 1cm */
+    /* ฉลาก PN Big Label - ปรับให้ยกขึ้นหนีขอบล่าง */
     .sticker-pn { 
       width: 9.1cm; 
       height: 12.9cm; 
-      padding: 1.45cm 0.3cm 1.5cm 0.3cm; /* เพิ่ม Padding bottom เป็น 1.5cm เพื่อยก Footer ขึ้น 1cm จากเดิม */
+      padding: 1.45cm 0.3cm 0.5cm 0.3cm; 
       box-sizing: border-box; 
       background: white; 
-      display: flex; 
-      flex-direction: column;
-      justify-content: flex-start;
+      display: block; /* เปลี่ยนจาก flex เป็น block เพื่อให้ข้อมูลไหลตามกัน */
     }
 
     /* ฉลากหน้าถุง */
@@ -45,22 +43,21 @@
       background: white; 
     }
 
-    .pn-table { width: 100%; font-size: 14.5px; border-collapse: collapse; border: 2px solid #000; margin-bottom: 2px; }
-    .pn-table td { border: 1px solid #000; padding: 2px 6px; vertical-align: middle; } /* ลด padding ในช่องตารางลงเพื่อประหยัดพื้นที่ */
+    .pn-table { width: 100%; font-size: 14.5px; border-collapse: collapse; border: 2px solid #000; margin-bottom: 8px; }
+    .pn-table td { border: 1px solid #000; padding: 2px 6px; vertical-align: middle; } 
     .pn-table th { border: 2px solid #000; padding: 3px; font-size: 13.5px; font-weight: 800; background: #eee; }
 
     .header-info { font-size: 15.5px; font-weight: 800; border-bottom: 2.5px solid #000; margin-bottom: 4px; padding-bottom: 2px; }
     
-    /* Footer - ยกขึ้นตั้งแต่ขีดแบ่ง */
+    /* Footer - ยกขึ้นมาต่อจากตารางทันที ไม่เว้นที่ว่างเยอะ */
     .footer-container { 
       display: flex; 
       justify-content: space-between; 
       align-items: flex-end; 
       width: 100%; 
-      margin-top: auto; 
       border-top: 2px solid #000; 
-      padding-top: 5px; 
-      margin-bottom: 0px; /* อาศัย padding-bottom ของ .sticker-pn ในการยกขึ้น */
+      padding-top: 5px;
+      margin-top: 5px;
     }
     
     .rate-box { border: 2.5px solid #000; padding: 2px 8px; font-size: 16px; font-weight: 900; background: #fff; }
