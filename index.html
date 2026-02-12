@@ -36,12 +36,14 @@
   </div>
 
   <div id="mainApp" class="max-w-4xl mx-auto hidden">
-    <nav class="flex justify-between items-center mb-4">
-        <div class="flex items-center gap-2">
-            <span class="text-xs font-bold text-gray-400 uppercase tracking-tighter">ผู้บันทึก:</span>
-            <span id="displayUserName" class="text-sm font-black text-emerald-700 px-3 py-1 bg-white border border-emerald-100 rounded-xl shadow-sm"></span>
-            <button onclick="logout()" class="text-[10px] font-black text-red-400 hover:text-red-600 uppercase ml-2 underline">Logout</button>
-        </div>
+    <div class="flex items-center gap-2">
+    <span class="text-xs font-bold text-gray-400 uppercase tracking-tighter">ผู้บันทึก:</span>
+    <span id="displayUserName" class="text-sm font-black text-emerald-700 px-3 py-1 bg-white border border-emerald-100 rounded-xl shadow-sm"></span>
+    
+    <a href="dashboard.html" class="text-[10px] font-black text-emerald-600 hover:text-emerald-800 uppercase ml-4 border border-emerald-200 px-2 py-1 rounded-lg bg-white shadow-sm">📊 Dashboard</a>
+    
+    <button onclick="logout()" class="text-[10px] font-black text-red-400 hover:text-red-600 uppercase ml-2 underline">Logout</button>
+</div>
     </nav>
 
     <div class="space-y-6">
