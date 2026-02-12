@@ -6,7 +6,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700;800&display=swap" rel="stylesheet">
   <style>
-    /* พื้นฐานคงเดิมที่คุณขิมชอบ */
     * { font-family: 'Sarabun', sans-serif; color: #000; line-height: 1.1; font-weight: 700; }
     
     @media print {
@@ -21,7 +20,6 @@
       }
     }
 
-    /* โครงสร้างหลักล็อคระยะ 12.9cm */
     .sticker-pn { 
       width: 9.1cm; height: 12.9cm; padding: 1.45cm 0.3cm 0.5cm 0.3cm; 
       box-sizing: border-box; background: white; position: relative; display: flex; flex-direction: column;
@@ -31,22 +29,21 @@
     .pn-table td { border: 1px solid #000; vertical-align: middle; word-wrap: break-word; }
     .pn-table th { border: 2px solid #000; padding: 4px; font-size: 14px; background: #eee; }
 
-    /* โหมด 1: สารน้อย (<= 5 รายการ) - ขยายใหญ่สะใจ */
+    /* โหมด 1: สารน้อย (<= 5 รายการ) */
     .large-mode .pn-table td { padding: 8px 6px; font-size: 18px; }
     .large-mode .header-info { font-size: 17px; }
 
-    /* โหมด 2: สารเยอะ (6-9 รายการ) - แก้ไข Defect ปรับ Padding และ Font ให้พอดี */
+    /* โหมด 2: สารเยอะ (6-9 รายการ) */
     .compact-mode .pn-table td { padding: 2.5px 6px; font-size: 15px; }
     .compact-mode .header-info { font-size: 15px; }
-    .compact-mode .table-container { max-height: 7.0cm; } /* คุมเพดานตาราง */
+    .compact-mode .table-container { max-height: 7.0cm; }
 
     .header-info { border-bottom: 2.5px solid #000; margin-bottom: 4px; padding-bottom: 2px; }
     
-    /* Footer ล็อคตำแหน่ง 1.05cm ตามที่คุณขิมสั่งขยับลงมา */
     .footer-container { 
       position: absolute; bottom: 0.95cm; left: 0.3cm; right: 0.3cm;
       border-top: 2px solid #000; padding-top: 5px; display: grid; grid-template-columns: 1fr 1fr;
-      background: white; /* ป้องกันการเห็นรอยตารางแลบทับขีด */
+      background: white;
     }
     
     .rate-box { border: 2.5px solid #000; padding: 2px 8px; font-size: 18px; font-weight: 900; background: #fff; }
@@ -96,6 +93,7 @@
     }
 
     function splitProductName(name) {
+      if (!name) return "";
       if (name.includes(' ml / ')) {
         const match = name.match(/(\d{1,3}(,\d{3})* ml \/ \d+ kcal)/);
         if (match) {
@@ -107,11 +105,14 @@
       return `<span>${name}</span>`;
     }
 
-    function renderLabels(o) {
+    function renderLabels() {
+      const params = new URLSearchParams(window.location.search);
+      const o = Object.fromEntries(params.entries());
+      if (!o.hn) return;
+
       const expDate = new Date(o.orderDate);
       expDate.setDate(expDate.getDate() + 1);
 
-      // กรองรายการที่มีค่าจริง
       const rows = [];
       const addRow = (label, val) => { if (val && parseFloat(val) > 0) rows.push({label, val}); };
       
@@ -129,6 +130,7 @@
       const modeClass = rowCount <= 5 ? 'large-mode' : 'compact-mode';
       document.getElementById('mode-hint').innerText = rowCount <= 5 ? '✨ LARGE MODE active' : '✨ COMPACT MODE active';
 
+      const routeLabel = (o.route || "").includes('Central') ? 'C-line' : 'P-line';
       const qty = parseInt(o.quantity) || 1;
       let pnHTML = '';
 
@@ -147,9 +149,8 @@
             </div>
             <div class="flex justify-between text-[14px] font-bold mb-1" contenteditable="true">
               <span>Ward: ${o.ward}</span>
-              <span>Route: ${o.route.includes('Central') ? 'C-line' : 'P-line'}</span>
+              <span>Route: ${routeLabel}</span>
             </div>
-            
             <div class="table-container">
               <table class="pn-table">
                 <thead>
@@ -164,7 +165,6 @@
                 </tbody>
               </table>
             </div>
-
             <div class="footer-container" contenteditable="true">
               <div class="energy-text">Energy: ${o.productKcal} kcal</div>
               <div class="text-right flex flex-col items-end">
@@ -177,7 +177,6 @@
       }
       document.getElementById('pn-area').innerHTML = pnHTML;
 
-      // ใบหน้าถุง (คงเดิม)
       document.getElementById('bag-area').innerHTML = `
         <div class="sticker sticker-pn flex flex-col items-center justify-center text-center" style="width:3.75in; height:2.48in; padding:1.1cm 0.25in 0.1in 0.25in;" contenteditable="true">
           <div style="font-size: 52px; font-weight: 900; line-height: 1;">${o.ward}</div>
@@ -190,6 +189,9 @@
         </div>
       `;
     }
+
+    // เรียกใช้งานเมื่อโหลดหน้าเสร็จ
+    window.onload = renderLabels;
   </script>
 </body>
 </html>
