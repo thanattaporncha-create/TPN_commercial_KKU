@@ -1,369 +1,204 @@
 <!doctype html>
-<html lang="th" class="h-full">
+<html lang="th">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TPN System | Srinagarind Hospital</title>
+  <title>TPN Master Print | Srinagarind Hospital</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700;800&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Sarabun', sans-serif; background-color: #f0f4f0; }
-    .gradient-header { background: linear-gradient(135deg, #065f46 0%, #10b981 100%); }
-    .card-shadow { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); }
-    .section-title { border-left: 5px solid #10b981; padding-left: 12px; font-weight: 800; color: #000000; font-size: 1.1rem; }
-    .ward-dropdown { max-height: 250px; overflow-y: auto; z-index: 100; }
-    input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-    .route-radio:checked + label { background-color: #065f46; color: white; border-color: #065f46; transform: scale(1.02); }
-    .hidden { display: none; }
+    /* พื้นฐานคงเดิมที่คุณขิมชอบ */
+    * { font-family: 'Sarabun', sans-serif; color: #000; line-height: 1.1; font-weight: 700; }
+    
+    @media print {
+      @page { margin: 0; size: auto; }
+      body { background: #fff; margin: 0; padding: 0; }
+      .no-print { display: none !important; }
+      .print-area:not(.active) { display: none !important; }
+      .sticker { 
+        box-shadow: none !important; border: none !important; 
+        margin: 3mm auto 0 auto !important; page-break-after: always;
+        overflow: hidden; 
+      }
+    }
+
+    /* โครงสร้างหลักล็อคระยะ 12.9cm */
+    .sticker-pn { 
+      width: 9.1cm; height: 12.9cm; padding: 1.45cm 0.3cm 0.5cm 0.3cm; 
+      box-sizing: border-box; background: white; position: relative; display: flex; flex-direction: column;
+    }
+
+    .pn-table { width: 100%; border-collapse: collapse; border: 2px solid #000; table-layout: fixed; }
+    .pn-table td { border: 1px solid #000; vertical-align: middle; word-wrap: break-word; }
+    .pn-table th { border: 2px solid #000; padding: 4px; font-size: 14px; background: #eee; }
+
+    /* โหมด 1: สารน้อย (<= 5 รายการ) - ขยายใหญ่สะใจ */
+    .large-mode .pn-table td { padding: 8px 6px; font-size: 18px; }
+    .large-mode .header-info { font-size: 17px; }
+
+    /* โหมด 2: สารเยอะ (6-9 รายการ) - ปรับจูน Padding เพื่อไม่ให้ทับ Energy */
+    .compact-mode .pn-table td { padding: 2.2px 6px; font-size: 14.5px; } /* บีบ padding ลงเล็กน้อย */
+    .compact-mode .header-info { font-size: 15px; }
+    .compact-mode .table-container { max-height: 7.2cm; overflow: hidden; }
+
+    .header-info { border-bottom: 2.5px solid #000; margin-bottom: 4px; padding-bottom: 2px; }
+    
+    /* Footer ล็อคตำแหน่ง 1.05cm ตามที่คุณขิมสั่ง */
+    .footer-container { 
+      position: absolute; bottom: 1.05cm; left: 0.3cm; right: 0.3cm;
+      border-top: 2px solid #000; padding-top: 6px; display: grid; grid-template-columns: 1fr 1fr;
+      background: white; /* บังรอยตารางแลบ */
+    }
+    
+    .rate-box { border: 2.5px solid #000; padding: 2px 8px; font-size: 18px; font-weight: 900; background: #fff; }
+    .exp-text { font-size: 11px; text-align: right; line-height: 1.2; margin-top: 2px; }
+    .energy-text { font-size: 15px; align-self: start; }
+
+    [contenteditable="true"]:hover { background: #fff9c4; outline: 1px dashed #ccc; cursor: text; }
   </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="bg-slate-50 min-h-screen">
 
-  <div id="loginPage" class="min-h-[80vh] flex items-center justify-center">
-    <div class="max-w-md w-full bg-white p-10 rounded-3xl shadow-2xl border border-emerald-50 text-center">
-      <div class="inline-block p-4 rounded-2xl bg-emerald-600 text-white mb-4 shadow-lg">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-        </svg>
+  <div class="max-w-xl mx-auto py-8 no-print text-center">
+    <h1 class="text-2xl font-black text-emerald-900 mb-6 uppercase tracking-tighter">🖨️ เลือกสั่งพิมพ์</h1>
+    <div class="grid grid-cols-2 gap-4 mb-8">
+      <div id="card-pn" onclick="selectSection('pn')" class="bg-white p-6 rounded-3xl border-4 border-emerald-100 cursor-pointer shadow-sm hover:scale-105 transition-transform">
+        <div class="text-3xl mb-2">📄</div>
+        <h3 class="font-black text-lg text-emerald-900">TPN Label</h3>
+        <p id="mode-hint" class="text-[10px] text-emerald-600 font-bold mt-1 uppercase"></p>
       </div>
-      <h1 class="text-2xl font-black text-emerald-900 mb-6 uppercase tracking-tighter">TPN LOGIN SYSTEM</h1>
-      <form onsubmit="handleLogin(event)" class="space-y-4">
-        <input type="text" id="username" placeholder="Username" required class="w-full p-4 border-2 border-emerald-50 rounded-2xl focus:border-emerald-500 outline-none font-bold text-center uppercase tracking-widest text-emerald-700 bg-emerald-50/30">
-        <input type="password" id="password" placeholder="Password" required class="w-full p-4 border-2 border-emerald-50 rounded-2xl focus:border-emerald-500 outline-none font-bold text-center tracking-widest text-emerald-700 bg-emerald-50/30">
-        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white p-5 rounded-2xl font-black text-xl shadow-xl transition-all transform active:scale-95">
-          เข้าสู่ระบบ 🚀
-        </button>
-      </form>
+      <div id="card-bag" onclick="selectSection('bag')" class="bg-white p-6 rounded-3xl border-4 border-emerald-100 cursor-pointer shadow-sm hover:scale-105 transition-transform">
+        <div class="text-3xl mb-2">🏷️</div>
+        <h3 class="font-black text-lg text-emerald-900">ฉลากหน้าถุง</h3>
+      </div>
+    </div>
+    <div id="action-btns" class="hidden">
+      <button onclick="window.print()" class="bg-slate-900 text-white py-5 px-14 rounded-3xl font-black text-2xl shadow-xl active:scale-95 uppercase">Print labels</button>
     </div>
   </div>
 
-  <div id="mainApp" class="max-w-4xl mx-auto hidden">
-    <nav class="flex justify-between items-center mb-4">
-        <div class="flex items-center gap-2">
-            <span class="text-xs font-bold text-gray-400 uppercase tracking-tighter">ผู้บันทึก:</span>
-            <span id="displayUserName" class="text-sm font-black text-emerald-700 px-3 py-1 bg-white border border-emerald-100 rounded-xl shadow-sm"></span>
-            <button onclick="logout()" class="text-[10px] font-black text-red-400 hover:text-red-600 uppercase ml-2 underline">Logout</button>
-        </div>
-        <div class="flex gap-2">
-            <button class="px-4 py-2 bg-white rounded-xl text-emerald-800 font-black text-xs shadow-sm border border-emerald-50 hover:bg-emerald-50">📊 Dashboard</button>
-            <button class="px-4 py-2 bg-white rounded-xl text-emerald-800 font-black text-xs shadow-sm border border-emerald-50 hover:bg-emerald-50">📦 Stock</button>
-        </div>
-    </nav>
-
-    <div class="space-y-6">
-        <header class="gradient-header p-8 rounded-3xl shadow-xl">
-          <div class="flex justify-between items-center text-white">
-            <div>
-              <h1 class="text-2xl font-bold uppercase tracking-tight text-white">TPN COMMERCIAL ORDER</h1>
-              <p class="text-lg font-medium text-white">ระบบคำนวณสารอาหารแบบสำเร็จรูป</p>
-              <p class="text-sm uppercase text-white">Srinagarind Hospital</p>
-            </div>
-            <button onclick="location.reload()" class="text-xs bg-white/20 px-3 py-1 rounded-lg hover:bg-white/30 transition-all text-white border border-white/20">🔄 เริ่มใหม่</button>
-          </div>
-        </header>
-
-        <section class="bg-white p-6 rounded-2xl card-shadow space-y-4">
-          <h2 class="section-title">📋 ข้อมูลทั่วไป</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div>
-              <label class="block text-sm font-bold text-gray-600 mb-1">วันที่ Order</label>
-              <input type="date" id="orderDate" class="w-full p-2.5 border rounded-xl bg-gray-50 outline-none">
-            </div>
-            <div>
-              <label class="block text-sm font-bold text-gray-600 mb-1">HN</label>
-              <input type="text" id="hn" placeholder="ระบุ HN" class="w-full p-2.5 border rounded-xl outline-none">
-            </div>
-            <div>
-              <label class="block text-sm font-bold text-gray-600 mb-1">ชื่อ-นามสกุล</label>
-              <input type="text" id="patientName" placeholder="ชื่อคนไข้" class="w-full p-2.5 border rounded-xl outline-none">
-            </div>
-            <div class="relative">
-              <label class="block text-sm font-bold text-gray-600 mb-1">Ward</label>
-              <input type="text" id="wardInput" placeholder="ค้นหา..." class="w-full p-2.5 border rounded-xl outline-none" onfocus="showWards()" oninput="filterWards()" autocomplete="off">
-              <div id="wardList" class="hidden absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-2xl ward-dropdown"></div>
-            </div>
-          </div>
-          <div class="pt-4 border-t border-emerald-50 text-center">
-            <label class="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-widest text-center">Route</label>
-            <div class="grid grid-cols-2 gap-4">
-                <input type="radio" name="route" id="route-central" value="Central Line" class="hidden route-radio" checked>
-                <label for="route-central" class="flex items-center justify-center p-3 border-2 border-emerald-50 rounded-xl cursor-pointer font-bold text-emerald-800 transition-all">🟣 Central</label>
-                <input type="radio" name="route" id="route-peripheral" value="Peripheral Line" class="hidden route-radio">
-                <label for="route-peripheral" class="flex items-center justify-center p-3 border-2 border-emerald-50 rounded-xl cursor-pointer font-bold text-emerald-800 transition-all">🔵 Peripheral</label>
-            </div>
-          </div>
-        </section>
-
-        <section class="bg-white p-6 rounded-2xl card-shadow">
-          <h2 class="section-title mb-4">⚖️ น้ำหนักคนไข้</h2>
-          <div class="relative max-w-xs mx-auto md:mx-0">
-            <input type="number" id="bw" step="0.1" placeholder="0.0" class="w-full p-4 border-2 border-emerald-100 rounded-2xl pr-16 text-3xl font-black text-emerald-700 outline-none" oninput="calculateAll()">
-            <span class="absolute right-4 top-5 text-emerald-300 font-black text-xl">kg</span>
-          </div>
-        </section>
-
-        <section class="bg-white p-6 rounded-2xl card-shadow space-y-4 border-t-8 border-emerald-600">
-          <h2 class="section-title" style="color:#065f46; text-center; text-emerald-800">📦 เลือกผลิตภัณฑ์และจำนวน</h2>
-          <select id="productSelect" class="w-full p-4 border-2 border-emerald-100 rounded-xl bg-emerald-50 text-xl font-black text-emerald-900 outline-none text-center" onchange="updateProductDetails()">
-            <option value="">-- คลิกเลือกสารอาหาร --</option>
-            <option value="smof_c_1477" data-vol="1477" data-kcal="1600">SMOF kabiven (C-line) 1,477 ml / 1600 kcal</option>
-            <option value="smof_c_986" data-vol="986" data-kcal="1100">SMOF kabiven (C-line) 986 ml / 1100 kcal</option>
-            <option value="smof_p_1904" data-vol="1904" data-kcal="1300">SMOF kabiven (P-line) 1,904 ml / 1300 kcal</option>
-            <option value="oli_n7" data-vol="1500" data-kcal="1800">Oliclinomel N/7 (C-line) 1,500 ml / 1800 kcal</option>
-            <option value="oli_n4" data-vol="1500" data-kcal="910">Oliclinomel N/4 (P-line) 1,500 ml / 910 kcal</option>
-            <option value="nutri_p" data-vol="1875" data-kcal="1435">Nutriflex lipid peri 1,875 ml / 1435 kcal</option>
-            <option value="nutri_vr" data-vol="1250" data-kcal="1475">Nutriflex lipid VR 1,250 ml / 1475 kcal</option>
-            <option value="bfluid" data-vol="1000" data-kcal="420">B-Fluid 1,000 ml / 420 kcal</option>
-          </select>
-
-          <div class="bg-emerald-50 p-4 rounded-2xl border border-emerald-100 text-center">
-            <label class="block text-xs font-black text-emerald-600 uppercase mb-2 tracking-widest">จำนวนถุงที่เบิก (Stock Out)</label>
-            <div class="flex items-center justify-center gap-6">
-              <button onclick="changeBag(-1)" class="w-12 h-12 bg-white rounded-full shadow-md text-2xl font-black text-emerald-600 border border-emerald-100 active:scale-90">-</button>
-              <span id="bagCountDisplay" class="text-4xl font-black text-emerald-900 w-16 text-center">1</span>
-              <button onclick="changeBag(1)" class="w-12 h-12 bg-white rounded-full shadow-md text-2xl font-black text-emerald-600 border border-emerald-100 active:scale-90">+</button>
-            </div>
-            <input type="hidden" id="bagCount" value="1">
-          </div>
-
-          <div class="grid grid-cols-2 gap-4">
-            <div class="p-4 bg-emerald-50 rounded-2xl text-center border border-emerald-100">
-                <span class="text-xs font-black text-emerald-600 uppercase">Volume:</span>
-                <div class="text-2xl font-black text-emerald-900"><span id="prodVol">0</span> ml</div>
-            </div>
-            <div class="p-4 bg-yellow-50 rounded-2xl text-center border border-yellow-100">
-                <span class="text-xs font-black text-yellow-600 uppercase">Energy:</span>
-                <div class="text-2xl font-black text-yellow-900"><span id="prodKcal">0</span> kcal</div>
-            </div>
-          </div>
-        </section>
-
-        <section class="bg-white p-8 rounded-2xl card-shadow space-y-6">
-          <h2 class="section-title">🧪 ADDITIVES</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-center">
-            <div class="space-y-2">
-              <label class="block text-xl font-black text-gray-800 uppercase">Addamel-N (ml)</label>
-              <input type="number" id="addamel" value="10" class="w-full p-4 border-2 border-gray-100 rounded-2xl text-3xl font-black text-emerald-700 bg-gray-50 outline-none text-center" oninput="calculateAll()">
-            </div>
-            <div class="space-y-3">
-              <label class="block text-xl font-black text-gray-800 flex justify-between uppercase px-2">Vitamins <span id="vit-max-msg" class="text-xs text-red-500 font-black invisible uppercase tracking-tighter self-center">MAX REACHED</span></label>
-              <div class="flex gap-2">
-                <button onclick="selectVitamin('cernevit')" id="btn-cernevit" class="flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-white text-gray-400">Cernevit</button>
-                <button onclick="selectVitamin('soluvit')" id="btn-soluvit" class="flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-white text-gray-400">Soluvit-N</button>
-              </div>
-              <input type="number" id="vitVol" class="w-full p-4 border-2 border-gray-100 rounded-2xl text-3xl font-black text-emerald-700 bg-gray-50 outline-none text-center" oninput="calculateAll()">
-              <p id="vit-hint" class="text-[10px] font-bold text-gray-400 uppercase italic"></p>
-            </div>
-            <div class="space-y-2">
-              <label class="block text-xl font-black text-gray-800 flex justify-between uppercase px-2">B-CO (ml) <span class="text-xs text-red-500 font-black tracking-tighter self-center uppercase">MAX 2 ml</span></label>
-              <input type="number" id="bco" value="2" class="w-full p-4 border-2 border-gray-100 rounded-2xl text-3xl font-black text-emerald-700 bg-gray-50 outline-none text-center" oninput="checkBcoLimit()">
-            </div>
-            <div class="space-y-2">
-              <label class="block text-xl font-black text-gray-800 uppercase">Vitalipid Adult (ml)</label>
-              <input type="number" id="vitalipid" value="10" class="w-full p-4 border-2 border-gray-100 rounded-2xl text-3xl font-black text-emerald-700 bg-gray-50 outline-none text-center" oninput="calculateAll()">
-            </div>
-          </div>
-
-          <div class="space-y-4 pt-8 border-t border-emerald-50 text-left">
-            <span class="text-xl font-black text-gray-800 italic block uppercase tracking-widest mb-4">Add สารอื่นๆ</span>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="other-additives">
-              <div class="flex gap-3"><input type="text" id="o1-name" placeholder="ชื่อสาร 1" class="flex-1 p-3 border border-gray-100 rounded-xl font-bold"><input type="number" id="o1-vol" placeholder="ml" class="w-24 p-3 border border-gray-100 rounded-xl text-center font-black text-emerald-700 other-vol" oninput="calculateAll()"></div>
-              <div class="flex gap-3"><input type="text" id="o2-name" placeholder="ชื่อสาร 2" class="flex-1 p-3 border border-gray-100 rounded-xl font-bold"><input type="number" id="o2-vol" placeholder="ml" class="w-24 p-3 border border-gray-100 rounded-xl text-center font-black text-emerald-700 other-vol" oninput="calculateAll()"></div>
-              <div class="flex gap-3"><input type="text" id="o3-name" placeholder="ชื่อสาร 3" class="flex-1 p-3 border border-gray-100 rounded-xl font-bold"><input type="number" id="o3-vol" placeholder="ml" class="w-24 p-3 border border-gray-100 rounded-xl text-center font-black text-emerald-700 other-vol" oninput="calculateAll()"></div>
-              <div class="flex gap-3"><input type="text" id="o4-name" placeholder="ชื่อสาร 4" class="flex-1 p-3 border border-gray-100 rounded-xl font-bold"><input type="number" id="o4-vol" placeholder="ml" class="w-24 p-3 border border-gray-100 rounded-xl text-center font-black text-emerald-700 other-vol" oninput="calculateAll()"></div>
-            </div>
-          </div>
-        </section>
-
-        <section class="bg-emerald-900 text-white p-8 rounded-3xl shadow-2xl border-b-[12px] border-emerald-700">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10 text-center">
-                <div class="space-y-1">
-                    <span class="text-emerald-400 font-bold uppercase text-xs tracking-widest">Total Volume (ml)</span>
-                    <div class="text-6xl font-black"><span id="totalVolDisplay">0</span> <small class="text-2xl text-emerald-300">ml</small></div>
-                </div>
-                <div class="bg-white/5 p-6 rounded-2xl border border-white/20">
-                    <div class="text-yellow-400 text-base font-black mb-3 italic tracking-wide" id="rateHint">👉 กรุณาเลือก Product...</div>
-                    <div class="flex items-center gap-4">
-                        <input type="number" id="manualRate" placeholder="0.0" class="w-full bg-emerald-700 text-white text-4xl font-black p-4 rounded-2xl outline-none text-center placeholder-emerald-800">
-                        <span class="text-2xl font-black">ml/hr</span>
-                    </div>
-                </div>
-            </div>
-            <button id="saveBtn" onclick="saveOrder()" class="w-full bg-emerald-500 hover:bg-emerald-400 p-8 rounded-3xl text-3xl font-black shadow-xl transition-all active:scale-95">💾 บันทึกและพิมพ์ฉลาก</button>
-        </section>
-        <p class="text-center text-emerald-800 text-[10px] py-10 uppercase font-black tracking-[0.2em]">Srinagarind Hospital • Pharmacy Dept</p>
-    </div>
-  </div>
+  <div id="pn-area" class="print-area"></div>
+  <div id="bag-area" class="print-area"></div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzaH4rJ663N7O0NrdqbAMiXqx9HYJAU-AsvXW5B6tB8_w8eZ06ui8GJDzo83e9scvPn/exec";
+    function formatThaiDate(dateStr) {
+      if (!dateStr) return "-";
+      const d = new Date(dateStr);
+      const months = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+      return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear() + 543}`;
+    }
 
-    const userMap = {
-      'OP': 'ภญ.อรปภา ชัยเลิศวาณิช', 'SK': 'ภญ.ศิริโชค คุณวงศ์กฤต', 'NC': 'ภญ.ณัฐวรรณ ฉ่ำมณี',
-      'TT': 'ภญ.ศิริรัตน์ อิ่มเอมกมล', 'MP': 'ภญ.หนึ่งฤทัย พรหมหาราช', 'PC': 'ภญ.พิชญานิล ชาธรรมา',
-      'CK': 'ภญ.ชนม์นิภา กันหากุล', 'KM': 'ภญ.ธณัฐภรณ์ เจริญกิจตระกูล', 'ST': 'ภญ.สุวิมล ธรรมกุล', 
-      'LS': 'ภญ.ลักษิกา จิตรชื่น', 'SO': 'ภญ.อิสรา โสภัย'
-    };
+    function selectSection(type) {
+      document.querySelectorAll('.print-area').forEach(el => el.classList.remove('active'));
+      document.getElementById(`${type}-area`).classList.add('active');
+      document.querySelectorAll('.bg-white').forEach(el => el.style.borderColor = '#ecfdf5');
+      document.getElementById(`card-${type}`).style.borderColor = '#10b981'; 
+      document.getElementById('action-btns').classList.remove('hidden');
+    }
 
-    function handleLogin(e) {
-      if (e) e.preventDefault();
-      const u = document.getElementById('username').value.trim().toUpperCase();
-      const p = document.getElementById('password').value.trim().toUpperCase();
-      if (u === p && userMap[u]) {
-        sessionStorage.setItem('tpnUser', userMap[u]);
-        showMainApp();
-      } else {
-        alert('❌ รหัสผิดพลาดนะคะ ตรวจสอบรหัส ' + u + ' อีกครั้งค่ะ');
+    function splitProductName(name) {
+      if (!name) return "";
+      if (name.includes(' ml / ')) {
+        const match = name.match(/(\d{1,3}(,\d{3})* ml \/ \d+ kcal)/);
+        if (match) {
+          const spec = match[0];
+          const pName = name.replace(spec, '').trim();
+          return `<span>${pName}</span><br><span style="font-size: 0.8em; font-weight: 800;">${spec}</span>`;
+        }
       }
+      return `<span>${name}</span>`;
     }
 
-    function showMainApp() {
-      document.getElementById('loginPage').classList.add('hidden');
-      document.getElementById('mainApp').classList.remove('hidden');
-      document.getElementById('displayUserName').textContent = sessionStorage.getItem('tpnUser');
-      document.getElementById('orderDate').valueAsDate = new Date();
-      calculateAll();
-    }
+    function renderLabels() {
+      const params = new URLSearchParams(window.location.search);
+      const o = Object.fromEntries(params.entries());
+      if (!o.hn) return;
 
-    function logout() { sessionStorage.clear(); location.reload(); }
+      const expDate = new Date(o.orderDate);
+      expDate.setDate(expDate.getDate() + 1);
 
-    function changeBag(val) {
-      const display = document.getElementById('bagCountDisplay');
-      const hiddenInput = document.getElementById('bagCount');
-      let current = parseInt(hiddenInput.value);
-      let newValue = current + val;
-      if (newValue < 1) newValue = 1;
-      hiddenInput.value = newValue;
-      display.textContent = newValue;
-    }
-
-    // แก้ไข Syntax ตรงนี้เรียบร้อยแล้วค่ะ
-    const wards = ["2ค", "2ง", "3ก", "3ค", "3ง", "3ฉ", "4ก", "4ค", "5ข", "6ก", "6ข", 
-      "AE1", "AE2", "AE3", "CCU", "CVT-ICU", "HOME PN", "IMC2ง", "IMC3ข", "IMC4ข", 
-      "MICU 1", "MICU 2", "NICU", "PICU", "PICU ศสก.", "SCTU", "SICU 1", "SICU 2", 
-      "กว.6/1", "กว.6/2", "กว.7/1", "กว.7/2", "สว.1/11", "สว.1/12", "สว.1/13", 
-      "สว.1/14", "สว.1/15", "สว.1/8B", "สว.1/8C", "สว.1/9A", "สว.1/9B", "สว.1/9C"];
-
-    function showWards() { document.getElementById('wardList').classList.remove('hidden'); renderWards(wards); }
-    function renderWards(items) { document.getElementById('wardList').innerHTML = items.map(w => `<div class="p-4 hover:bg-emerald-50 cursor-pointer border-b font-black text-gray-700 text-center" onclick="selectWard('${w}')">${w}</div>`).join(''); }
-    function filterWards() { const val = document.getElementById('wardInput').value.toLowerCase(); renderWards(wards.filter(w => w.toLowerCase().includes(val))); }
-    function selectWard(w) { document.getElementById('wardInput').value = w; document.getElementById('wardList').classList.add('hidden'); }
-    
-    let currentVitType = '';
-    function selectVitamin(type) {
-      const vitVol = document.getElementById('vitVol');
-      const vitalipid = document.getElementById('vitalipid');
-      const vitHint = document.getElementById('vit-hint');
-      currentVitType = type;
-      document.getElementById('btn-cernevit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-white text-gray-400";
-      document.getElementById('btn-soluvit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-white text-gray-400";
-      if (type === 'cernevit') {
-        document.getElementById('btn-cernevit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-emerald-600 text-white shadow-md";
-        vitVol.value = 5; vitHint.innerHTML = "⚠️ MAX CERNEVIT = 5 ML";
-        vitalipid.value = 0; vitalipid.readOnly = true; vitalipid.classList.add('opacity-30', 'bg-gray-200');
-      } else {
-        document.getElementById('btn-soluvit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-yellow-400 text-black shadow-md";
-        vitVol.value = 10; vitHint.innerHTML = "⚠️ MAX SOLUVIT-N = 10 ML";
-        vitalipid.value = 10; vitalipid.readOnly = false; vitalipid.classList.remove('opacity-30', 'bg-gray-200');
-      }
-      calculateAll();
-    }
-
-    function checkBcoLimit() {
-      const bco = document.getElementById('bco');
-      if (parseFloat(bco.value) > 2) bco.classList.add('text-red-700', 'bg-red-50');
-      else bco.classList.remove('text-red-700', 'bg-red-50');
-      calculateAll();
-    }
-
-    function updateProductDetails() {
-      const s = document.getElementById('productSelect');
-      const o = s.options[s.selectedIndex];
-      document.getElementById('prodVol').textContent = o.getAttribute('data-vol') || 0;
-      document.getElementById('prodKcal').textContent = o.getAttribute('data-kcal') || 0;
-      calculateAll();
-    }
-
-    function calculateAll() {
-      const v = (id) => parseFloat(document.getElementById(id).value) || 0;
-      const prodVol = parseFloat(document.getElementById('prodVol').textContent) || 0;
-      const vitVol = v('vitVol');
-      const vitMaxMsg = document.getElementById('vit-max-msg');
-      if ((currentVitType==='cernevit' && vitVol>5) || (currentVitType==='soluvit' && vitVol>10)) vitMaxMsg.classList.remove('invisible');
-      else vitMaxMsg.classList.add('invisible');
-      let otherTotal = 0;
-      document.querySelectorAll('.other-vol').forEach(input => { otherTotal += parseFloat(input.value) || 0; });
-      const grandTotal = prodVol + v('addamel') + vitVol + v('bco') + v('vitalipid') + otherTotal;
-      document.getElementById('totalVolDisplay').textContent = grandTotal.toLocaleString();
-      const rh = document.getElementById('rateHint');
-      if (grandTotal > 0) { rh.textContent = `✅ แนะนำ: ${(grandTotal/24).toFixed(1)} ml/hr`; rh.style.color = "#bef264"; }
-      else { rh.textContent = `👉 กรุณาเลือก Product...`; rh.style.color = "#facc15"; }
-    }
-
-    async function saveOrder() {
-      const saveBtn = document.getElementById('saveBtn');
-      const hn = document.getElementById('hn').value;
-      const pName = document.getElementById('patientName').value;
-      if (!hn || !pName) { alert("⚠️ กรุณาระบุ HN และชื่อคนไข้ค่ะ"); return; }
+      // กรองรายการที่มีค่าจริง
+      const rows = [];
+      const addRow = (label, val) => { if (val && parseFloat(val) > 0) rows.push({label, val}); };
       
-      const productSelect = document.getElementById('productSelect');
-      if (productSelect.value === "") { alert("⚠️ กรุณาเลือกผลิตภัณฑ์ค่ะ"); return; }
+      addRow(o.productName, o.productVol);
+      addRow('Addamel-N', o.addamel);
+      addRow(o.vitType === 'soluvit' ? 'Soluvit-N' : '◆ Cernevit ◆', o.vitVol);
+      addRow('B-Complex', o.bco);
+      addRow('Vitalipid-N Adult', o.vitalipid);
+      addRow(o.other1Name, o.other1Vol);
+      addRow(o.other2Name, o.other2Vol);
+      addRow(o.other3Name, o.other3Vol);
+      addRow(o.other4Name, o.other4Vol);
 
-      const v = (id) => document.getElementById(id).value;
-      const t = (id) => document.getElementById(id).textContent;
-      
-      const formData = new URLSearchParams();
-      formData.append("action", "saveOrder");
-      formData.append("orderDate", v('orderDate'));
-      formData.append("hn", hn);
-      formData.append("patientName", pName);
-      formData.append("ward", v('wardInput'));
-      formData.append("route", document.querySelector('input[name="route"]:checked').value);
-      formData.append("bw", v('bw'));
-      formData.append("productName", productSelect.options[productSelect.selectedIndex].text);
-      formData.append("productVol", t('prodVol'));
-      formData.append("productKcal", t('prodKcal'));
-      formData.append("quantity", v('bagCount'));
-      formData.append("addamel", v('addamel'));
-      formData.append("vitType", currentVitType);
-      formData.append("vitVol", v('vitVol'));
-      formData.append("bco", v('bco'));
-      formData.append("vitalipid", v('vitalipid'));
-      formData.append("other1Name", v('o1-name'));
-      formData.append("other1Vol", v('o1-vol'));
-      formData.append("other2Name", v('o2-name'));
-      formData.append("other2Vol", v('o2-vol'));
-      formData.append("other3Name", v('o3-name'));
-      formData.append("other3Vol", v('o3-vol'));
-      formData.append("other4Name", v('o4-name'));
-      formData.append("other4Vol", v('o4-vol'));
-      formData.append("totalVol", t('totalVolDisplay'));
-      formData.append("rate", v('manualRate') || (parseFloat(t('totalVolDisplay').replace(/,/g,''))/24).toFixed(1));
-      formData.append("recordedBy", sessionStorage.getItem('tpnUser'));
+      const rowCount = rows.length;
+      const modeClass = rowCount <= 5 ? 'large-mode' : 'compact-mode';
+      document.getElementById('mode-hint').innerText = rowCount <= 5 ? '✨ LARGE MODE active' : '✨ COMPACT MODE active';
 
-      saveBtn.disabled = true;
-      saveBtn.innerHTML = "⏳ กำลังบันทึก...";
+      const routeLabel = (o.route || "").includes('Central') ? 'C-line' : 'P-line';
+      const qty = parseInt(o.quantity) || 1;
+      let pnHTML = '';
 
-      try {
-        await fetch(SCRIPT_URL, {
-          method: 'POST',
-          mode: 'no-cors', 
-          body: formData
+      for (let i = 1; i <= qty; i++) {
+        let tableBody = '';
+        rows.forEach((row, index) => {
+          let labelText = index === 0 ? splitProductName(row.label) : row.label;
+          tableBody += `<tr><td>${index + 1}. ${labelText}</td><td class="text-right">${row.val}</td></tr>`;
         });
-        
-        const params = formData.toString();
-        window.open(`label.html?${params}`, '_blank');
-        
-        alert("✅ บันทึกข้อมูลเรียบร้อยแล้วค่ะ!");
-        location.reload(); 
-      } catch (e) {
-        alert("❌ เกิดข้อผิดพลาด: " + e.message);
-        saveBtn.disabled = false;
-        saveBtn.innerHTML = "💾 บันทึกและพิมพ์ฉลาก";
+
+        pnHTML += `
+          <div class="sticker sticker-pn ${modeClass}">
+            <div class="header-info flex justify-between" contenteditable="true">
+              <span>HN: ${o.hn} - ${o.patientName}</span>
+              <span>${i}/${qty}</span>
+            </div>
+            <div class="flex justify-between text-[14px] font-bold mb-1" contenteditable="true">
+              <span>Ward: ${o.ward}</span>
+              <span>Route: ${routeLabel}</span>
+            </div>
+            
+            <div class="table-container">
+              <table class="pn-table">
+                <thead>
+                  <tr><th style="text-align:left;">รายการสารอาหาร</th><th style="width:30%;">ปริมาตร (ml)</th></tr>
+                </thead>
+                <tbody contenteditable="true">
+                  ${tableBody}
+                  <tr style="background:#eee; font-weight:800;">
+                    <td class="text-right">Total Volume (ml)</td>
+                    <td class="text-right">${o.totalVol}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="footer-container" contenteditable="true">
+              <div class="energy-text">Energy: ${o.productKcal} kcal</div>
+              <div class="text-right flex flex-col items-end">
+                <div class="rate-box mb-1">Rate: ${o.rate} ml/hr</div>
+                <div class="exp-text">หมดอายุ ${formatThaiDate(expDate)}<br>เวลา 18:00 น.</div>
+              </div>
+            </div>
+          </div>
+        `;
       }
+      document.getElementById('pn-area').innerHTML = pnHTML;
+
+      document.getElementById('bag-area').innerHTML = `
+        <div class="sticker sticker-pn flex flex-col items-center justify-center text-center" style="width:3.75in; height:2.48in; padding:1.1cm 0.25in 0.1in 0.25in;" contenteditable="true">
+          <div style="font-size: 52px; font-weight: 900; line-height: 1;">${o.ward}</div>
+          <div style="border-top: 4px solid #000; border-bottom: 4px solid #000; width: 100%; padding: 8px 0; margin: 8px 0;">
+            <span style="font-size: 26px; font-weight: 900; display: block; line-height: 1.1;">${o.patientName}</span>
+          </div>
+          <div style="font-size: 22px; font-weight: 800; margin-bottom: 4px;">HN: ${o.hn}</div>
+          <div style="font-size: 16px; font-weight: 700;">เตรียมวันที่: ${formatThaiDate(o.orderDate)}</div>
+          <div style="font-size: 15px; font-weight: 800; color: #000; margin-top: 6px;">(เก็บในตู้เย็น 2-8° C)</div>
+        </div>
+      `;
     }
 
-    window.onload = () => { if (sessionStorage.getItem('tpnUser')) showMainApp(); };
+    // จุดสำคัญ: สั่งให้ทำงานทันทีที่โหลดหน้าเสร็จ
+    window.onload = renderLabels;
   </script>
 </body>
 </html>
+
