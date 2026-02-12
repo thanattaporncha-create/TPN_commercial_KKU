@@ -12,6 +12,14 @@
     .btn-action { transition: all 0.2s; }
     .btn-action:hover { transform: scale(1.05); }
     input:focus, select:focus { border-color: #10b981 !important; outline: none; }
+    
+    /* ปรับแต่งหัวตารางให้ใหญ่และหนาขึ้น */
+    th { font-size: 15px !important; letter-spacing: 0.05em !important; }
+    
+    /* ปรับแต่งเนื้อหาในตารางให้อ่านง่ายขึ้น */
+    td { font-size: 16px !important; vertical-align: middle !important; }
+    .hn-text { font-size: 19px !important; }
+    .patient-name-text { font-size: 15px !important; }
   </style>
 </head>
 <body class="p-4 md:p-8">
@@ -52,12 +60,12 @@
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
         <div class="md:col-span-3 bg-white p-6 rounded-3xl shadow-sm border border-emerald-50">
           <h2 class="text-sm font-black text-emerald-900 mb-4 flex items-center gap-2 italic uppercase tracking-widest">📦 สรุป Product (ตามการค้นหาด้านบน)</h2>
-          <div id="productStats" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 italic"></div>
+          <div id="productStats" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 italic text-sm"></div>
         </div>
         <div class="bg-gradient-to-br from-emerald-600 to-emerald-800 text-white p-6 rounded-3xl shadow-xl flex flex-col justify-center text-center">
-          <span class="text-[10px] font-bold opacity-80 uppercase tracking-widest mb-1">แสดงผลอยู่</span>
+          <span class="text-[10px] font-bold opacity-80 uppercase tracking-widest mb-1 text-xs">แสดงผลอยู่</span>
           <span id="caseCount" class="text-5xl font-black">0</span>
-          <span class="text-[10px] mt-1 font-bold">รายการ</span>
+          <span class="text-[10px] mt-1 font-bold text-xs">รายการ</span>
         </div>
       </div>
     </div>
@@ -65,18 +73,18 @@
     <div class="table-container bg-white border border-emerald-50 overflow-hidden">
       <table class="w-full text-left border-collapse">
         <thead>
-          <tr class="bg-emerald-900 text-white text-[11px] uppercase tracking-[0.2em]">
-            <th class="p-5 text-center">No.</th>
-            <th class="p-5">วันที่ Order</th>
-            <th class="p-5">คนไข้ (HN / ชื่อ)</th>
-            <th class="p-5">Ward / Route</th>
-            <th class="p-5">Product Name</th>
-            <th class="p-5 text-center">ถุง</th>
-            <th class="p-5 text-center">จัดการ</th>
+          <tr class="bg-emerald-900 text-white uppercase tracking-[0.05em]">
+            <th class="p-6 text-center border-r border-emerald-800/50">No.</th>
+            <th class="p-6">วันที่ Order</th>
+            <th class="p-6">คนไข้ (HN / ชื่อ)</th>
+            <th class="p-6">Ward / Route</th>
+            <th class="p-6">Product Name</th>
+            <th class="p-6 text-center">ถุง</th>
+            <th class="p-6 text-center">จัดการ</th>
           </tr>
         </thead>
-        <tbody id="summaryBody" class="text-gray-700 divide-y divide-emerald-50 font-medium italic">
-          <tr><td colspan="7" class="p-20 text-center text-gray-400 italic font-bold">กรุณากดปุ่มดึงข้อมูลเพื่อเริ่มต้น</td></tr>
+        <tbody id="summaryBody" class="text-gray-700 divide-y divide-emerald-50">
+          <tr><td colspan="7" class="p-20 text-center text-gray-400 italic font-bold text-xl">กรุณากดปุ่มดึงข้อมูลเพื่อเริ่มต้น</td></tr>
         </tbody>
       </table>
     </div>
@@ -104,7 +112,7 @@
       const tbody = document.getElementById('summaryBody');
       const statsContainer = document.getElementById('statsContainer');
       
-      tbody.innerHTML = '<tr><td colspan="7" class="p-20 text-center font-black text-emerald-600 animate-pulse text-xl italic">⏳ กำลังกรองข้อมูลตามวันที่เลือก...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" class="p-20 text-center font-black text-emerald-600 animate-pulse text-2xl italic">⏳ กำลังกรองข้อมูลตามวันที่เลือก...</td></tr>';
       statsContainer.classList.add('hidden');
 
       try {
@@ -118,7 +126,7 @@
 
         filterDisplay();
       } catch (e) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-20 text-center text-red-500 font-bold italic text-xl">❌ เกิดข้อผิดพลาดในการดึงข้อมูล</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="p-20 text-center text-red-500 font-bold font-black italic text-xl">❌ เกิดข้อผิดพลาดในการดึงข้อมูล</td></tr>`;
       }
     }
 
@@ -154,8 +162,8 @@
         .sort((a, b) => b[1] - a[1])
         .map(([name, count]) => `
           <div class="bg-emerald-50/50 border border-emerald-100 p-4 rounded-2xl flex justify-between items-center shadow-sm italic">
-            <span class="text-xs font-bold text-emerald-800 truncate pr-2">${name}</span>
-            <span class="bg-emerald-600 text-white px-3 py-1 rounded-xl font-black text-xs shadow-sm">${count} ถุง</span>
+            <span class="font-bold text-emerald-800 truncate pr-2">${name}</span>
+            <span class="bg-emerald-600 text-white px-3 py-1 rounded-xl font-black text-sm shadow-sm">${count} ถุง</span>
           </div>
         `).join('');
       document.getElementById('statsContainer').classList.remove('hidden');
@@ -163,25 +171,25 @@
       tbody.innerHTML = filtered.map((row, index) => {
         const rowData = encodeURIComponent(JSON.stringify(row));
         return `
-        <tr class="hover:bg-emerald-50/30 transition-colors group">
-          <td class="p-5 text-center font-black text-gray-300 group-hover:text-emerald-500 italic underline decoration-emerald-200 underline-offset-4 font-bold">${index + 1}</td>
-          <td class="p-5 text-[12px] font-bold text-gray-400 italic">${formatThaiDate(row.date)}</td>
-          <td class="p-5 italic">
-            <div class="font-black text-emerald-900 text-lg leading-tight italic">${row.hn}</div>
-            <div class="text-[13px] font-bold text-gray-400 italic">${row.name}</div>
+        <tr class="hover:bg-emerald-50/30 transition-colors group italic">
+          <td class="p-6 text-center font-black text-gray-300 group-hover:text-emerald-500 underline decoration-emerald-200 underline-offset-4">${index + 1}</td>
+          <td class="p-6 font-bold text-gray-400 whitespace-nowrap">${formatThaiDate(row.date)}</td>
+          <td class="p-6">
+            <div class="font-black text-emerald-900 hn-text leading-tight">${row.hn}</div>
+            <div class="font-bold text-gray-500 patient-name-text italic">${row.name}</div>
           </td>
-          <td class="p-5 italic">
-            <div class="text-[14px] font-black text-blue-600 italic">🏥 ${row.ward}</div>
-            <div class="text-[10px] text-gray-400 uppercase font-black tracking-tighter">${row.route || '-'}</div>
+          <td class="p-6">
+            <div class="font-black text-blue-600">🏥 ${row.ward}</div>
+            <div class="text-[12px] text-gray-400 uppercase font-black tracking-tighter">${row.route || '-'}</div>
           </td>
-          <td class="p-5 text-[11px] font-bold text-gray-600 leading-tight italic underline decoration-emerald-200 underline-offset-4 font-bold">${row.productName}</td>
-          <td class="p-5 text-center font-black italic">
-            <span class="bg-white px-3 py-1 rounded-lg border border-emerald-100 shadow-sm text-emerald-700 italic">${row.quantity || 1}</span>
+          <td class="p-6 font-bold text-gray-600 leading-tight underline decoration-emerald-200 underline-offset-4">${row.productName}</td>
+          <td class="p-6 text-center">
+            <span class="bg-white px-4 py-2 rounded-xl border border-emerald-100 shadow-sm text-emerald-700 font-black text-xl">${row.quantity || 1}</span>
           </td>
-          <td class="p-5">
-            <div class="flex justify-center gap-2">
-              <button onclick="reprint('${rowData}')" class="btn-action bg-blue-500 text-white p-2.5 rounded-xl shadow-lg shadow-blue-200 italic" title="พิมพ์ซ้ำครบ">🖨️ พิมพ์</button>
-              <button onclick="deleteCase('${row.id}', '${row.hn}')" class="btn-action bg-red-100 text-red-500 p-2.5 rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-sm" title="ลบข้อมูล">🗑️</button>
+          <td class="p-6">
+            <div class="flex justify-center gap-3">
+              <button onclick="reprint('${rowData}')" class="btn-action bg-blue-500 text-white p-3 rounded-xl shadow-lg shadow-blue-200 font-bold flex items-center gap-1" title="พิมพ์ซ้ำครบ">🖨️ <span class="text-xs">พิมพ์</span></button>
+              <button onclick="deleteCase('${row.id}', '${row.hn}')" class="btn-action bg-red-100 text-red-500 p-3 rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-sm" title="ลบข้อมูล">🗑️</button>
             </div>
           </td>
         </tr>
