@@ -3,14 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TPN Master Dashboard</title>
+  <title>TPN Master Dashboard | Monitoring</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700;800&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Sarabun', sans-serif; background-color: #f0fdf4; }
     .table-container { overflow-x: auto; border-radius: 1.5rem; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); }
     .btn-action { transition: all 0.2s; }
-    .btn-action:hover { transform: scale(1.1); }
+    .btn-action:hover { transform: scale(1.05); }
+    .stat-card { transition: all 0.3s ease; }
+    .stat-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
   </style>
 </head>
 <body class="p-4 md:p-8">
@@ -18,7 +20,7 @@
     <div class="flex justify-between items-center mb-8 bg-white p-6 rounded-3xl shadow-sm border border-emerald-50">
       <div>
         <h1 class="text-3xl font-black text-emerald-900 tracking-tighter italic">📊 TPN MONITORING</h1>
-        <p class="text-emerald-600 font-bold">จัดการเคสและพิมพ์ฉลากย้อนหลัง</p>
+        <p class="text-emerald-600 font-bold">ระบบจัดการเคสและวิเคราะห์สถิติ</p>
       </div>
       <a href="index.html" class="bg-emerald-50 text-emerald-600 px-6 py-3 rounded-2xl font-black hover:bg-emerald-100 transition-all shadow-sm border border-emerald-200">🔙 กลับหน้าหลัก</a>
     </div>
@@ -36,8 +38,18 @@
         <button onclick="loadSummary()" class="bg-emerald-600 text-white px-10 py-3 rounded-2xl font-black hover:bg-emerald-700 shadow-xl shadow-emerald-100 transition-all active:scale-95">🔍 ดึงข้อมูล</button>
       </div>
       <div class="bg-gradient-to-br from-emerald-600 to-emerald-800 text-white p-6 rounded-3xl shadow-xl flex flex-col justify-center">
-        <span class="text-[10px] font-bold opacity-80 uppercase tracking-widest mb-1">เคสทั้งหมด</span>
+        <span class="text-[10px] font-bold opacity-80 uppercase tracking-widest mb-1">รวมการเตรียม</span>
         <span id="caseCount" class="text-5xl font-black">0</span>
+      </div>
+    </div>
+
+    <div id="statsContainer" class="hidden mb-8">
+      <div class="bg-white p-6 rounded-3xl shadow-sm border border-emerald-50">
+        <h2 class="text-lg font-black text-emerald-900 mb-4 flex items-center gap-2">
+          <span class="bg-emerald-100 p-2 rounded-lg">📦</span> สถิติการใช้ผลิตภัณฑ์ (คัดแยกตามชนิด)
+        </h2>
+        <div id="productStats" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 italic">
+          </div>
       </div>
     </div>
 
@@ -48,8 +60,8 @@
             <th class="p-5 text-center">No.</th>
             <th class="p-5">ข้อมูลคนไข้ (HN / ชื่อ)</th>
             <th class="p-5">Ward / Route</th>
-            <th class="p-5">Product</th>
-            <th class="p-5 text-right">Vol (ml)</th>
+            <th class="p-5">Product Name</th>
+            <th class="p-5 text-center">จำนวนถุง</th>
             <th class="p-5 text-center">จัดการ</th>
           </tr>
         </thead>
@@ -76,8 +88,11 @@
       const end = document.getElementById('endDate').value;
       const tbody = document.getElementById('summaryBody');
       const countLabel = document.getElementById('caseCount');
+      const statsContainer = document.getElementById('statsContainer');
+      const productStatsDiv = document.getElementById('productStats');
       
       tbody.innerHTML = '<tr><td colspan="6" class="p-20 text-center font-black text-emerald-600 animate-pulse text-xl">⏳ กำลังประมวลผลข้อมูล...</td></tr>';
+      statsContainer.classList.add('hidden');
 
       try {
         const res = await fetch(`${SCRIPT_URL}?action=getSummary&start=${start}&end=${end}`);
@@ -89,42 +104,64 @@
           return;
         }
 
+        // --- Calculate Product Statistics ---
+        const productCounts = {};
+        data.forEach(row => {
+          const name = row.productName || "ไม่ระบุ";
+          const qty = parseInt(row.quantity) || 1;
+          productCounts[name] = (productCounts[name] || 0) + qty;
+        });
+
+        // --- Render Product Statistics Cards ---
+        productStatsDiv.innerHTML = Object.entries(productCounts)
+          .sort((a, b) => b[1] - a[1]) // Sort by quantity descending
+          .map(([name, count]) => `
+            <div class="stat-card bg-emerald-50/50 border border-emerald-100 p-4 rounded-2xl flex justify-between items-center">
+              <span class="text-sm font-bold text-emerald-800 truncate pr-2" title="${name}">${name}</span>
+              <span class="bg-emerald-600 text-white px-3 py-1 rounded-xl font-black text-sm whitespace-nowrap">${count} ถุง</span>
+            </div>
+          `).join('');
+        statsContainer.classList.remove('hidden');
+
+        // --- Render Main Table ---
         tbody.innerHTML = data.map((row, index) => {
           const rowData = encodeURIComponent(JSON.stringify(row));
-          const id = new Date(row.id).getTime(); // ใช้ Timestamp เป็น ID
+          const id = new Date(row.id).getTime();
           return `
-          <tr class="hover:bg-emerald-50/50 transition-colors group">
+          <tr class="hover:bg-emerald-50/50 transition-colors group italic">
             <td class="p-5 text-center font-black text-gray-300 group-hover:text-emerald-500 transition-colors">${index + 1}</td>
             <td class="p-5">
-              <div class="font-black text-emerald-900 text-lg">${row.hn}</div>
+              <div class="font-black text-emerald-900 text-lg leading-tight">${row.hn}</div>
               <div class="text-[13px] font-bold text-gray-400">${row.name}</div>
             </td>
             <td class="p-5">
-              <div class="text-[14px] font-black text-blue-600">${row.ward}</div>
-              <div class="text-[10px] text-gray-400 uppercase font-black">${row.route || '-'}</div>
+              <div class="text-[14px] font-black text-blue-600 italic">🏥 ${row.ward}</div>
+              <div class="text-[10px] text-gray-400 uppercase font-black tracking-tighter">${row.route || '-'}</div>
             </td>
             <td class="p-5">
                <div class="text-[12px] font-bold text-gray-600 leading-tight">${row.productName}</div>
             </td>
-            <td class="p-5 text-right font-black text-emerald-700 text-xl">${row.totalVol}</td>
+            <td class="p-5 text-center">
+               <span class="bg-gray-100 text-gray-700 px-4 py-1.5 rounded-full font-black text-lg shadow-sm border border-gray-200">
+                 ${row.quantity || 1}
+               </span>
+            </td>
             <td class="p-5">
-              <div class="flex justify-center gap-3">
-                <button onclick="reprint('${rowData}')" class="btn-action bg-blue-500 text-white p-3 rounded-2xl shadow-lg shadow-blue-100" title="พิมพ์ซ้ำครบถ้วน">🖨️ พิมพ์ซ้ำ</button>
-                <button onclick="deleteCase('${id}', '${row.hn}')" class="btn-action bg-red-100 text-red-600 p-3 rounded-2xl hover:bg-red-600 hover:text-white" title="ลบถาวร">🗑️</button>
+              <div class="flex justify-center gap-2">
+                <button onclick="reprint('${rowData}')" class="btn-action bg-blue-500 text-white p-2.5 rounded-xl shadow-lg shadow-blue-100" title="พิมพ์ซ้ำครบถ้วน">🖨️</button>
+                <button onclick="deleteCase('${id}', '${row.hn}')" class="btn-action bg-red-100 text-red-600 p-2.5 rounded-xl hover:bg-red-600 hover:text-white" title="ลบถาวร">🗑️</button>
               </div>
             </td>
           </tr>
         `}).join('');
       } catch (e) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-20 text-center text-red-500">❌ Error: ${e.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="p-20 text-center text-red-500 font-bold">❌ Error: ${e.message}</td></tr>`;
       }
     }
 
     function reprint(encodedData) {
       const row = JSON.parse(decodeURIComponent(encodedData));
       const params = new URLSearchParams();
-
-      // รวบรวมข้อมูลทุกฟิลด์ส่งกลับหน้า label
       const fields = [
         "orderDate", "hn", "patientName", "ward", "route", "bw", 
         "productName", "productVol", "productKcal", "quantity", 
@@ -133,14 +170,12 @@
         "other3Name", "other3Vol", "other4Name", "other4Vol", 
         "totalVol", "rate"
       ];
-
       fields.forEach(f => {
         let val = row[f];
         if (f === "patientName") val = row.name;
         if (f === "orderDate") val = row.date;
         if (val !== undefined && val !== null) params.append(f, val);
       });
-
       window.open(`label.html?${params.toString()}`, '_blank');
     }
 
