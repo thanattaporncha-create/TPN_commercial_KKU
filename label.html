@@ -18,60 +18,41 @@
         border: none !important; 
         margin: 3mm auto 0 auto !important; 
         page-break-after: always;
-        overflow: hidden; /* ล็อคไม่ให้เนื้อหาหลุดออกจากกรอบสติกเกอร์ */
+        overflow: hidden;
       }
     }
 
-    [contenteditable="true"]:hover { background: #fff9c4; outline: 1px dashed #ccc; cursor: text; }
-
+    /* โครงสร้างหลักล็อคไว้เหมือนเดิม */
     .sticker-pn { 
-      width: 9.1cm; 
-      height: 12.9cm; 
-      padding: 1.45cm 0.3cm 0.5cm 0.3cm; 
-      box-sizing: border-box; 
-      background: white; 
-      position: relative;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* กล่องควบคุมตาราง: ล็อคความสูงสูงสุดไว้เพื่อไม่ให้ไปทับ Footer */
-    .table-container {
-      width: 100%;
-      max-height: 7.2cm; /* ล็อคความสูงตารางไว้แค่ตรงนี้ เพื่อเหลือที่ให้ Footer */
-      overflow: hidden; 
-      margin-bottom: 5px;
+      width: 9.1cm; height: 12.9cm; padding: 1.45cm 0.3cm 0.5cm 0.3cm; 
+      box-sizing: border-box; background: white; position: relative; display: flex; flex-direction: column;
     }
 
     .pn-table { width: 100%; border-collapse: collapse; border: 2px solid #000; table-layout: fixed; }
-    .pn-table td { 
-      border: 1px solid #000; 
-      padding: 2.5px 6px; 
-      vertical-align: middle; 
-      font-size: 15px; /* ขนาดปกติ */
-      word-wrap: break-word;
-    }
-    /* ถ้ามีบรรทัดเยอะมาก (ตรวจจับผ่าน JS หรือ CSS บีบ) จะใช้ฟอนต์เล็กลง */
-    .compact-table td { font-size: 13px; padding: 1.5px 6px; }
-
+    .pn-table td { border: 1px solid #000; vertical-align: middle; word-wrap: break-word; }
     .pn-table th { border: 2px solid #000; padding: 4px; font-size: 14px; background: #eee; }
 
-    .header-info { font-size: 15.5px; border-bottom: 2.5px solid #000; margin-bottom: 4px; padding-bottom: 2px; }
+    /* โหมด 1: สารน้อย (<= 5 รายการ) - ขยายใหญ่ 7% */
+    .large-mode .pn-table td { padding: 8px 6px; font-size: 18px; }
+    .large-mode .header-info { font-size: 17px; }
+
+    /* โหมด 2: สารเยอะ (6-9 รายการ) - โค้ด Perfect ล่าสุด */
+    .compact-mode .pn-table td { padding: 3px 6px; font-size: 15.5px; }
+    .compact-mode .header-info { font-size: 15.5px; }
+
+    .header-info { border-bottom: 2.5px solid #000; margin-bottom: 4px; padding-bottom: 2px; }
     
-    /* Footer: ล็อคตำแหน่งตายตัว ห้ามขยับ ห้ามตกแผ่น */
+    /* ล็อค Footer ไว้ตำแหน่ง 1.05cm เสมอ */
     .footer-container { 
-      position: absolute;
-      bottom: 1.05cm; /* ตำแหน่งเดิมที่คุณขิมต้องการ */
-      left: 0.3cm;
-      right: 0.3cm;
-      border-top: 2px solid #000; 
-      padding-top: 6px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+      position: absolute; bottom: 1.05cm; left: 0.3cm; right: 0.3cm;
+      border-top: 2px solid #000; padding-top: 6px; display: grid; grid-template-columns: 1fr 1fr;
     }
     
-    .rate-box { border: 2.5px solid #000; padding: 2px 8px; font-size: 18px; font-weight: 900; background: #fff; display: inline-block; }
+    .rate-box { border: 2.5px solid #000; padding: 2px 8px; font-size: 18px; font-weight: 900; background: #fff; }
     .exp-text { font-size: 11.5px; text-align: right; line-height: 1.2; margin-top: 2px; }
+    .energy-text { font-size: 15px; }
+
+    [contenteditable="true"]:hover { background: #fff9c4; outline: 1px dashed #ccc; cursor: text; }
   </style>
 </head>
 <body class="bg-slate-50 min-h-screen">
@@ -82,6 +63,7 @@
       <div id="card-pn" onclick="selectSection('pn')" class="bg-white p-6 rounded-3xl border-4 border-emerald-100 cursor-pointer shadow-sm hover:scale-105 transition-transform">
         <div class="text-3xl mb-2">📄</div>
         <h3 class="font-black text-lg text-emerald-900">TPN Label</h3>
+        <p id="mode-hint" class="text-xs text-emerald-600 font-bold mt-1"></p>
       </div>
       <div id="card-bag" onclick="selectSection('bag')" class="bg-white p-6 rounded-3xl border-4 border-emerald-100 cursor-pointer shadow-sm hover:scale-105 transition-transform">
         <div class="text-3xl mb-2">🏷️</div>
@@ -98,6 +80,7 @@
 
   <script>
     let currentRowNum = 1;
+    let activeRows = [];
 
     document.addEventListener('DOMContentLoaded', () => {
       const params = new URLSearchParams(window.location.search);
@@ -120,78 +103,83 @@
       return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear() + 543}`;
     }
 
-    function createAutoRow(label, value) {
-      const val = parseFloat(value);
-      if (!value || isNaN(val) || val === 0) return '';
+    function prepareRows(o) {
+      const rows = [];
+      const addRow = (label, val) => {
+        if (val && parseFloat(val) > 0) rows.push({label, val});
+      };
       
-      let displayLabel = label;
-      if (label.includes('soluvit')) displayLabel = 'Soluvit-N';
-      else if (label.includes('cernevit')) displayLabel = '◆ Cernevit ◆';
-      else if (label.includes('bco')) displayLabel = 'B-Complex';
-      else if (label.includes('Vitalipid')) displayLabel = 'Vitalipid-N Adult';
-
-      const row = `<tr><td>${currentRowNum}. ${displayLabel}</td><td class="text-right">${value}</td></tr>`;
-      currentRowNum++;
-      return row;
-    }
-
-    function splitProductName(name) {
-      if (name.includes(' ml / ')) {
-        const match = name.match(/(\d{1,3}(,\d{3})* ml \/ \d+ kcal)/);
-        if (match) {
-          const spec = match[0];
-          const productName = name.replace(spec, '').trim();
-          return `<span>${productName}</span><br><span style="font-size: 12px; font-weight: 800;">${spec}</span>`;
-        }
-      }
-      return `<span>${name}</span>`;
+      // เก็บรายการทั้งหมดที่มีค่า > 0
+      addRow(o.productName, o.productVol);
+      addRow('Addamel-N', o.addamel);
+      addRow(o.vitType === 'soluvit' ? 'Soluvit-N' : '◆ Cernevit ◆', o.vitVol);
+      addRow('B-Complex', o.bco);
+      addRow('Vitalipid-N Adult', o.vitalipid);
+      addRow(o.other1Name, o.other1Vol);
+      addRow(o.other2Name, o.other2Vol);
+      addRow(o.other3Name, o.other3Vol);
+      addRow(o.other4Name, o.other4Vol);
+      
+      return rows;
     }
 
     function renderLabels(o) {
       const expDate = new Date(o.orderDate);
       expDate.setDate(expDate.getDate() + 1);
-      const routeDisplay = o.route.includes('Central') ? 'C-line' : 'P-line';
+      const rows = prepareRows(o);
+      const rowCount = rows.length;
+      
+      // ตัดสินใจเลือกโหมด
+      const isLarge = rowCount <= 5;
+      const modeClass = isLarge ? 'large-mode' : 'compact-mode';
+      document.getElementById('mode-hint').innerText = isLarge ? '✨ Auto: Large Mode' : '✨ Auto: Compact Mode';
+
       const qty = parseInt(o.quantity) || 1;
       let pnHTML = '';
 
       for (let i = 1; i <= qty; i++) {
-        currentRowNum = 1; 
+        let tableBody = '';
+        rows.forEach((row, index) => {
+          let labelText = row.label;
+          if (index === 0) { // รายการแรกที่เป็น ProductName
+            if (labelText.includes(' ml / ')) {
+              const match = labelText.match(/(\d{1,3}(,\d{3})* ml \/ \d+ kcal)/);
+              if (match) {
+                const spec = match[0];
+                const pName = labelText.replace(spec, '').trim();
+                labelText = `<span>${pName}</span><br><span style="font-size: 0.8em; font-weight: 800;">${spec}</span>`;
+              }
+            }
+          }
+          tableBody += `<tr><td>${index + 1}. ${labelText}</td><td class="text-right">${row.val}</td></tr>`;
+        });
+
         pnHTML += `
-          <div class="sticker sticker-pn">
+          <div class="sticker sticker-pn ${modeClass}">
             <div class="header-info flex justify-between" contenteditable="true">
               <span>HN: ${o.hn} - ${o.patientName}</span>
               <span>${i}/${qty}</span>
             </div>
             <div class="flex justify-between text-[14.5px] font-bold mb-1.5" contenteditable="true">
               <span>Ward: ${o.ward}</span>
-              <span>Route: ${routeDisplay}</span>
+              <span>Route: ${o.route.includes('Central') ? 'C-line' : 'P-line'}</span>
             </div>
             
-            <div class="table-container">
-              <table class="pn-table">
-                <thead>
-                  <tr><th style="text-align:left;">รายการสารอาหาร</th><th style="width:30%;">ปริมาตร (ml)</th></tr>
-                </thead>
-                <tbody contenteditable="true">
-                  ${createAutoRow(splitProductName(o.productName), o.productVol)}
-                  ${createAutoRow('Addamel-N', o.addamel)}
-                  ${createAutoRow(o.vitType === 'soluvit' ? 'soluvit' : 'cernevit', o.vitVol)}
-                  ${createAutoRow('bco', o.bco)}
-                  ${createAutoRow('Vitalipid Adult', o.vitalipid)}
-                  ${createAutoRow(`${o.other1Name}`, o.other1Vol)}
-                  ${createAutoRow(`${o.other2Name}`, o.other2Vol)}
-                  ${createAutoRow(`${o.other3Name}`, o.other3Vol)}
-                  ${createAutoRow(`${o.other4Name}`, o.other4Vol)}
-                  <tr style="background:#eee; font-weight:800;">
-                    <td class="text-right">Total Volume (ml)</td>
-                    <td class="text-right">${o.totalVol}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <table class="pn-table">
+              <thead>
+                <tr><th style="text-align:left;">รายการสารอาหาร</th><th style="width:30%;">ปริมาตร (ml)</th></tr>
+              </thead>
+              <tbody contenteditable="true">
+                ${tableBody}
+                <tr style="background:#eee; font-weight:800;">
+                  <td class="text-right">Total Volume (ml)</td>
+                  <td class="text-right">${o.totalVol}</td>
+                </tr>
+              </tbody>
+            </table>
 
             <div class="footer-container" contenteditable="true">
-              <div class="energy-text" style="font-size: 15px;">Energy: ${o.productKcal} kcal</div>
+              <div class="energy-text">Energy: ${o.productKcal} kcal</div>
               <div class="text-right flex flex-col items-end">
                 <div class="rate-box mb-1">Rate: ${o.rate} ml/hr</div>
                 <div class="exp-text">หมดอายุ ${formatThaiDate(expDate)}<br>เวลา 18:00 น.</div>
@@ -202,6 +190,7 @@
       }
       document.getElementById('pn-area').innerHTML = pnHTML;
 
+      // ฉลากหน้าถุง (คงเดิม)
       document.getElementById('bag-area').innerHTML = `
         <div class="sticker sticker-pn flex flex-col items-center justify-center text-center" style="width:3.75in; height:2.48in; padding:1.1cm 0.25in 0.1in 0.25in;" contenteditable="true">
           <div style="font-size: 52px; font-weight: 900; line-height: 1;">${o.ward}</div>
