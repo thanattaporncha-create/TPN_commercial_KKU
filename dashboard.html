@@ -16,7 +16,7 @@
 </head>
 <body class="p-4 md:p-8">
   <div class="max-w-7xl mx-auto">
-    <div class="flex justify-between items-center mb-8 bg-white p-6 rounded-3xl shadow-sm border border-emerald-50">
+    <div class="flex justify-between items-center mb-8 bg-white p-6 rounded-3xl shadow-sm border border-emerald-50 text-center md:text-left">
       <div>
         <h1 class="text-3xl font-black text-emerald-900 tracking-tighter italic">📊 TPN MONITORING</h1>
         <p class="text-emerald-600 font-bold italic">ค้นหา จัดการข้อมูล และสรุปสถิติ</p>
@@ -83,7 +83,7 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyW8oE4ISu5RXYlXIlsdoAFtJ_XJmu9Mcu0qfHy7ZzodJPlt8XtfB5kT3E68rbw3bBp/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxfIRMYigsSxBmJmTp1lpJCYnMgQwewEkDItOu4fCNdg8sDu2tL7XaQwi5ufv8e5iGo/exec";
     let masterData = [];
 
     window.onload = () => {
@@ -99,30 +99,28 @@
     }
 
     async function loadSummary() {
-  const start = document.getElementById('startDate').value; // คืนค่า YYYY-MM-DD
-  const end = document.getElementById('endDate').value;
-  const tbody = document.getElementById('summaryBody');
-  
-  // โชว์ Loading
-  tbody.innerHTML = '<tr><td colspan="7" class="p-20 text-center font-black text-emerald-600 animate-pulse text-xl">⏳ กำลังกรองข้อมูล...</td></tr>';
+      const start = document.getElementById('startDate').value;
+      const end = document.getElementById('endDate').value;
+      const tbody = document.getElementById('summaryBody');
+      const statsContainer = document.getElementById('statsContainer');
+      
+      tbody.innerHTML = '<tr><td colspan="7" class="p-20 text-center font-black text-emerald-600 animate-pulse text-xl italic">⏳ กำลังกรองข้อมูลตามวันที่เลือก...</td></tr>';
+      statsContainer.classList.add('hidden');
 
-  try {
-    // ตรวจสอบ URL อีกครั้งว่าลงท้ายด้วย /exec
-    const res = await fetch(`${SCRIPT_URL}?action=getSummary&start=${start}&end=${end}`);
-    masterData = await res.json();
-    
-    // อัปเดต Dropdown Ward อัตโนมัติจากข้อมูลที่ดึงมา
-    const wards = [...new Set(masterData.map(item => item.ward))].filter(w => w).sort();
-    const wardSelect = document.getElementById('searchWard');
-    wardSelect.innerHTML = '<option value="">ทั้งหมด (All Wards)</option>' + 
-      wards.map(w => `<option value="${w}">${w}</option>`).join('');
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=getSummary&start=${start}&end=${end}`);
+        masterData = await res.json();
+        
+        const wards = [...new Set(masterData.map(item => item.ward))].filter(w => w).sort();
+        const wardSelect = document.getElementById('searchWard');
+        wardSelect.innerHTML = '<option value="">ทั้งหมด (All Wards)</option>' + 
+          wards.map(w => `<option value="${w}">${w}</option>`).join('');
 
-    filterDisplay(); // นำข้อมูลไปวาดตารางและสถิติ
-  } catch (e) {
-    console.error(e);
-    tbody.innerHTML = '<tr><td colspan="7" class="p-20 text-center text-red-500 font-bold italic">❌ ไม่สามารถดึงข้อมูลได้</td></tr>';
-  }
-}
+        filterDisplay();
+      } catch (e) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-20 text-center text-red-500 font-bold italic text-xl">❌ เกิดข้อผิดพลาดในการดึงข้อมูล</td></tr>`;
+      }
+    }
 
     function filterDisplay() {
       const hnSearch = document.getElementById('searchHN').value.toLowerCase();
@@ -155,7 +153,7 @@
       productStatsDiv.innerHTML = Object.entries(productCounts)
         .sort((a, b) => b[1] - a[1])
         .map(([name, count]) => `
-          <div class="bg-emerald-50/50 border border-emerald-100 p-4 rounded-2xl flex justify-between items-center shadow-sm">
+          <div class="bg-emerald-50/50 border border-emerald-100 p-4 rounded-2xl flex justify-between items-center shadow-sm italic">
             <span class="text-xs font-bold text-emerald-800 truncate pr-2">${name}</span>
             <span class="bg-emerald-600 text-white px-3 py-1 rounded-xl font-black text-xs shadow-sm">${count} ถุง</span>
           </div>
@@ -166,24 +164,24 @@
         const rowData = encodeURIComponent(JSON.stringify(row));
         return `
         <tr class="hover:bg-emerald-50/30 transition-colors group">
-          <td class="p-5 text-center font-black text-gray-300 group-hover:text-emerald-500">${index + 1}</td>
-          <td class="p-5 text-[12px] font-bold text-gray-400">${formatThaiDate(row.date)}</td>
-          <td class="p-5">
-            <div class="font-black text-emerald-900 text-lg leading-tight">${row.hn}</div>
-            <div class="text-[13px] font-bold text-gray-500">${row.name}</div>
+          <td class="p-5 text-center font-black text-gray-300 group-hover:text-emerald-500 italic underline decoration-emerald-200 underline-offset-4 font-bold">${index + 1}</td>
+          <td class="p-5 text-[12px] font-bold text-gray-400 italic">${formatThaiDate(row.date)}</td>
+          <td class="p-5 italic">
+            <div class="font-black text-emerald-900 text-lg leading-tight italic">${row.hn}</div>
+            <div class="text-[13px] font-bold text-gray-400 italic">${row.name}</div>
           </td>
-          <td class="p-5">
+          <td class="p-5 italic">
             <div class="text-[14px] font-black text-blue-600 italic">🏥 ${row.ward}</div>
             <div class="text-[10px] text-gray-400 uppercase font-black tracking-tighter">${row.route || '-'}</div>
           </td>
-          <td class="p-5 text-[11px] font-bold text-gray-600 leading-tight">${row.productName}</td>
-          <td class="p-5 text-center font-black">
-            <span class="bg-white px-3 py-1 rounded-lg border border-emerald-100 shadow-sm text-emerald-700">${row.quantity || 1}</span>
+          <td class="p-5 text-[11px] font-bold text-gray-600 leading-tight italic underline decoration-emerald-200 underline-offset-4 font-bold">${row.productName}</td>
+          <td class="p-5 text-center font-black italic">
+            <span class="bg-white px-3 py-1 rounded-lg border border-emerald-100 shadow-sm text-emerald-700 italic">${row.quantity || 1}</span>
           </td>
           <td class="p-5">
             <div class="flex justify-center gap-2">
-              <button onclick="reprint('${rowData}')" class="btn-action bg-blue-500 text-white p-2.5 rounded-xl shadow-lg shadow-blue-200" title="พิมพ์ซ้ำ">🖨️</button>
-              <button onclick="deleteCase('${row.id}', '${row.hn}')" class="btn-action bg-red-100 text-red-500 p-2.5 rounded-xl hover:bg-red-600 hover:text-white" title="ลบข้อมูล">🗑️</button>
+              <button onclick="reprint('${rowData}')" class="btn-action bg-blue-500 text-white p-2.5 rounded-xl shadow-lg shadow-blue-200 italic" title="พิมพ์ซ้ำครบ">🖨️ พิมพ์</button>
+              <button onclick="deleteCase('${row.id}', '${row.hn}')" class="btn-action bg-red-100 text-red-500 p-2.5 rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-sm" title="ลบข้อมูล">🗑️</button>
             </div>
           </td>
         </tr>
@@ -204,17 +202,15 @@
     }
 
     async function deleteCase(id, hn) {
-      // แปลง ID ให้เป็น string เพื่อเทียบกับ GS
-      const numericId = new Date(id).getTime().toString();
       if (!confirm(`ยืนยันการลบ HN: ${hn}?\n(จะลบออกจากระบบถาวร)`)) return;
       try {
-        const res = await fetch(`${SCRIPT_URL}?action=deleteOrder&id=${numericId}`);
+        const res = await fetch(`${SCRIPT_URL}?action=deleteOrder&id=${id}`);
         const result = await res.json();
         if (result.result === "success") {
           alert("✅ ลบเรียบร้อยแล้วค่ะ");
           loadSummary();
         } else {
-          alert("❌ ไม่พบข้อมูลที่ต้องการลบ");
+          alert("❌ ไม่พบข้อมูลในระบบ หรือเกิดข้อผิดพลาด");
         }
       } catch (e) {
         alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อ");
