@@ -13,13 +13,27 @@
     .btn-action:hover { transform: scale(1.05); }
     input:focus, select:focus { border-color: #10b981 !important; outline: none; }
     
-    /* ปรับแต่งหัวตารางให้ใหญ่และหนาขึ้น */
     th { font-size: 15px !important; letter-spacing: 0.05em !important; }
-    
-    /* ปรับแต่งเนื้อหาในตารางให้อ่านง่ายขึ้น */
     td { font-size: 16px !important; vertical-align: middle !important; }
     .hn-text { font-size: 19px !important; }
     .patient-name-text { font-size: 15px !important; }
+
+    /* ตกแต่ง List สรุป Product */
+    .product-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 20px;
+      background-color: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      margin-bottom: 8px;
+      transition: all 0.2s;
+    }
+    .product-item:hover {
+      background-color: #ecfdf5;
+      border-color: #10b981;
+    }
   </style>
 </head>
 <body class="p-4 md:p-8">
@@ -59,9 +73,11 @@
     <div id="statsContainer" class="hidden">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
         <div class="md:col-span-3 bg-white p-6 rounded-3xl shadow-sm border border-emerald-50">
-          <h2 class="text-sm font-black text-emerald-900 mb-4 flex items-center gap-2 italic uppercase tracking-widest">📦 สรุป Product (ตามการค้นหาด้านบน)</h2>
-          <div id="productStats" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 italic text-sm"></div>
+          <h2 class="text-sm font-black text-emerald-900 mb-4 flex items-center gap-2 italic uppercase tracking-widest border-b pb-2">📦 สรุป Product (ตามการค้นหาด้านบน)</h2>
+          <div id="productStats" class="flex flex-col gap-1 italic">
+             </div>
         </div>
+        
         <div class="bg-gradient-to-br from-emerald-600 to-emerald-800 text-white p-6 rounded-3xl shadow-xl flex flex-col justify-center text-center">
           <span class="text-[10px] font-bold opacity-80 uppercase tracking-widest mb-1 text-xs">แสดงผลอยู่</span>
           <span id="caseCount" class="text-5xl font-black">0</span>
@@ -158,12 +174,13 @@
         productCounts[name] = (productCounts[name] || 0) + qty;
       });
 
+      // ปรับปรุงการแสดงผลเป็นแบบ List แถวเดียว
       productStatsDiv.innerHTML = Object.entries(productCounts)
         .sort((a, b) => b[1] - a[1])
         .map(([name, count]) => `
-          <div class="bg-emerald-50/50 border border-emerald-100 p-4 rounded-2xl flex justify-between items-center shadow-sm italic">
-            <span class="font-bold text-emerald-800 truncate pr-2">${name}</span>
-            <span class="bg-emerald-600 text-white px-3 py-1 rounded-xl font-black text-sm shadow-sm">${count} ถุง</span>
+          <div class="product-item shadow-sm">
+            <span class="font-bold text-emerald-800 text-base">${name}</span>
+            <span class="bg-emerald-600 text-white px-4 py-1.5 rounded-xl font-black text-sm whitespace-nowrap ml-4">${count} ถุง</span>
           </div>
         `).join('');
       document.getElementById('statsContainer').classList.remove('hidden');
