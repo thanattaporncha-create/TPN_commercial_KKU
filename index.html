@@ -42,6 +42,10 @@
             <span id="displayUserName" class="text-sm font-black text-emerald-700 px-3 py-1 bg-white border border-emerald-100 rounded-xl shadow-sm"></span>
             <button onclick="logout()" class="text-[10px] font-black text-red-400 hover:text-red-600 uppercase ml-2 underline">Logout</button>
         </div>
+        <div class="flex gap-2">
+            <button onclick="navigateTo('dashboard')" class="px-4 py-2 bg-white rounded-xl text-emerald-800 font-black text-xs shadow-sm border border-emerald-50 hover:bg-emerald-50 transition-colors">📊 Dashboard</button>
+            <button onclick="navigateTo('stock')" class="px-4 py-2 bg-white rounded-xl text-emerald-800 font-black text-xs shadow-sm border border-emerald-50 hover:bg-emerald-50 transition-colors">📦 Stock</button>
+        </div>
     </nav>
 
     <div class="space-y-6">
@@ -193,6 +197,8 @@
   </div>
 
   <script>
+    // ดึง base URL จากตัวสคริปต์ปัจจุบันเพื่อให้เปิดไฟล์อื่นๆ ในโครงการเดียวกันได้
+    const baseUrl = window.location.href.split('?')[0].split('#')[0];
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby6KoskGninnWrg9UUCAqgA4r-5FK5gSlUbFROtYx-wlAVf9QMX8ecoJq1DCSqyo9Kg/exec";
 
     const userMap = {
@@ -201,6 +207,17 @@
       'CK': 'ภญ.ชนม์นิภา กันหากุล', 'KM': 'ภญ.ธณัฐภรณ์ เจริญกิจตระกูล', 'ST': 'ภญ.สุวิมล ธรรมกุล', 
       'LS': 'ภญ.ลักษิกา จิตรชื่น', 'SO': 'ภญ.อิสรา โสภัย'
     };
+
+    // ฟังก์ชันเปลี่ยนหน้า (เชื่อมไปยังไฟล์อื่นในโครงการ)
+    function navigateTo(page) {
+      // ตรวจสอบว่ามีข้อมูลผู้ใช้หรือไม่ (เพื่อความปลอดภัย)
+      if(!sessionStorage.getItem('tpnUser')) {
+          alert('กรุณาเข้าสู่ระบบก่อนค่ะ');
+          return;
+      }
+      // สร้าง URL ใหม่เพื่อเปิดไฟล์ .html ชื่อตามที่ระบุ
+      window.location.href = baseUrl + "?page=" + page;
+    }
 
     function handleLogin(e) {
       if (e) e.preventDefault();
@@ -245,7 +262,6 @@
     function filterWards() { const val = document.getElementById('wardInput').value.toLowerCase(); renderWards(wards.filter(w => w.toLowerCase().includes(val))); }
     function selectWard(w) { document.getElementById('wardInput').value = w; document.getElementById('wardList').classList.add('hidden'); }
     
-    // --- ค้นหาข้อมูลล่าสุด ---
     let cachedLatestOrder = null;
 
     async function fetchLatestOrder() {
