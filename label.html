@@ -6,14 +6,35 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700;800&display=swap" rel="stylesheet">
   <style>
-    /* พื้นฐานคงเดิมที่คุณขิมชอบ */
-    * { font-family: 'Sarabun', sans-serif; color: #000; line-height: 1.1; font-weight: 700; }
+    /* 1. เพิ่มการจัดกึ่งกลางบนหน้าจอคอมพิวเตอร์ */
+    body { 
+      font-family: 'Sarabun', sans-serif; 
+      color: #000; 
+      line-height: 1.1; 
+      font-weight: 700;
+      background-color: #f1f5f9; /* สีพื้นหลังให้อ่านง่ายขึ้นบนจอ */
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; /* จัดกึ่งกลางแนวนอน */
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* จัดกึ่งกลางพื้นที่แสดงผลฉลาก */
+    .print-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
     
     @media print {
       @page { margin: 0; size: auto; }
-      body { background: #fff; margin: 0; padding: 0; }
+      body { background: #fff; display: block; } 
       .no-print { display: none !important; }
       .print-area:not(.active) { display: none !important; }
+      .print-area { display: block; }
       .sticker { 
         box-shadow: none !important; border: none !important; 
         margin: 3mm auto 0 auto !important; page-break-after: always;
@@ -25,28 +46,29 @@
     .sticker-pn { 
       width: 9.1cm; height: 12.9cm; padding: 1.45cm 0.3cm 0.5cm 0.3cm; 
       box-sizing: border-box; background: white; position: relative; display: flex; flex-direction: column;
+      margin-bottom: 20px; /* ระยะห่างระหว่างฉลากบนหน้าจอ */
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); /* เงาเบาๆ บนหน้าจอ */
     }
 
     .pn-table { width: 100%; border-collapse: collapse; border: 2px solid #000; table-layout: fixed; }
     .pn-table td { border: 1px solid #000; vertical-align: middle; word-wrap: break-word; }
     .pn-table th { border: 2px solid #000; padding: 4px; font-size: 14px; background: #eee; }
 
-    /* โหมด 1: สารน้อย (<= 5 รายการ) - ขยายใหญ่สะใจ */
+    /* โหมด 1: สารน้อย (<= 5 รายการ) */
     .large-mode .pn-table td { padding: 8px 6px; font-size: 18px; }
     .large-mode .header-info { font-size: 17px; }
 
-    /* โหมด 2: สารเยอะ (6-9 รายการ) - ปรับจูน Padding เพื่อไม่ให้ทับ Energy */
-    .compact-mode .pn-table td { padding: 2.2px 6px; font-size: 14.5px; } /* บีบ padding ลงเล็กน้อย */
+    /* โหมด 2: สารเยอะ (6-9 รายการ) */
+    .compact-mode .pn-table td { padding: 2.2px 6px; font-size: 14.5px; }
     .compact-mode .header-info { font-size: 15px; }
     .compact-mode .table-container { max-height: 7.2cm; overflow: hidden; }
 
     .header-info { border-bottom: 2.5px solid #000; margin-bottom: 4px; padding-bottom: 2px; }
     
-    /* Footer ล็อคตำแหน่ง 1.05cm ตามที่คุณขิมสั่ง */
     .footer-container { 
       position: absolute; bottom: 1.05cm; left: 0.3cm; right: 0.3cm;
       border-top: 2px solid #000; padding-top: 6px; display: grid; grid-template-columns: 1fr 1fr;
-      background: white; /* บังรอยตารางแลบ */
+      background: white;
     }
     
     .rate-box { border: 2.5px solid #000; padding: 2px 8px; font-size: 18px; font-weight: 900; background: #fff; }
@@ -56,9 +78,9 @@
     [contenteditable="true"]:hover { background: #fff9c4; outline: 1px dashed #ccc; cursor: text; }
   </style>
 </head>
-<body class="bg-slate-50 min-h-screen">
+<body>
 
-  <div class="max-w-xl mx-auto py-8 no-print text-center">
+  <div class="max-w-xl w-full py-8 no-print text-center">
     <h1 class="text-2xl font-black text-emerald-900 mb-6 uppercase tracking-tighter">🖨️ เลือกสั่งพิมพ์</h1>
     <div class="grid grid-cols-2 gap-4 mb-8">
       <div id="card-pn" onclick="selectSection('pn')" class="bg-white p-6 rounded-3xl border-4 border-emerald-100 cursor-pointer shadow-sm hover:scale-105 transition-transform">
@@ -116,7 +138,6 @@
       const expDate = new Date(o.orderDate);
       expDate.setDate(expDate.getDate() + 1);
 
-      // กรองรายการที่มีค่าจริง
       const rows = [];
       const addRow = (label, val) => { if (val && parseFloat(val) > 0) rows.push({label, val}); };
       
@@ -155,7 +176,6 @@
               <span>Ward: ${o.ward}</span>
               <span>Route: ${routeLabel}</span>
             </div>
-            
             <div class="table-container">
               <table class="pn-table">
                 <thead>
@@ -170,7 +190,6 @@
                 </tbody>
               </table>
             </div>
-
             <div class="footer-container" contenteditable="true">
               <div class="energy-text">Energy: ${o.productKcal} kcal</div>
               <div class="text-right flex flex-col items-end">
@@ -184,7 +203,7 @@
       document.getElementById('pn-area').innerHTML = pnHTML;
 
       document.getElementById('bag-area').innerHTML = `
-        <div class="sticker sticker-pn flex flex-col items-center justify-center text-center" style="width:3.75in; height:2.48in; padding:1.1cm 0.25in 0.1in 0.25in;" contenteditable="true">
+        <div class="sticker sticker-pn flex flex-col items-center justify-center text-center" style="width:3.75in; height:2.48in; padding:1.1cm 0.25in 0.1in 0.25in; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);" contenteditable="true">
           <div style="font-size: 52px; font-weight: 900; line-height: 1;">${o.ward}</div>
           <div style="border-top: 4px solid #000; border-bottom: 4px solid #000; width: 100%; padding: 8px 0; margin: 8px 0;">
             <span style="font-size: 26px; font-weight: 900; display: block; line-height: 1.1;">${o.patientName}</span>
@@ -196,7 +215,6 @@
       `;
     }
 
-    // จุดสำคัญ: สั่งให้ทำงานทันทีที่โหลดหน้าเสร็จ
     window.onload = renderLabels;
   </script>
 </body>
