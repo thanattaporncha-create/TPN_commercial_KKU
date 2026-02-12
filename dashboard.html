@@ -99,28 +99,30 @@
     }
 
     async function loadSummary() {
-      const start = document.getElementById('startDate').value;
-      const end = document.getElementById('endDate').value;
-      const tbody = document.getElementById('summaryBody');
-      const statsContainer = document.getElementById('statsContainer');
-      
-      tbody.innerHTML = '<tr><td colspan="7" class="p-20 text-center font-black text-emerald-600 animate-pulse text-xl">⏳ กำลังเชื่อมต่อฐานข้อมูล...</td></tr>';
-      statsContainer.classList.add('hidden');
+  const start = document.getElementById('startDate').value; // คืนค่า YYYY-MM-DD
+  const end = document.getElementById('endDate').value;
+  const tbody = document.getElementById('summaryBody');
+  
+  // โชว์ Loading
+  tbody.innerHTML = '<tr><td colspan="7" class="p-20 text-center font-black text-emerald-600 animate-pulse text-xl">⏳ กำลังกรองข้อมูล...</td></tr>';
 
-      try {
-        const res = await fetch(`${SCRIPT_URL}?action=getSummary&start=${start}&end=${end}`);
-        masterData = await res.json();
-        
-        const wards = [...new Set(masterData.map(item => item.ward))].filter(w => w).sort();
-        const wardSelect = document.getElementById('searchWard');
-        wardSelect.innerHTML = '<option value="">ทั้งหมด (All Wards)</option>' + 
-          wards.map(w => `<option value="${w}">${w}</option>`).join('');
+  try {
+    // ตรวจสอบ URL อีกครั้งว่าลงท้ายด้วย /exec
+    const res = await fetch(`${SCRIPT_URL}?action=getSummary&start=${start}&end=${end}`);
+    masterData = await res.json();
+    
+    // อัปเดต Dropdown Ward อัตโนมัติจากข้อมูลที่ดึงมา
+    const wards = [...new Set(masterData.map(item => item.ward))].filter(w => w).sort();
+    const wardSelect = document.getElementById('searchWard');
+    wardSelect.innerHTML = '<option value="">ทั้งหมด (All Wards)</option>' + 
+      wards.map(w => `<option value="${w}">${w}</option>`).join('');
 
-        filterDisplay();
-      } catch (e) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-20 text-center text-red-500 font-bold font-black italic text-xl">❌ เกิดข้อผิดพลาดในการดึงข้อมูล</td></tr>`;
-      }
-    }
+    filterDisplay(); // นำข้อมูลไปวาดตารางและสถิติ
+  } catch (e) {
+    console.error(e);
+    tbody.innerHTML = '<tr><td colspan="7" class="p-20 text-center text-red-500 font-bold italic">❌ ไม่สามารถดึงข้อมูลได้</td></tr>';
+  }
+}
 
     function filterDisplay() {
       const hnSearch = document.getElementById('searchHN').value.toLowerCase();
