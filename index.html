@@ -30,9 +30,7 @@
       <form onsubmit="handleLogin(event)" class="space-y-4">
         <input type="text" id="username" placeholder="Username" required class="w-full p-4 border-2 border-emerald-50 rounded-2xl focus:border-emerald-500 outline-none font-bold text-center uppercase tracking-widest text-emerald-700 bg-emerald-50/30">
         <input type="password" id="password" placeholder="Password" required class="w-full p-4 border-2 border-emerald-50 rounded-2xl focus:border-emerald-500 outline-none font-bold text-center tracking-widest text-emerald-700 bg-emerald-50/30">
-        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white p-5 rounded-2xl font-black text-xl shadow-xl transition-all transform active:scale-95">
-          เข้าสู่ระบบ 🚀
-        </button>
+        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white p-5 rounded-2xl font-black text-xl shadow-xl transition-all transform active:scale-95">เข้าสู่ระบบ 🚀</button>
       </form>
     </div>
   </div>
@@ -44,21 +42,16 @@
             <span id="displayUserName" class="text-sm font-black text-emerald-700 px-3 py-1 bg-white border border-emerald-100 rounded-xl shadow-sm"></span>
             <button onclick="logout()" class="text-[10px] font-black text-red-400 hover:text-red-600 uppercase ml-2 underline">Logout</button>
         </div>
-        <div class="flex gap-2">
-            <button class="px-4 py-2 bg-white rounded-xl text-emerald-800 font-black text-xs shadow-sm border border-emerald-50 hover:bg-emerald-50">📊 Dashboard</button>
-            <button class="px-4 py-2 bg-white rounded-xl text-emerald-800 font-black text-xs shadow-sm border border-emerald-50 hover:bg-emerald-50">📦 Stock</button>
-        </div>
     </nav>
 
     <div class="space-y-6">
         <header class="gradient-header p-8 rounded-3xl shadow-xl">
           <div class="flex justify-between items-center text-white">
             <div>
-              <h1 class="text-2xl font-bold uppercase tracking-tight text-white">TPN COMMERCIAL ORDER</h1>
-              <p class="text-lg font-medium text-white">ระบบคำนวณสารอาหารแบบสำเร็จรูป</p>
-              <p class="text-sm uppercase text-white">Srinagarind Hospital</p>
+              <h1 class="text-2xl font-bold uppercase tracking-tight">TPN COMMERCIAL ORDER</h1>
+              <p class="text-lg font-medium">ระบบคำนวณสารอาหารแบบสำเร็จรูป (Srinagarind)</p>
             </div>
-            <button onclick="location.reload()" class="text-xs bg-white/20 px-3 py-1 rounded-lg hover:bg-white/30 transition-all text-white border border-white/20">🔄 เริ่มใหม่</button>
+            <button onclick="location.reload()" class="text-xs bg-white/20 px-3 py-1 rounded-lg hover:bg-white/30 text-white border border-white/20">🔄 เริ่มใหม่</button>
           </div>
         </header>
 
@@ -99,14 +92,14 @@
 
         <section class="bg-white p-6 rounded-2xl card-shadow">
           <h2 class="section-title mb-4">⚖️ น้ำหนักคนไข้</h2>
-          <div class="relative max-w-xs mx-auto md:mx-0">
+          <div class="relative max-w-xs">
             <input type="number" id="bw" step="0.1" placeholder="0.0" class="w-full p-4 border-2 border-emerald-100 rounded-2xl pr-16 text-3xl font-black text-emerald-700 outline-none" oninput="calculateAll()">
             <span class="absolute right-4 top-5 text-emerald-300 font-black text-xl">kg</span>
           </div>
         </section>
 
         <section class="bg-white p-6 rounded-2xl card-shadow space-y-4 border-t-8 border-emerald-600">
-          <h2 class="section-title" style="color:#065f46; text-center; text-emerald-800">📦 เลือกผลิตภัณฑ์และจำนวน</h2>
+          <h2 class="section-title">📦 เลือกผลิตภัณฑ์และจำนวน</h2>
           <select id="productSelect" class="w-full p-4 border-2 border-emerald-100 rounded-xl bg-emerald-50 text-xl font-black text-emerald-900 outline-none text-center" onchange="updateProductDetails()">
             <option value="">-- คลิกเลือกสารอาหาร --</option>
             <option value="smof_c_1477" data-vol="1477" data-kcal="1600">SMOF kabiven (C-line) 1,477 ml / 1600 kcal</option>
@@ -122,9 +115,9 @@
           <div class="bg-emerald-50 p-4 rounded-2xl border border-emerald-100 text-center">
             <label class="block text-xs font-black text-emerald-600 uppercase mb-2 tracking-widest">จำนวนถุงที่เบิก (Stock Out)</label>
             <div class="flex items-center justify-center gap-6">
-              <button onclick="changeBag(-1)" class="w-12 h-12 bg-white rounded-full shadow-md text-2xl font-black text-emerald-600 border border-emerald-100 active:scale-90">-</button>
+              <button onclick="changeBag(-1)" class="w-12 h-12 bg-white rounded-full shadow-md text-2xl font-black text-emerald-600 active:scale-90">-</button>
               <span id="bagCountDisplay" class="text-4xl font-black text-emerald-900 w-16 text-center">1</span>
-              <button onclick="changeBag(1)" class="w-12 h-12 bg-white rounded-full shadow-md text-2xl font-black text-emerald-600 border border-emerald-100 active:scale-90">+</button>
+              <button onclick="changeBag(1)" class="w-12 h-12 bg-white rounded-full shadow-md text-2xl font-black text-emerald-600 active:scale-90">+</button>
             </div>
             <input type="hidden" id="bagCount" value="1">
           </div>
@@ -251,7 +244,7 @@
     function filterWards() { const val = document.getElementById('wardInput').value.toLowerCase(); renderWards(wards.filter(w => w.toLowerCase().includes(val))); }
     function selectWard(w) { document.getElementById('wardInput').value = w; document.getElementById('wardList').classList.add('hidden'); }
     
-    // --- ฟังก์ชันดึงข้อมูลคนไข้และ Order ล่าสุด ---
+    // --- ค้นหาข้อมูลล่าสุด ---
     let cachedLatestOrder = null;
 
     async function fetchLatestOrder() {
@@ -263,17 +256,16 @@
         const response = await fetch(`${SCRIPT_URL}?action=getLatestOrder&hn=${hn}`);
         const data = await response.json();
 
-        if (data && data.patientName) {
+        if (data) {
           cachedLatestOrder = data;
-          document.getElementById('patientName').value = data.patientName;
+          document.getElementById('patientName').value = data.patientName || "";
           if (data.ward) document.getElementById('wardInput').value = data.ward;
-          btn.classList.remove('hidden'); // แสดงปุ่ม Reorder
+          btn.classList.remove('hidden'); 
         } else {
           cachedLatestOrder = null;
           btn.classList.add('hidden');
         }
       } catch (e) {
-        console.error("Fetch error:", e);
         btn.classList.add('hidden');
       }
     }
@@ -282,14 +274,10 @@
       if (!cachedLatestOrder) return;
       const o = cachedLatestOrder;
 
-      // 1. ข้อมูลพื้นฐาน
       document.getElementById('bw').value = o.bw || "";
-      
-      // 2. เลือก Route
       if (o.route === "Central Line") document.getElementById('route-central').checked = true;
       else if (o.route === "Peripheral Line") document.getElementById('route-peripheral').checked = true;
 
-      // 3. เลือกผลิตภัณฑ์
       const productSelect = document.getElementById('productSelect');
       for (let i = 0; i < productSelect.options.length; i++) {
         if (productSelect.options[i].text === o.productName) {
@@ -299,7 +287,6 @@
       }
       updateProductDetails();
 
-      // 4. Additives
       document.getElementById('addamel').value = o.addamel || 0;
       document.getElementById('bco').value = o.bco || 0;
       document.getElementById('vitalipid').value = o.vitalipid || 0;
@@ -309,7 +296,6 @@
         document.getElementById('vitVol').value = o.vitVol || 0;
       }
 
-      // 5. สารอื่นๆ
       document.getElementById('o1-name').value = o.other1Name || "";
       document.getElementById('o1-vol').value = o.other1Vol || "";
       document.getElementById('o2-name').value = o.other2Name || "";
@@ -319,11 +305,10 @@
       document.getElementById('o4-name').value = o.other4Name || "";
       document.getElementById('o4-vol').value = o.other4Vol || "";
 
-      // 6. Rate
       document.getElementById('manualRate').value = o.rate || "";
 
       calculateAll();
-      alert("✅ ดึงข้อมูลสำเร็จ! กรุณาตรวจสอบความถูกต้องก่อนบันทึกนะคะ");
+      alert("✅ ดึงข้อมูลสำเร็จ! ตรวจสอบความถูกต้องก่อนบันทึกนะคะ");
     }
 
     let currentVitType = '';
@@ -382,7 +367,6 @@
       const hn = document.getElementById('hn').value;
       const pName = document.getElementById('patientName').value;
       if (!hn || !pName) { alert("⚠️ กรุณาระบุ HN และชื่อคนไข้ค่ะ"); return; }
-      
       const productSelect = document.getElementById('productSelect');
       if (productSelect.value === "") { alert("⚠️ กรุณาเลือกผลิตภัณฑ์ค่ะ"); return; }
 
@@ -420,17 +404,9 @@
 
       saveBtn.disabled = true;
       saveBtn.innerHTML = "⏳ กำลังบันทึก...";
-
       try {
-        await fetch(SCRIPT_URL, {
-          method: 'POST',
-          mode: 'no-cors', 
-          body: formData
-        });
-        
-        const params = formData.toString();
-        window.open(`label.html?${params}`, '_blank');
-        
+        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: formData });
+        window.open(`label.html?${formData.toString()}`, '_blank');
         alert("✅ บันทึกข้อมูลเรียบร้อยแล้วค่ะ!");
         location.reload(); 
       } catch (e) {
