@@ -196,10 +196,9 @@
     </div>
   </div>
 
-  <script>
-    // ดึง base URL จากตัวสคริปต์ปัจจุบันเพื่อให้เปิดไฟล์อื่นๆ ในโครงการเดียวกันได้
-    const baseUrl = window.location.href.split('?')[0].split('#')[0];
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzZlQlo7JCb5N7_aRFAzGxonbVWwEsJCvEhQL8XRDk5hzQ6sgF9ugKwMFb3FheXh2Hw/exec";
+<script>
+    // **สำคัญ: เมื่อ Deploy ใหม่แล้ว ให้นำ URL มาวางทับที่นี่**
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw9tyQ-r7GjTS2XJYSqEl8TQKslVNIHaaESD9nfcxfCRPqwFc8gq1Z6a6Kdzlqzdc-U/exec";
 
     const userMap = {
       'OP': 'ภญ.อรปภา ชัยเลิศวาณิช', 'SK': 'ภญ.ศิริโชค คุณวงศ์กฤต', 'NC': 'ภญ.ณัฐวรรณ ฉ่ำมณี',
@@ -208,15 +207,14 @@
       'LS': 'ภญ.ลักษิกา จิตรชื่น', 'SO': 'ภญ.อิสรา โสภัย'
     };
 
-    // ฟังก์ชันเปลี่ยนหน้า (เชื่อมไปยังไฟล์อื่นในโครงการ)
+    // --- ฟังก์ชันนำทางสลับหน้า ---
     function navigateTo(page) {
-      // ตรวจสอบว่ามีข้อมูลผู้ใช้หรือไม่ (เพื่อความปลอดภัย)
       if(!sessionStorage.getItem('tpnUser')) {
           alert('กรุณาเข้าสู่ระบบก่อนค่ะ');
           return;
       }
-      // สร้าง URL ใหม่เพื่อเปิดไฟล์ .html ชื่อตามที่ระบุ
-      window.location.href = baseUrl + "?page=" + page;
+      // ระบบจะวิ่งไปเรียก doGet ใน Code.gs พร้อมส่งพารามิเตอร์ page ไปให้
+      window.location.href = SCRIPT_URL + "?page=" + page;
     }
 
     function handleLogin(e) {
@@ -269,22 +267,17 @@
       const hn = hnField.value.trim();
       const btn = document.getElementById('reorderBtn');
       const status = document.getElementById('hn-status');
-      
       if (!hn) { status.innerText = ""; return; }
-
       status.innerText = "⏳ กำลังค้นหาข้อมูล...";
       status.className = "text-[10px] font-bold mt-1 ml-1 text-blue-500";
       btn.classList.add('hidden');
-
       try {
         const response = await fetch(`${SCRIPT_URL}?action=getLatestOrder&hn=${hn}`);
         const data = await response.json();
-
         if (data) {
           cachedLatestOrder = data;
           document.getElementById('patientName').value = data.patientName || "";
           if (data.ward) document.getElementById('wardInput').value = data.ward;
-          
           status.innerText = "✅ พบข้อมูลเดิม";
           status.className = "text-[10px] font-bold mt-1 ml-1 text-emerald-600";
           btn.classList.remove('hidden'); 
@@ -304,11 +297,9 @@
     function applyLatestOrder() {
       if (!cachedLatestOrder) return;
       const o = cachedLatestOrder;
-
       document.getElementById('bw').value = o.bw || "";
       if (o.route === "Central Line") document.getElementById('route-central').checked = true;
       else if (o.route === "Peripheral Line") document.getElementById('route-peripheral').checked = true;
-
       const productSelect = document.getElementById('productSelect');
       for (let i = 0; i < productSelect.options.length; i++) {
         if (productSelect.options[i].text === o.productName) {
@@ -317,16 +308,13 @@
         }
       }
       updateProductDetails();
-
       document.getElementById('addamel').value = o.addamel || 0;
       document.getElementById('bco').value = o.bco || 0;
       document.getElementById('vitalipid').value = o.vitalipid || 0;
-
       if (o.vitType) {
         selectVitamin(o.vitType);
         document.getElementById('vitVol').value = o.vitVol || 0;
       }
-
       document.getElementById('o1-name').value = o.other1Name || "";
       document.getElementById('o1-vol').value = o.other1Vol || "";
       document.getElementById('o2-name').value = o.other2Name || "";
@@ -335,62 +323,9 @@
       document.getElementById('o3-vol').value = o.other3Vol || "";
       document.getElementById('o4-name').value = o.other4Name || "";
       document.getElementById('o4-vol').value = o.other4Vol || "";
-
       document.getElementById('manualRate').value = o.rate || "";
-
       calculateAll();
       alert("✅ ดึงข้อมูลสำเร็จ! ตรวจสอบความถูกต้องก่อนบันทึกนะคะ");
-    }
-
-    let currentVitType = '';
-    function selectVitamin(type) {
-      const vitVol = document.getElementById('vitVol');
-      const vitalipid = document.getElementById('vitalipid');
-      const vitHint = document.getElementById('vit-hint');
-      currentVitType = type;
-      document.getElementById('btn-cernevit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-white text-gray-400";
-      document.getElementById('btn-soluvit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-white text-gray-400";
-      if (type === 'cernevit') {
-        document.getElementById('btn-cernevit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-emerald-600 text-white shadow-md";
-        vitVol.value = 5; vitHint.innerHTML = "⚠️ MAX CERNEVIT = 5 ML";
-        vitalipid.value = 0; vitalipid.readOnly = true; vitalipid.classList.add('opacity-30', 'bg-gray-200');
-      } else {
-        document.getElementById('btn-soluvit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-yellow-400 text-black shadow-md";
-        vitVol.value = 10; vitHint.innerHTML = "⚠️ MAX SOLUVIT-N = 10 ML";
-        vitalipid.value = 10; vitalipid.readOnly = false; vitalipid.classList.remove('opacity-30', 'bg-gray-200');
-      }
-      calculateAll();
-    }
-
-    function checkBcoLimit() {
-      const bco = document.getElementById('bco');
-      if (parseFloat(bco.value) > 2) bco.classList.add('text-red-700', 'bg-red-50');
-      else bco.classList.remove('text-red-700', 'bg-red-50');
-      calculateAll();
-    }
-
-    function updateProductDetails() {
-      const s = document.getElementById('productSelect');
-      const o = s.options[s.selectedIndex];
-      document.getElementById('prodVol').textContent = o.getAttribute('data-vol') || 0;
-      document.getElementById('prodKcal').textContent = o.getAttribute('data-kcal') || 0;
-      calculateAll();
-    }
-
-    function calculateAll() {
-      const v = (id) => parseFloat(document.getElementById(id).value) || 0;
-      const prodVol = parseFloat(document.getElementById('prodVol').textContent) || 0;
-      const vitVol = v('vitVol');
-      const vitMaxMsg = document.getElementById('vit-max-msg');
-      if ((currentVitType==='cernevit' && vitVol>5) || (currentVitType==='soluvit' && vitVol>10)) vitMaxMsg.classList.remove('invisible');
-      else vitMaxMsg.classList.add('invisible');
-      let otherTotal = 0;
-      document.querySelectorAll('.other-vol').forEach(input => { otherTotal += parseFloat(input.value) || 0; });
-      const grandTotal = prodVol + v('addamel') + vitVol + v('bco') + v('vitalipid') + otherTotal;
-      document.getElementById('totalVolDisplay').textContent = grandTotal.toLocaleString();
-      const rh = document.getElementById('rateHint');
-      if (grandTotal > 0) { rh.textContent = `✅ แนะนำ: ${(grandTotal/24).toFixed(1)} ml/hr`; rh.style.color = "#bef264"; }
-      else { rh.textContent = `👉 กรุณาเลือก Product...`; rh.style.color = "#facc15"; }
     }
 
     async function saveOrder() {
@@ -400,10 +335,8 @@
       if (!hn || !pName) { alert("⚠️ กรุณาระบุ HN และชื่อคนไข้ค่ะ"); return; }
       const productSelect = document.getElementById('productSelect');
       if (productSelect.value === "") { alert("⚠️ กรุณาเลือกผลิตภัณฑ์ค่ะ"); return; }
-
       const v = (id) => document.getElementById(id).value;
       const t = (id) => document.getElementById(id).textContent;
-      
       const formData = new URLSearchParams();
       formData.append("action", "saveOrder");
       formData.append("orderDate", v('orderDate'));
@@ -437,7 +370,7 @@
       saveBtn.innerHTML = "⏳ กำลังบันทึก...";
       try {
         await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: formData });
-        window.open(`label.html?${formData.toString()}`, '_blank');
+        window.open(`${SCRIPT_URL}?page=label&${formData.toString()}`, '_blank');
         alert("✅ บันทึกข้อมูลเรียบร้อยแล้วค่ะ!");
         location.reload(); 
       } catch (e) {
@@ -445,6 +378,54 @@
         saveBtn.disabled = false;
         saveBtn.innerHTML = "💾 บันทึกและพิมพ์ฉลาก";
       }
+    }
+    
+    let currentVitType = '';
+    function selectVitamin(type) {
+      const vitVol = document.getElementById('vitVol');
+      const vitalipid = document.getElementById('vitalipid');
+      const vitHint = document.getElementById('vit-hint');
+      currentVitType = type;
+      document.getElementById('btn-cernevit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-white text-gray-400";
+      document.getElementById('btn-soluvit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-white text-gray-400";
+      if (type === 'cernevit') {
+        document.getElementById('btn-cernevit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-emerald-600 text-white shadow-md";
+        vitVol.value = 5; vitHint.innerHTML = "⚠️ MAX CERNEVIT = 5 ML";
+        vitalipid.value = 0; vitalipid.readOnly = true; vitalipid.classList.add('opacity-30', 'bg-gray-200');
+      } else {
+        document.getElementById('btn-soluvit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-yellow-400 text-black shadow-md";
+        vitVol.value = 10; vitHint.innerHTML = "⚠️ MAX SOLUVIT-N = 10 ML";
+        vitalipid.value = 10; vitalipid.readOnly = false; vitalipid.classList.remove('opacity-30', 'bg-gray-200');
+      }
+      calculateAll();
+    }
+    function updateProductDetails() {
+      const s = document.getElementById('productSelect');
+      const o = s.options[s.selectedIndex];
+      document.getElementById('prodVol').textContent = o.getAttribute('data-vol') || 0;
+      document.getElementById('prodKcal').textContent = o.getAttribute('data-kcal') || 0;
+      calculateAll();
+    }
+    function calculateAll() {
+      const v = (id) => parseFloat(document.getElementById(id).value) || 0;
+      const prodVol = parseFloat(document.getElementById('prodVol').textContent) || 0;
+      const vitVol = v('vitVol');
+      const vitMaxMsg = document.getElementById('vit-max-msg');
+      if ((currentVitType==='cernevit' && vitVol>5) || (currentVitType==='soluvit' && vitVol>10)) vitMaxMsg.classList.remove('invisible');
+      else vitMaxMsg.classList.add('invisible');
+      let otherTotal = 0;
+      document.querySelectorAll('.other-vol').forEach(input => { otherTotal += parseFloat(input.value) || 0; });
+      const grandTotal = prodVol + v('addamel') + vitVol + v('bco') + v('vitalipid') + otherTotal;
+      document.getElementById('totalVolDisplay').textContent = grandTotal.toLocaleString();
+      const rh = document.getElementById('rateHint');
+      if (grandTotal > 0) { rh.textContent = `✅ แนะนำ: ${(grandTotal/24).toFixed(1)} ml/hr`; rh.style.color = "#bef264"; }
+      else { rh.textContent = `👉 กรุณาเลือก Product...`; rh.style.color = "#facc15"; }
+    }
+    function checkBcoLimit() {
+      const bco = document.getElementById('bco');
+      if (parseFloat(bco.value) > 2) bco.classList.add('text-red-700', 'bg-red-50');
+      else bco.classList.remove('text-red-700', 'bg-red-50');
+      calculateAll();
     }
 
     window.onload = () => { if (sessionStorage.getItem('tpnUser')) showMainApp(); };
