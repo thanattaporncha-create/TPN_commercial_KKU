@@ -1,187 +1,101 @@
 <!doctype html>
-<html lang="th" class="h-full">
+<html lang="th">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TPN Dashboard | โรงพยาบาลศรีนครินทร์</title>
+  <title>TPN Dashboard | Summary</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700;800&display=swap" rel="stylesheet">
   <style>
-    * { font-family: 'Sarabun', sans-serif; }
-    /* ปรับโทนสีเป็นเขียวแบบหน้า Index */
-    .gradient-header { background: linear-gradient(135deg, #065f46 0%, #10b981 100%); }
-    .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    
-    .btn-action { 
-      @apply flex-1 py-1.5 rounded-full text-[10px] font-black transition-all flex items-center justify-center gap-1 border-2 border-gray-100 bg-transparent text-gray-700; 
-    }
-    .btn-label:hover { @apply border-emerald-400 text-emerald-800; }
-    .btn-off:hover { @apply border-red-400 text-red-800; }
+    body { font-family: 'Sarabun', sans-serif; background-color: #f8fafc; }
+    .table-container { overflow-x: auto; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
   </style>
 </head>
-<body class="bg-gray-50 min-h-full">
+<body class="p-4 md:p-8">
+  <div class="max-w-5xl mx-auto">
+    <div class="flex justify-between items-center mb-8">
+      <div>
+        <h1 class="text-3xl font-black text-emerald-900">📊 TPN DASHBOARD</h1>
+        <p class="text-emerald-600 font-bold">สรุปรายการคำนวณสารอาหาร</p>
+      </div>
+      <a href="index.html" class="bg-white border-2 border-emerald-500 text-emerald-600 px-6 py-2 rounded-2xl font-bold hover:bg-emerald-50 transition-all">🔙 กลับหน้าหลัก</a>
+    </div>
 
-  <header class="gradient-header text-white py-3 px-6 sticky top-0 z-50 shadow-lg">
-    <div class="max-w-7xl mx-auto flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="text-2xl">📊</div>
+    <div class="bg-white p-6 rounded-3xl shadow-sm border border-emerald-50 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
         <div>
-          <h1 class="text-lg font-bold uppercase tracking-tight text-white">TPN Order Dashboard</h1>
-          <p class="text-emerald-50 text-[10px]">Srinagarind Hospital | KKU Pharmacy</p>
+          <label class="block text-sm font-bold text-gray-600 mb-1">เริ่มวันที่</label>
+          <input type="date" id="startDate" class="w-full p-3 border rounded-xl outline-none focus:border-emerald-500">
         </div>
-      </div>
-      <button onclick="window.location.href='index.html'" class="px-5 py-2 bg-white/10 hover:bg-white/20 rounded-full transition-all text-sm font-black border border-white/20 text-white">🏠 กลับหน้าหลัก</button>
-    </div>
-  </header>
-
-  <main class="max-w-7xl mx-auto p-4 md:p-6 text-black">
-    <div class="bg-white rounded-[2rem] shadow-sm p-6 mb-4 border border-gray-200">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-5 items-end font-black">
-        <div class="flex flex-col">
-          <span class="text-[11px] mb-1 uppercase tracking-wider text-emerald-800">📅 เริ่มวันที่</span>
-          <input type="date" id="startDate" class="px-4 py-2 rounded-2xl border-2 border-gray-100 focus:border-emerald-500 outline-none">
+        <div>
+          <label class="block text-sm font-bold text-gray-600 mb-1">ถึงวันที่</label>
+          <input type="date" id="endDate" class="w-full p-3 border rounded-xl outline-none focus:border-emerald-500">
         </div>
-        <div class="flex flex-col">
-          <span class="text-[11px] mb-1 uppercase tracking-wider text-emerald-800">📅 ถึงวันที่</span>
-          <input type="date" id="endDate" class="px-4 py-2 rounded-2xl border-2 border-gray-100 focus:border-emerald-500 outline-none">
-        </div>
-        <div class="flex flex-col">
-          <span class="text-[11px] mb-1 uppercase tracking-wider text-emerald-800">🔍 ค้นหา HN</span>
-          <input type="text" id="filterHN" placeholder="ระบุเลข HN..." class="px-4 py-2 rounded-2xl border-2 border-gray-100 focus:border-emerald-500 outline-none" oninput="renderContent()">
-        </div>
-        <div class="flex items-center gap-3">
-          <button onclick="loadData()" class="flex-1 px-4 py-2.5 bg-emerald-600 text-white rounded-full font-black text-xs shadow-md hover:bg-emerald-700 transition-all">🔄 ดึงข้อมูล</button>
-          <div class="text-right min-w-[50px]"><span id="caseCount" class="text-4xl font-black text-emerald-900 leading-none">0</span></div>
-        </div>
+        <button onclick="loadSummary()" class="bg-emerald-600 text-white p-3 rounded-xl font-bold hover:bg-emerald-700 shadow-lg transition-all">🔍 ดึงข้อมูลสรุป</button>
       </div>
     </div>
 
-    <div id="cardContainer" class="flex flex-col gap-3 animate-fade-in mb-8">
-        </div>
-
-    <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-200">
-        <h3 class="font-black text-emerald-800 mb-4 flex items-center gap-2">📦 สรุปยอดเบิกผลิตภัณฑ์ (ถุง)</h3>
-        <div class="h-[300px]">
-            <canvas id="inventoryChart"></canvas>
-        </div>
+    <div class="table-container bg-white">
+      <table class="w-full text-left border-collapse">
+        <thead class="bg-emerald-600 text-white">
+          <tr>
+            <th class="p-4 font-bold">วันที่</th>
+            <th class="p-4 font-bold">HN</th>
+            <th class="p-4 font-bold">ชื่อคนไข้</th>
+            <th class="p-4 font-bold">Ward</th>
+            <th class="p-4 font-bold">Product</th>
+            <th class="p-4 font-bold text-right">Vol (ml)</th>
+          </tr>
+        </thead>
+        <tbody id="summaryBody" class="text-gray-700">
+          <tr>
+            <td colspan="6" class="p-10 text-center text-gray-400 italic">กรุณาเลือกช่วงวันที่และกดปุ่มดึงข้อมูล</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-
-    <p class="text-center text-emerald-800 text-[10px] py-10 uppercase font-black tracking-[0.2em]">Srinagarind Hospital • Pharmacy Dept</p>
-  </main>
+  </div>
 
   <script>
-    let allOrders = [];
-    let inventoryChart;
+    const SCRIPT_URL = "ใส่ URL ของ Google Script คุณขิมที่นี่";
 
-    document.addEventListener('DOMContentLoaded', () => {
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('startDate').value = today;
-        document.getElementById('endDate').value = today;
-        loadData();
-    });
+    // ตั้งค่าวันที่เริ่มต้นเป็นวันนี้
+    window.onload = () => {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('startDate').value = today;
+      document.getElementById('endDate').value = today;
+    };
 
-    function loadData() {
-        const start = document.getElementById('startDate').value;
-        const end = document.getElementById('endDate').value;
-        
-        document.getElementById('cardContainer').innerHTML = `<div class="text-center py-10 font-black">🔄 กำลังเรียกข้อมูล...</div>`;
-        
-        google.script.run.withSuccessHandler(data => {
-            allOrders = data;
-            renderContent();
-        }).getDashboardData(start, end);
-    }
+    async function loadSummary() {
+      const start = document.getElementById('startDate').value;
+      const end = document.getElementById('endDate').value;
+      const tbody = document.getElementById('summaryBody');
+      
+      tbody.innerHTML = '<tr><td colspan="6" class="p-10 text-center font-bold text-emerald-600 animate-pulse">⏳ กำลังประมวลผลข้อมูล...</td></tr>';
 
-    function renderContent() {
-        const container = document.getElementById('cardContainer');
-        const fHN = document.getElementById('filterHN').value.toLowerCase();
-        
-        const filtered = allOrders.filter(o => (fHN ? o.hn?.toString().toLowerCase().includes(fHN) : true));
-        
-        document.getElementById('caseCount').innerText = filtered.length;
-        
-        // คำนวณยอดผลิตภัณฑ์สำหรับกราฟ
-        const productStats = {};
-        filtered.forEach(o => {
-            const qty = parseFloat(o.quantity) || 0;
-            productStats[o.productName] = (productStats[o.productName] || 0) + qty;
-        });
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=getSummary&start=${start}&end=${end}`);
+        const data = await res.json();
 
-        updateChart(productStats);
-
-        // แสดงรายการคนไข้แบบ Card ตามสไตล์ที่คุณขิมชอบ
-        if (filtered.length === 0) {
-            container.innerHTML = `<div class="text-center py-10 bg-white rounded-3xl border-2 border-dashed border-gray-200 font-black">ไม่พบข้อมูล</div>`;
-            return;
+        if (data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" class="p-10 text-center text-red-400 font-bold">❌ ไม่พบข้อมูลในช่วงเวลาที่เลือก</td></tr>';
+          return;
         }
 
-        container.innerHTML = filtered.reverse().map(order => {
-            const isC = order.route?.toLowerCase().includes('central');
-            return `
-            <div class="bg-white border-2 border-gray-200 rounded-[1.5rem] p-4 shadow-sm flex flex-col gap-4 hover:border-emerald-400 transition-all">
-              <div class="flex items-center gap-5">
-                <div class="flex flex-col items-center justify-center min-w-[85px] border-r-2 border-gray-100 pr-4">
-                  <span class="text-3xl font-black text-black leading-none">${order.ward || '-'}</span>
-                  <span class="${isC ? 'bg-red-600' : 'bg-emerald-600'} text-white text-[10px] px-3 py-1 rounded-full font-black mt-2 uppercase tracking-tight">${order.route || 'N/A'}</span>
-                </div>
-                <div class="flex-1 min-w-[180px]">
-                  <h3 class="font-black text-xl text-black leading-tight">${order.patientName || 'ไม่ระบุชื่อ'}</h3>
-                  <p class="text-sm font-black text-black font-mono mt-1">HN: <span class="text-lg font-bold text-emerald-700">${order.hn}</span> | <span class="text-blue-700 bg-blue-50 px-2 rounded-lg">BW: ${order.bw} kg</span></p>
-                </div>
-                <div class="hidden md:flex gap-3 text-center min-w-[200px]">
-                  <div class="flex-1 bg-gray-50 rounded-2xl p-2 border border-gray-200">
-                    <span class="text-[9px] text-black block font-black uppercase mb-1">Total Vol</span>
-                    <span class="text-lg font-black text-emerald-800">${order.totalVol || '0'}</span>
-                  </div>
-                </div>
-              </div>
-              <div class="flex gap-3 pt-3 border-t border-gray-100">
-                <button onclick="window.open('label.html?row=${order.row_index}', '_blank')" class="btn-action btn-label">🏷️ พิมพ์ฉลาก</button>
-                <button onclick="deleteOrder(${order.row_index})" class="btn-action btn-off">🗑️ OFF TPN</button>
-              </div>
-            </div>`;
-        }).join('');
-    }
+        tbody.innerHTML = data.map(row => `
+          <tr class="border-b hover:bg-emerald-50/50 transition-colors">
+            <td class="p-4 text-sm">${new Date(row.date).toLocaleDateString('th-TH')}</td>
+            <td class="p-4 font-bold">${row.hn}</td>
+            <td class="p-4">${row.name}</td>
+            <td class="p-4"><span class="bg-emerald-100 text-emerald-800 px-2 py-1 rounded-md text-xs font-bold">${row.ward}</span></td>
+            <td class="p-4 text-xs font-medium">${row.product}</td>
+            <td class="p-4 text-right font-black text-emerald-700">${row.totalVol}</td>
+          </tr>
+        `).join('');
 
-    function updateChart(productData) {
-        const ctx = document.getElementById('inventoryChart').getContext('2d');
-        if (inventoryChart) inventoryChart.destroy();
-        
-        inventoryChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: Object.keys(productData),
-                datasets: [{
-                    label: 'จำนวนถุง',
-                    data: Object.values(productData),
-                    backgroundColor: '#10b981', // สีเขียว Emerald
-                    borderRadius: 12
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { 
-                  legend: { display: false }
-                },
-                scales: { 
-                  y: { 
-                    beginAtZero: true, 
-                    ticks: { stepSize: 1, color: '#065f46', font: { weight: 'bold' } } 
-                  },
-                  x: {
-                    ticks: { color: '#065f46', font: { weight: 'bold' } }
-                  }
-                }
-            }
-        });
-    }
-
-    async function deleteOrder(index) {
-        if(!confirm("⚠️ ยืนยันการสั่ง Off TPN?")) return;
-        alert("ระบบจะทำการลบข้อมูลลำดับที่ " + index + " (ฟังก์ชันลบจริงกำลังพัฒนาค่ะ)");
+      } catch (e) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-10 text-center text-red-500">เกิดข้อผิดพลาด: ${e.message}</td></tr>`;
+      }
     }
   </script>
 </body>
