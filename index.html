@@ -68,6 +68,7 @@
                 <input type="text" id="hn" placeholder="ระบุ HN" class="w-full p-2.5 border rounded-xl outline-none" onblur="fetchLatestOrder()">
                 <button id="reorderBtn" onclick="applyLatestOrder()" class="hidden absolute right-1.5 top-1.5 bg-yellow-400 hover:bg-yellow-500 text-[10px] font-black px-2 py-1.5 rounded-lg shadow-sm border border-yellow-600 transition-all active:scale-95">🔄 Order เดิม</button>
               </div>
+              <p id="hn-status" class="text-[10px] font-bold mt-1 ml-1 h-3"></p>
             </div>
             <div>
               <label class="block text-sm font-bold text-gray-600 mb-1">ชื่อ-นามสกุล</label>
@@ -248,9 +249,16 @@
     let cachedLatestOrder = null;
 
     async function fetchLatestOrder() {
-      const hn = document.getElementById('hn').value.trim();
+      const hnField = document.getElementById('hn');
+      const hn = hnField.value.trim();
       const btn = document.getElementById('reorderBtn');
-      if (!hn) return;
+      const status = document.getElementById('hn-status');
+      
+      if (!hn) { status.innerText = ""; return; }
+
+      status.innerText = "⏳ กำลังค้นหาข้อมูล...";
+      status.className = "text-[10px] font-bold mt-1 ml-1 text-blue-500";
+      btn.classList.add('hidden');
 
       try {
         const response = await fetch(`${SCRIPT_URL}?action=getLatestOrder&hn=${hn}`);
@@ -260,12 +268,19 @@
           cachedLatestOrder = data;
           document.getElementById('patientName').value = data.patientName || "";
           if (data.ward) document.getElementById('wardInput').value = data.ward;
+          
+          status.innerText = "✅ พบข้อมูลเดิม";
+          status.className = "text-[10px] font-bold mt-1 ml-1 text-emerald-600";
           btn.classList.remove('hidden'); 
         } else {
           cachedLatestOrder = null;
+          status.innerText = "🔹 คนไข้รายใหม่";
+          status.className = "text-[10px] font-bold mt-1 ml-1 text-orange-500";
           btn.classList.add('hidden');
         }
       } catch (e) {
+        status.innerText = "❌ เกิดข้อผิดพลาดในการเชื่อมต่อ";
+        status.className = "text-[10px] font-bold mt-1 ml-1 text-red-500";
         btn.classList.add('hidden');
       }
     }
