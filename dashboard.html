@@ -48,10 +48,10 @@
       </div>
     </div>
 
-    <div id="statsContainer" class="hidden animate-fadeIn">
+    <div id="statsContainer" class="hidden">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
         <div class="md:col-span-3 bg-white p-6 rounded-3xl shadow-sm border border-emerald-50">
-          <h2 class="text-sm font-black text-emerald-900 mb-4 flex items-center gap-2 italic uppercase tracking-widest">📦 สรุป Product (ตามผลการกรอกข้างบน)</h2>
+          <h2 class="text-sm font-black text-emerald-900 mb-4 flex items-center gap-2 italic uppercase tracking-widest">📦 สรุป Product (ตามการค้นหาด้านบน)</h2>
           <div id="productStats" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 italic"></div>
         </div>
         <div class="bg-gradient-to-br from-emerald-600 to-emerald-800 text-white p-6 rounded-3xl shadow-xl flex flex-col justify-center text-center">
@@ -75,7 +75,7 @@
             <th class="p-5 text-center">จัดการ</th>
           </tr>
         </thead>
-        <tbody id="summaryBody" class="text-gray-700 divide-y divide-emerald-50">
+        <tbody id="summaryBody" class="text-gray-700 divide-y divide-emerald-50 font-medium italic">
           <tr><td colspan="7" class="p-20 text-center text-gray-400 italic font-bold">กรุณากดปุ่มดึงข้อมูลเพื่อเริ่มต้น</td></tr>
         </tbody>
       </table>
@@ -84,7 +84,7 @@
 
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxfIRMYigsSxBmJmTp1lpJCYnMgQwewEkDItOu4fCNdg8sDu2tL7XaQwi5ufv8e5iGo/exec";
-    let masterData = []; // เก็บข้อมูลทั้งหมดที่ดึงมาครั้งแรก
+    let masterData = [];
 
     window.onload = () => {
       const today = new Date().toISOString().split('T')[0];
@@ -111,13 +111,12 @@
         const res = await fetch(`${SCRIPT_URL}?action=getSummary&start=${start}&end=${end}`);
         masterData = await res.json();
         
-        // อัปเดต Dropdown Ward ให้มีเฉพาะ Ward ที่มีข้อมูลในช่วงนั้น
-        const wards = [...new Set(masterData.map(item => item.ward))].sort();
+        const wards = [...new Set(masterData.map(item => item.ward))].filter(w => w).sort();
         const wardSelect = document.getElementById('searchWard');
         wardSelect.innerHTML = '<option value="">ทั้งหมด (All Wards)</option>' + 
           wards.map(w => `<option value="${w}">${w}</option>`).join('');
 
-        filterDisplay(); // เรียกใช้การแสดงผล
+        filterDisplay();
       } catch (e) {
         tbody.innerHTML = `<tr><td colspan="7" class="p-20 text-center text-red-500 font-bold font-black italic text-xl">❌ เกิดข้อผิดพลาดในการดึงข้อมูล</td></tr>`;
       }
@@ -129,10 +128,9 @@
       const tbody = document.getElementById('summaryBody');
       const productStatsDiv = document.getElementById('productStats');
 
-      // กรองข้อมูลจาก masterData
       const filtered = masterData.filter(item => {
-        const matchHN = item.hn.toString().toLowerCase().includes(hnSearch) || 
-                        item.name.toLowerCase().includes(hnSearch);
+        const matchHN = (item.hn || "").toString().toLowerCase().includes(hnSearch) || 
+                        (item.name || "").toLowerCase().includes(hnSearch);
         const matchWard = wardSearch === "" || item.ward === wardSearch;
         return matchHN && matchWard;
       });
@@ -145,7 +143,6 @@
         return;
       }
 
-      // สถิติ Product
       const productCounts = {};
       filtered.forEach(row => {
         const name = row.productName || "ไม่ระบุ";
@@ -163,10 +160,64 @@
         `).join('');
       document.getElementById('statsContainer').classList.remove('hidden');
 
-      // แสดงผลตาราง
       tbody.innerHTML = filtered.map((row, index) => {
         const rowData = encodeURIComponent(JSON.stringify(row));
-        const id = new Date(row.id).getTime();
         return `
-        <tr class="hover:bg-emerald-50/30 transition-colors group italic">
-          <td class="p-5 text-center font-black text-gray-300 group-hover:text-emerald-500">${index + 1}
+        <tr class="hover:bg-emerald-50/30 transition-colors group">
+          <td class="p-5 text-center font-black text-gray-300 group-hover:text-emerald-500">${index + 1}</td>
+          <td class="p-5 text-[12px] font-bold text-gray-400">${formatThaiDate(row.date)}</td>
+          <td class="p-5">
+            <div class="font-black text-emerald-900 text-lg leading-tight">${row.hn}</div>
+            <div class="text-[13px] font-bold text-gray-500">${row.name}</div>
+          </td>
+          <td class="p-5">
+            <div class="text-[14px] font-black text-blue-600 italic">🏥 ${row.ward}</div>
+            <div class="text-[10px] text-gray-400 uppercase font-black tracking-tighter">${row.route || '-'}</div>
+          </td>
+          <td class="p-5 text-[11px] font-bold text-gray-600 leading-tight">${row.productName}</td>
+          <td class="p-5 text-center font-black">
+            <span class="bg-white px-3 py-1 rounded-lg border border-emerald-100 shadow-sm text-emerald-700">${row.quantity || 1}</span>
+          </td>
+          <td class="p-5">
+            <div class="flex justify-center gap-2">
+              <button onclick="reprint('${rowData}')" class="btn-action bg-blue-500 text-white p-2.5 rounded-xl shadow-lg shadow-blue-200" title="พิมพ์ซ้ำ">🖨️</button>
+              <button onclick="deleteCase('${row.id}', '${row.hn}')" class="btn-action bg-red-100 text-red-500 p-2.5 rounded-xl hover:bg-red-600 hover:text-white" title="ลบข้อมูล">🗑️</button>
+            </div>
+          </td>
+        </tr>
+      `}).join('');
+    }
+
+    function reprint(encodedData) {
+      const row = JSON.parse(decodeURIComponent(encodedData));
+      const params = new URLSearchParams();
+      const fields = ["orderDate", "hn", "patientName", "ward", "route", "bw", "productName", "productVol", "productKcal", "quantity", "addamel", "vitType", "vitVol", "bco", "vitalipid", "other1Name", "other1Vol", "other2Name", "other2Vol", "other3Name", "other3Vol", "other4Name", "other4Vol", "totalVol", "rate"];
+      fields.forEach(f => {
+        let val = row[f];
+        if (f === "patientName") val = row.name;
+        if (f === "orderDate") val = row.date;
+        if (val !== undefined && val !== null) params.append(f, val);
+      });
+      window.open(`label.html?${params.toString()}`, '_blank');
+    }
+
+    async function deleteCase(id, hn) {
+      // แปลง ID ให้เป็น string เพื่อเทียบกับ GS
+      const numericId = new Date(id).getTime().toString();
+      if (!confirm(`ยืนยันการลบ HN: ${hn}?\n(จะลบออกจากระบบถาวร)`)) return;
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=deleteOrder&id=${numericId}`);
+        const result = await res.json();
+        if (result.result === "success") {
+          alert("✅ ลบเรียบร้อยแล้วค่ะ");
+          loadSummary();
+        } else {
+          alert("❌ ไม่พบข้อมูลที่ต้องการลบ");
+        }
+      } catch (e) {
+        alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อ");
+      }
+    }
+  </script>
+</body>
+</html>
