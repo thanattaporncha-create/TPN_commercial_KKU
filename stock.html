@@ -167,15 +167,21 @@
     async function loadHistory() {
       const start = document.getElementById('startDate').value;
       const end = document.getElementById('endDate').value;
+      const selectedProduct = document.getElementById('filterProduct').value;
       const tbody = document.getElementById('historyBody');
-      tbody.innerHTML = '<tr><td colspan="6" class="p-10 text-center font-bold text-emerald-600 animate-pulse text-xl">⏳ กำลังดึงข้อมูล Stock Card...</td></tr>';
+      
+      tbody.innerHTML = '<tr><td colspan="6" class="p-20 text-center font-black text-emerald-600 animate-pulse text-xl">⏳ กำลังดึงข้อมูล Stock Card...</td></tr>';
 
       try {
         const res = await fetch(`${SCRIPT_URL}?action=getStockLog&start=${start}&end=${end}`);
-        const data = await res.json();
+        let data = await res.json();
         
+        if (selectedProduct !== "") {
+          data = data.filter(log => log.product === selectedProduct);
+        }
+
         if (!data || data.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="6" class="p-10 text-center text-gray-400 font-bold">❌ ไม่พบประวัติในช่วงเวลาที่เลือก</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="6" class="p-20 text-center text-gray-400 font-bold text-lg italic">❌ ไม่พบประวัติรายการที่เลือกในช่วงเวลานี้</td></tr>';
           return;
         }
 
@@ -185,21 +191,16 @@
           if (log.type === "ADJUST") typeColor = "text-orange-500";
 
           return `
-            <tr class="border-b border-gray-100 hover:bg-emerald-50/30 transition-all">
-              <td class="p-5 text-gray-500 text-[12px] font-bold">${log.timestamp}</td>
-              <td class="p-5 text-emerald-900 font-black">${log.product}</td>
-              <td class="p-5 text-center"><span class="px-3 py-1 rounded-lg bg-gray-100 ${typeColor}">${log.type}</span></td>
-              <td class="p-5 text-center font-black text-lg">${log.qty > 0 ? '+' : ''}${log.qty}</td>
-              <td class="p-5 text-center font-black text-xl text-emerald-800 bg-emerald-50/50">${log.balance}</td>
-              <td class="p-5">
-                <div class="text-sm font-black text-gray-800">${log.user}</div>
-                <div class="text-[11px] text-gray-400 font-normal italic">${log.reason}</div>
-              </td>
-            </tr>
+            <tr class="hover:bg-emerald-50/50 transition-all border-b border-emerald-50">
+              <td class="p-6 text-gray-500 text-[12px] font-bold">${log.timestamp}</td>
+              <td class="p-6 text-emerald-900 font-black text-lg">${log.reason}</td> <td class="p-6 text-center"><span class="px-3 py-1 rounded-lg bg-gray-100 ${typeColor} font-black text-xs">${log.type}</span></td>
+              <td class="p-6 text-center font-black text-xl">${log.qty > 0 ? '+' : ''}${log.qty}</td>
+              <td class="p-6 text-center font-black text-2xl text-emerald-800 bg-emerald-50/30">${log.balance}</td>
+              <td class="p-6 text-sm font-black text-gray-600">${log.user}</td> </tr>
           `;
         }).join('');
-      } catch (err) { tbody.innerHTML = `<tr><td colspan="6" class="p-10 text-center text-red-500">❌ Error: ${err.message}</td></tr>`; }
+      } catch (err) { tbody.innerHTML = `<tr><td colspan="6" class="p-20 text-center text-red-500 font-black">❌ Error: ${err.message}</td></tr>`; }
     }
-  </script>
+</script>
 </body>
 </html>
