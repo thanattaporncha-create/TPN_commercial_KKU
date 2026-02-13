@@ -28,14 +28,11 @@
         <h1 class="text-3xl font-black text-emerald-900 tracking-tighter uppercase italic">📦 Stock Management</h1>
         <p class="text-emerald-600 font-bold">ระบบบริหารคลังสินค้า TPN Commercial</p>
       </div>
-      <div class="flex gap-3">
-        <a href="dashboard.html" class="bg-blue-50 text-blue-600 px-6 py-3 rounded-2xl font-black hover:bg-blue-100 transition-all border border-blue-200 shadow-sm">📊 Dashboard</a>
-        <a href="index.html" class="bg-emerald-50 text-emerald-600 px-6 py-3 rounded-2xl font-black hover:bg-emerald-100 transition-all border border-emerald-200 shadow-sm">🔙 กลับหน้าหลัก</a>
-      </div>
+      <a href="index.html" class="bg-emerald-50 text-emerald-600 px-6 py-3 rounded-2xl font-black hover:bg-emerald-100 transition-all border border-emerald-200 shadow-sm">🔙 กลับหน้าหลัก</a>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10" id="stockGrid">
-      <div class="col-span-full p-10 text-center text-emerald-600 font-bold animate-pulse text-xl">⏳ กำลังโหลดข้อมูลสต็อกปัจจุบัน...</div>
+      <div class="col-span-full p-10 text-center text-emerald-600 font-bold animate-pulse text-xl">⏳ กำลังโหลดสต็อกปัจจุบัน...</div>
     </div>
 
     <div class="bg-white p-6 rounded-3xl shadow-sm border border-emerald-50 mb-8">
@@ -79,7 +76,7 @@
           </tr>
         </thead>
         <tbody id="historyBody" class="font-bold">
-          <tr><td colspan="6" class="p-20 text-center text-gray-400 font-bold text-xl italic">กรุณาเลือก Product และวันที่ แล้วกด "ดูประวัติ Stock Card"</td></tr>
+          <tr><td colspan="6" class="p-20 text-center text-gray-400 font-bold text-xl">กรุณากดปุ่ม "ดูประวัติ"</td></tr>
         </tbody>
       </table>
     </div>
@@ -100,7 +97,7 @@
           <input type="number" id="updateQty" required class="w-full p-4 border-2 border-emerald-50 rounded-2xl text-2xl font-black text-center text-emerald-700 outline-none">
         </div>
         <div class="mb-6">
-          <label class="block text-xs font-black text-gray-400 uppercase mb-1">เหตุผล / หมายเหตุ (จะโชว์ในช่องรายการ)</label>
+          <label class="block text-xs font-black text-gray-400 uppercase mb-1">รายละเอียด (ชื่อคนไข้ / เหตุผล)</label>
           <textarea id="updateReason" required class="w-full p-4 border-2 border-emerald-50 rounded-2xl font-bold outline-none focus:border-emerald-500 bg-gray-50/50" rows="3"></textarea>
         </div>
         <div class="flex gap-4">
@@ -167,10 +164,10 @@
       formData.append("reason", document.getElementById('updateReason').value);
       formData.append("user", user);
 
-      btn.disabled = true; btn.textContent = "⌛ กำลังบันทึก...";
+      btn.disabled = true; btn.textContent = "⌛ บันทึก...";
       try {
         await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: formData });
-        alert("✅ อัปเดต Stock Card สำเร็จ!");
+        alert("✅ สำเร็จ!");
         closeModal(); loadStockStatus(); loadHistory();
       } catch (err) { alert("❌ Error: " + err.message); }
       finally { btn.disabled = false; btn.textContent = "ยืนยันบันทึก 🚀"; }
@@ -182,7 +179,7 @@
       const selectedProduct = document.getElementById('filterProduct').value;
       const tbody = document.getElementById('historyBody');
       
-      tbody.innerHTML = '<tr><td colspan="6" class="p-20 text-center font-black text-emerald-600 animate-pulse text-xl">⏳ กำลังดึงข้อมูล Stock Card...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" class="p-20 text-center font-black text-emerald-600 animate-pulse text-xl">⏳ กำลังดึงข้อมูล...</td></tr>';
 
       try {
         const res = await fetch(`${SCRIPT_URL}?action=getStockLog&start=${start}&end=${end}`);
@@ -193,7 +190,7 @@
         }
 
         if (!data || data.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="6" class="p-20 text-center text-gray-400 font-bold text-lg italic">❌ ไม่พบประวัติรายการที่เลือกในช่วงเวลานี้</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="6" class="p-20 text-center text-gray-400 font-bold text-lg italic">❌ ไม่พบประวัติรายการ</td></tr>';
           return;
         }
 
@@ -202,18 +199,16 @@
           if (log.type === "OUT") typeColor = "text-red-500";
           if (log.type === "ADJUST") typeColor = "text-orange-500";
 
+          // *** แก้ไขตำแหน่ง Mapping ใหม่ที่นี่ ***
           return `
             <tr class="hover:bg-emerald-50/50 transition-all border-b border-emerald-50">
               <td class="p-6 text-gray-500 text-[12px] font-bold">${log.timestamp}</td>
-              <td class="p-6 text-emerald-900 font-black text-lg">${log.reason}</td>
-              <td class="p-6 text-center"><span class="px-3 py-1 rounded-lg bg-gray-100 ${typeColor} font-black text-xs">${log.type}</span></td>
+              <td class="p-6 text-emerald-900 font-black text-lg">${log.reason}</td> <td class="p-6 text-center"><span class="px-3 py-1 rounded-lg bg-gray-100 ${typeColor} font-black text-xs">${log.type}</span></td>
               <td class="p-6 text-center font-black text-xl">${log.qty > 0 ? '+' : ''}${log.qty}</td>
-              <td class="p-6 text-center font-black text-2xl text-emerald-800 bg-emerald-50/30">${log.balance}</td>
-              <td class="p-6 text-sm font-black text-gray-600">${log.user}</td>
-            </tr>
+              <td class="p-6 text-center font-black text-2xl text-emerald-800 bg-emerald-50/30">${log.balance}</td> <td class="p-6 text-sm font-black text-gray-600">${log.user}</td> </tr>
           `;
         }).join('');
-      } catch (err) { tbody.innerHTML = `<tr><td colspan="6" class="p-20 text-center text-red-500 font-black text-lg">❌ Error: ${err.message}</td></tr>`; }
+      } catch (err) { tbody.innerHTML = `<tr><td colspan="6" class="p-20 text-center text-red-500 font-black">❌ Error: ${err.message}</td></tr>`; }
     }
   </script>
 </body>
