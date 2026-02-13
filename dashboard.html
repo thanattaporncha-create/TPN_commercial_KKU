@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TPN Master Dashboard | Srinagarind</title>
+  <title>TPN Commercial Dashboard | Srinagarind</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700;800&display=swap" rel="stylesheet">
   <style>
@@ -13,10 +13,26 @@
     .btn-action:hover { transform: scale(1.05); }
     input:focus, select:focus { border-color: #10b981 !important; outline: none; }
     
-    th { font-size: 15px !important; letter-spacing: 0.05em !important; }
-    td { font-size: 16px !important; vertical-align: middle !important; }
-    .hn-text { font-size: 19px !important; }
-    .patient-name-text { font-size: 15px !important; }
+    /* ปรับแต่งหัวตาราง */
+    th { font-size: 16px !important; letter-spacing: 0.05em !important; font-weight: 800 !important; }
+    
+    /* ปรับแต่งเนื้อหาในตาราง (เอาตัวเอียงออกทั้งหมด) */
+    td { font-size: 16px !important; vertical-align: middle !important; font-style: normal !important; color: #1f2937; }
+    .hn-text { font-size: 19px !important; font-weight: 800; color: #064e3b; }
+    .patient-name-text { font-size: 16px !important; font-weight: 600; color: #4b5563; }
+    .row-no { color: #000000 !important; font-weight: 800; }
+    .row-date { color: #000000 !important; font-weight: 700; }
+
+    /* ปรับแต่ง Label */
+    .input-label { 
+      display: block; 
+      font-size: 13px; 
+      font-weight: 800; 
+      color: #000000; 
+      margin-bottom: 4px; 
+      text-transform: uppercase; 
+      letter-spacing: 0.025em;
+    }
 
     /* ตกแต่ง List สรุป Product */
     .product-item {
@@ -24,11 +40,12 @@
       justify-content: space-between;
       align-items: center;
       padding: 12px 20px;
-      background-color: #f9fafb;
+      background-color: #ffffff;
       border: 1px solid #e5e7eb;
       border-radius: 12px;
       margin-bottom: 8px;
       transition: all 0.2s;
+      font-style: normal !important;
     }
     .product-item:hover {
       background-color: #ecfdf5;
@@ -40,48 +57,46 @@
   <div class="max-w-7xl mx-auto">
     <div class="flex justify-between items-center mb-8 bg-white p-6 rounded-3xl shadow-sm border border-emerald-50 text-center md:text-left">
       <div>
-        <h1 class="text-3xl font-black text-emerald-900 tracking-tighter italic">📊 TPN MONITORING</h1>
-        <p class="text-emerald-600 font-bold italic">ค้นหา จัดการข้อมูล และสรุปสถิติ</p>
+        <h1 class="text-3xl font-black text-emerald-900 tracking-tighter uppercase">📊 TPN Commercial Dashboard</h1>
       </div>
-      <a href="index.html" class="bg-emerald-50 text-emerald-600 px-6 py-3 rounded-2xl font-black hover:bg-emerald-100 transition-all border border-emerald-200 shadow-sm">🔙 กลับหน้าหลัก</a>
+      <a href="index.html" class="bg-emerald-50 text-emerald-600 px-6 py-3 rounded-2xl font-black hover:bg-emerald-100 transition-all border border-emerald-200 shadow-sm">กลับหน้าหลัก</a>
     </div>
 
     <div class="bg-white p-6 rounded-3xl shadow-sm border border-emerald-50 mb-6">
       <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
         <div>
-          <label class="block text-[10px] font-black text-gray-400 mb-1 uppercase tracking-widest italic">วันที่เริ่ม</label>
-          <input type="date" id="startDate" class="w-full p-3 border-2 border-gray-50 rounded-2xl font-bold bg-gray-50/50">
+          <label class="input-label">วันที่เริ่ม</label>
+          <input type="date" id="startDate" class="w-full p-3 border-2 border-gray-200 rounded-2xl font-bold bg-gray-50/50 text-lg">
         </div>
         <div>
-          <label class="block text-[10px] font-black text-gray-400 mb-1 uppercase tracking-widest italic">วันที่สิ้นสุด</label>
-          <input type="date" id="endDate" class="w-full p-3 border-2 border-gray-50 rounded-2xl font-bold bg-gray-50/50">
+          <label class="input-label">วันที่สิ้นสุด</label>
+          <input type="date" id="endDate" class="w-full p-3 border-2 border-gray-200 rounded-2xl font-bold bg-gray-50/50 text-lg">
         </div>
         <div>
-          <label class="block text-[10px] font-black text-emerald-600 mb-1 uppercase tracking-widest italic font-bold">🔍 ค้นหา HN / ชื่อ</label>
-          <input type="text" id="searchHN" placeholder="ระบุ HN หรือชื่อ..." oninput="filterDisplay()" class="w-full p-3 border-2 border-emerald-50 rounded-2xl font-bold bg-emerald-50/30">
+          <label class="input-label text-emerald-700">🔍 ค้นหา HN / ชื่อ</label>
+          <input type="text" id="searchHN" placeholder="ระบุ HN หรือชื่อ..." oninput="filterDisplay()" class="w-full p-3 border-2 border-emerald-100 rounded-2xl font-bold bg-emerald-50/30 text-lg">
         </div>
         <div>
-          <label class="block text-[10px] font-black text-blue-600 mb-1 uppercase tracking-widest italic font-bold">🏥 กรองตาม WARD</label>
-          <select id="searchWard" onchange="filterDisplay()" class="w-full p-3 border-2 border-blue-50 rounded-2xl font-bold bg-blue-50/30">
+          <label class="input-label text-blue-700">กรองตาม WARD</label>
+          <select id="searchWard" onchange="filterDisplay()" class="w-full p-3 border-2 border-blue-100 rounded-2xl font-bold bg-blue-50/30 text-lg">
             <option value="">ทั้งหมด (All Wards)</option>
           </select>
         </div>
-        <button onclick="loadSummary()" class="bg-emerald-600 text-white px-6 py-3.5 rounded-2xl font-black hover:bg-emerald-700 shadow-lg shadow-emerald-100 transition-all active:scale-95">🔄 ดึงข้อมูลใหม่</button>
+        <button onclick="loadSummary()" class="bg-emerald-600 text-white px-6 py-4 rounded-2xl font-black hover:bg-emerald-700 shadow-lg shadow-emerald-100 transition-all active:scale-95 text-lg">🔄 ดึงข้อมูลใหม่</button>
       </div>
     </div>
 
     <div id="statsContainer" class="hidden">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
         <div class="md:col-span-3 bg-white p-6 rounded-3xl shadow-sm border border-emerald-50">
-          <h2 class="text-sm font-black text-emerald-900 mb-4 flex items-center gap-2 italic uppercase tracking-widest border-b pb-2">📦 สรุป Product (ตามการค้นหาด้านบน)</h2>
-          <div id="productStats" class="flex flex-col gap-1 italic">
-             </div>
+          <h2 class="text-sm font-black text-emerald-900 mb-4 flex items-center gap-2 uppercase tracking-widest border-b pb-2">📦 สรุป Product (ตามการค้นหาด้านบน)</h2>
+          <div id="productStats" class="flex flex-col gap-1"></div>
         </div>
         
         <div class="bg-gradient-to-br from-emerald-600 to-emerald-800 text-white p-6 rounded-3xl shadow-xl flex flex-col justify-center text-center">
-          <span class="text-[10px] font-bold opacity-80 uppercase tracking-widest mb-1 text-xs">แสดงผลอยู่</span>
+          <span class="text-xs font-bold opacity-80 uppercase tracking-widest mb-1">แสดงผลอยู่</span>
           <span id="caseCount" class="text-5xl font-black">0</span>
-          <span class="text-[10px] mt-1 font-bold text-xs">รายการ</span>
+          <span class="text-xs mt-1 font-bold">รายการ</span>
         </div>
       </div>
     </div>
@@ -96,11 +111,11 @@
             <th class="p-6">Ward / Route</th>
             <th class="p-6">Product Name</th>
             <th class="p-6 text-center">ถุง</th>
-            <th class="p-6 text-center">จัดการ</th>
+            <th class="p-5 text-center">จัดการ</th>
           </tr>
         </thead>
-        <tbody id="summaryBody" class="text-gray-700 divide-y divide-emerald-50">
-          <tr><td colspan="7" class="p-20 text-center text-gray-400 italic font-bold text-xl">กรุณากดปุ่มดึงข้อมูลเพื่อเริ่มต้น</td></tr>
+        <tbody id="summaryBody" class="divide-y divide-emerald-50">
+          <tr><td colspan="7" class="p-20 text-center text-gray-400 font-bold text-xl">กรุณากดปุ่มดึงข้อมูลเพื่อเริ่มต้น</td></tr>
         </tbody>
       </table>
     </div>
@@ -128,7 +143,7 @@
       const tbody = document.getElementById('summaryBody');
       const statsContainer = document.getElementById('statsContainer');
       
-      tbody.innerHTML = '<tr><td colspan="7" class="p-20 text-center font-black text-emerald-600 animate-pulse text-2xl italic">⏳ กำลังกรองข้อมูลตามวันที่เลือก...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" class="p-20 text-center font-black text-emerald-600 animate-pulse text-2xl">⏳ กำลังกรองข้อมูลตามวันที่เลือก...</td></tr>';
       statsContainer.classList.add('hidden');
 
       try {
@@ -142,7 +157,7 @@
 
         filterDisplay();
       } catch (e) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-20 text-center text-red-500 font-bold font-black italic text-xl">❌ เกิดข้อผิดพลาดในการดึงข้อมูล</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="p-20 text-center text-red-500 font-bold font-black text-xl">❌ เกิดข้อผิดพลาดในการดึงข้อมูล</td></tr>`;
       }
     }
 
@@ -162,7 +177,7 @@
       document.getElementById('caseCount').textContent = filtered.length;
 
       if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="p-20 text-center text-gray-400 font-bold italic text-xl">❌ ไม่พบรายการที่ค้นหา</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="p-20 text-center text-gray-400 font-bold text-xl">❌ ไม่พบรายการที่ค้นหา</td></tr>';
         document.getElementById('statsContainer').classList.add('hidden');
         return;
       }
@@ -174,37 +189,42 @@
         productCounts[name] = (productCounts[name] || 0) + qty;
       });
 
-      // ปรับปรุงการแสดงผลเป็นแบบ List แถวเดียว
       productStatsDiv.innerHTML = Object.entries(productCounts)
         .sort((a, b) => b[1] - a[1])
         .map(([name, count]) => `
           <div class="product-item shadow-sm">
-            <span class="font-bold text-emerald-800 text-base">${name}</span>
-            <span class="bg-emerald-600 text-white px-4 py-1.5 rounded-xl font-black text-sm whitespace-nowrap ml-4">${count} ถุง</span>
+            <span class="font-bold text-emerald-800 text-lg">${name}</span>
+            <span class="bg-emerald-600 text-white px-5 py-2 rounded-xl font-black text-sm whitespace-nowrap ml-4">${count} ถุง</span>
           </div>
         `).join('');
       document.getElementById('statsContainer').classList.remove('hidden');
 
       tbody.innerHTML = filtered.map((row, index) => {
         const rowData = encodeURIComponent(JSON.stringify(row));
+        
+        // แปลงข้อความ Route
+        let routeDisplay = row.route || '-';
+        routeDisplay = routeDisplay.replace(/Central line/gi, 'C-Line');
+        routeDisplay = routeDisplay.replace(/Peripheral line/gi, 'P-Line');
+
         return `
-        <tr class="hover:bg-emerald-50/30 transition-colors group italic">
-          <td class="p-6 text-center font-black text-gray-300 group-hover:text-emerald-500 underline decoration-emerald-200 underline-offset-4">${index + 1}</td>
-          <td class="p-6 font-bold text-gray-400 whitespace-nowrap">${formatThaiDate(row.date)}</td>
+        <tr class="hover:bg-emerald-50/30 transition-colors group">
+          <td class="p-6 text-center row-no underline decoration-emerald-200 underline-offset-4">${index + 1}</td>
+          <td class="p-6 row-date whitespace-nowrap">${formatThaiDate(row.date)}</td>
           <td class="p-6">
             <div class="font-black text-emerald-900 hn-text leading-tight">${row.hn}</div>
-            <div class="font-bold text-gray-500 patient-name-text italic">${row.name}</div>
+            <div class="font-bold text-gray-500 patient-name-text">${row.name}</div>
           </td>
           <td class="p-6">
-            <div class="font-black text-blue-600">🏥 ${row.ward}</div>
-            <div class="text-[12px] text-gray-400 uppercase font-black tracking-tighter">${row.route || '-'}</div>
+            <div class="font-black text-blue-800 text-lg">${row.ward}</div>
+            <div class="text-[12px] text-gray-500 uppercase font-black tracking-tighter">${routeDisplay}</div>
           </td>
-          <td class="p-6 font-bold text-gray-600 leading-tight underline decoration-emerald-200 underline-offset-4">${row.productName}</td>
+          <td class="p-6 font-bold text-gray-700 leading-tight underline decoration-emerald-200 underline-offset-4">${row.productName}</td>
           <td class="p-6 text-center">
-            <span class="bg-white px-4 py-2 rounded-xl border border-emerald-100 shadow-sm text-emerald-700 font-black text-xl">${row.quantity || 1}</span>
+            <span class="bg-white px-5 py-2 rounded-xl border border-emerald-100 shadow-sm text-emerald-700 font-black text-2xl">${row.quantity || 1}</span>
           </td>
-          <td class="p-6">
-            <div class="flex justify-center gap-3">
+          <td class="p-5">
+            <div class="flex justify-center gap-2">
               <button onclick="reprint('${rowData}')" class="btn-action bg-blue-500 text-white p-3 rounded-xl shadow-lg shadow-blue-200 font-bold flex items-center gap-1" title="พิมพ์ซ้ำครบ">🖨️ <span class="text-xs">พิมพ์</span></button>
               <button onclick="deleteCase('${row.id}', '${row.hn}')" class="btn-action bg-red-100 text-red-500 p-3 rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-sm" title="ลบข้อมูล">🗑️</button>
             </div>
