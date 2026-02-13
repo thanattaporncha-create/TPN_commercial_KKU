@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stock Management | TPN System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Sarabun', sans-serif; background-color: #f0fdf4; }
+    .stock-card { transition: all 0.3s ease; border: 2px solid transparent; }
+    .stock-card:hover { transform: translateY(-5px); border-color: #10b981; }
+    .low-stock { animation: pulse-red 2s infinite; border-color: #ef4444 !important; }
+    @keyframes pulse-red {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+    .modal { transition: opacity 0.25s ease; }
+    .modal-active { overflow-x: hidden; overflow-y: visible !important; }
+  </style>
+</head>
+<body class="p-4 md:p-8">
+  <div class="max-w-7xl mx-auto">
+    <div class="flex justify-between items-center mb-8 bg-white p-6 rounded-3xl shadow-sm border border-emerald-50">
+      <div>
+        <h1 class="text-3xl font-black text-emerald-900 tracking-tighter uppercase italic">📦 Stock Management</h1>
+        <p class="text-emerald-600 font-bold">ระบบบริหารคลังสินค้า TPN Commercial</p>
+      </div>
+      <a href="index.html" class="bg-emerald-50 text-emerald-600 px-6 py-3 rounded-2xl font-black hover:bg-emerald-100 transition-all border border-emerald-200 shadow-sm">🔙 กลับหน้าหลัก</a>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10" id="stockGrid">
+      <div class="col-span-full p-10 text-center text-emerald-600 font-bold animate-pulse text-xl">⏳ กำลังโหลดข้อมูลสต็อกปัจจุบัน...</div>
+    </div>
+
+    <div class="bg-white p-6 rounded-3xl shadow-sm border border-emerald-50 mb-8">
+      <div class="flex flex-wrap justify-between items-end gap-4">
+        <div class="flex gap-4">
+          <div>
+            <label class="block text-[10px] font-black text-gray-400 mb-1 uppercase tracking-widest">เริ่มวันที่</label>
+            <input type="date" id="startDate" class="p-3 border-2 border-gray-50 rounded-2xl font-bold outline-none focus:border-emerald-500 bg-gray-50/50">
+          </div>
+          <div>
+            <label class="block text-[10px] font-black text-gray-400 mb-1 uppercase tracking-widest">ถึงวันที่</label>
+            <input type="date" id="endDate" class="p-3 border-2 border-gray-50 rounded-2xl font-bold outline-none focus:border-emerald-500 bg-gray-50/50">
+          </div>
+          <button onclick="loadHistory()" class="bg-emerald-600 text-white px-8 py-3 rounded-2xl font-black hover:bg-emerald-700 shadow-lg mt-auto transition-all active:scale-95">🔍 ดูประวัติ</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="overflow-hidden rounded-3xl border border-emerald-50 shadow-sm bg-white">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-emerald-900 text-white text-[11px] uppercase tracking-widest">
+            <th class="p-5">วัน-เวลา</th>
+            <th class="p-5">รายการ</th>
+            <th class="p-5">ประเภท</th>
+            <th class="p-5 text-center">จำนวน</th>
+            <th class="p-5">ผู้ทำรายการ / เหตุผล</th>
+          </tr>
+        </thead>
+        <tbody id="historyBody" class="text-sm">
+          <tr><td colspan="5" class="p-10 text-center text-gray-400 font-bold">กรุณากดปุ่ม "ดูประวัติ" เพื่อดึงข้อมูล</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="stockModal" class="modal opacity-0 pointer-events-none fixed w-full h-full top-0 left-0 flex items-center justify-center z-50">
+    <div class="modal-overlay absolute w-full h-full bg-black opacity-50"></div>
+    <div class="modal-container bg-white w-full max-w-md mx-auto rounded-3xl shadow-2xl z-50 overflow-y-auto p-8">
+      <div class="text-center mb-6">
+        <h2 id="modalTitle" class="text-2xl font-black text-emerald-900 uppercase">เติมสต็อก</h2>
+        <p id="modalProductName" class="text-emerald-600 font-bold text-sm"></p>
+      </div>
+      
+      <form id="stockForm" onsubmit="handleStockUpdate(event)">
+        <input type="hidden" id="targetProduct">
+        <input type="hidden" id="updateType">
+        
+        <div class="mb-4">
+          <label class="block text-xs font-black text-gray-400 uppercase mb-1">จำนวนถุง</label>
+          <input type="number" id="updateQty" required class="w-full p-4 border-2 border-emerald-50 rounded-2xl text-2xl font-black text-center text-emerald-700 focus:border-emerald-500 outline-none" placeholder="0">
+        </div>
+        
+        <div class="mb-6">
+          <label class="block text-xs font-black text-gray-400 uppercase mb-1">เหตุผล / หมายเหตุ</label>
+          <textarea id="updateReason" required class="w-full p-4 border-2 border-emerald-50 rounded-2xl font-bold outline-none focus:border-emerald-500 bg-gray-50/50" rows="3" placeholder="ระบุเหตุผลในการปรับปรุง..."></textarea>
+        </div>
+        
+        <div class="flex gap-4">
+          <button type="button" onclick="closeModal()" class="flex-1 bg-gray-100 text-gray-500 py-4 rounded-2xl font-black hover:bg-gray-200 transition-all">ยกเลิก</button>
+          <button type="submit" id="submitBtn" class="flex-1 bg-emerald-600 text-white py-4 rounded-2xl font-black shadow-lg hover:bg-emerald-700 transition-all">ยืนยันบันทึก 🚀</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyBmvgjqruX8DC2wHpzqIKcjlgdA0N5uk_XAdE-aeorHXJRxXHliv-OqY5TGqmXEpK0/exec";
+
+    window.onload = () => {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('startDate').value = today;
+      document.getElementById('endDate').value = today;
+      loadStockStatus();
+    };
+
+    // --- ฟังก์ชันดึงสถานะสต็อกปัจจุบัน ---
+    async function loadStockStatus() {
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=getCurrentStock`);
+        const data = await res.json();
+        const grid = document.getElementById('stockGrid');
+        
+        grid.innerHTML = data.map(item => {
+          const isLow = item.balance <= 10;
+          return `
+            <div class="stock-card bg-white p-6 rounded-3xl shadow-sm border border-emerald-50 flex flex-col justify-between ${isLow ? 'low-stock' : ''}">
+              <div>
+                <h3 class="font-black text-emerald-900 leading-tight mb-2 h-10 overflow-hidden text-sm uppercase">${item.name}</h3>
+                <div class="text-4xl font-black ${isLow ? 'text-red-600' : 'text-emerald-700'} mb-1">${item.balance}</div>
+                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">ถุงคงเหลือ</span>
+              </div>
+              <div class="flex gap-2 mt-4">
+                <button onclick="openModal('${item.name}', 'IN')" class="flex-1 bg-emerald-50 text-emerald-600 py-2 rounded-xl font-black text-[10px] hover:bg-emerald-600 hover:text-white transition-all">+ เติมของ</button>
+                <button onclick="openModal('${item.name}', 'ADJUST')" class="flex-1 bg-gray-50 text-gray-500 py-2 rounded-xl font-black text-[10px] hover:bg-gray-800 hover:text-white transition-all">🛠️ ADJUST</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (e) {
+        console.error("Load Stock Error:", e);
+      }
+    }
+
+    // --- ฟังก์ชันจัดการ Modal ---
+    function openModal(name, type) {
+      document.getElementById('targetProduct').value = name;
+      document.getElementById('updateType').value = type;
+      document.getElementById('modalProductName').textContent = name;
+      document.getElementById('modalTitle').textContent = type === 'IN' ? '➕ เติมสต็อก (Stock In)' : '🛠️ ปรับปรุง (Adjust)';
+      document.getElementById('updateQty').value = '';
+      document.getElementById('updateReason').value = type === 'IN' ? 'รับสินค้าเข้าคลัง' : '';
+      
+      const modal = document.getElementById('stockModal');
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('stockModal');
+      modal.classList.add('opacity-0', 'pointer-events-none');
+    }
+
+    // --- ฟังก์ชันบันทึกการอัปเดตสต็อก ---
+    async function handleStockUpdate(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      const user = sessionStorage.getItem('tpnUser') || 'Unknown User';
+      
+      const formData = new URLSearchParams();
+      formData.append("action", "updateStock");
+      formData.append("productName", document.getElementById('targetProduct').value);
+      formData.append("type", document.getElementById('updateType').value);
+      formData.append("qty", document.getElementById('updateQty').value);
+      formData.append("reason", document.getElementById('updateReason').value);
+      formData.append("user", user);
+
+      btn.disabled = true;
+      btn.textContent = "⌛ กำลังบันทึก...";
+
+      try {
+        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: formData });
+        alert("✅ อัปเดตสต็อกเรียบร้อยแล้วค่ะ");
+        closeModal();
+        loadStockStatus();
+        loadHistory();
+      } catch (err) {
+        alert("❌ เกิดข้อผิดพลาด: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "ยืนยันบันทึก 🚀";
+      }
+    }
+
+    // --- ฟังก์ชันดึงประวัติการเคลื่อนไหว ---
+    async function loadHistory() {
+      const start = document.getElementById('startDate').value;
+      const end = document.getElementById('endDate').value;
+      const tbody = document.getElementById('historyBody');
+      
+      tbody.innerHTML = '<tr><td colspan="5" class="p-10 text-center font-bold text-emerald-600 animate-pulse">⏳ กำลังดึงข้อมูลประวัติ...</td></tr>';
+
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=getStockLog&start=${start}&end=${end}`);
+        const data = await res.json();
+        
+        if (data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="p-10 text-center text-gray-400 font-bold">❌ ไม่พบประวัติในช่วงเวลาที่เลือก</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = data.map(log => {
+          let typeColor = "text-emerald-600";
+          if (log.type === "OUT") typeColor = "text-red-500";
+          if (log.type === "ADJUST") typeColor = "text-orange-500";
+
+          return `
+            <tr class="border-b border-gray-50 hover:bg-gray-50/50 transition-all font-bold">
+              <td class="p-4 text-gray-400 text-[11px]">${log.timestamp}</td>
+              <td class="p-4 text-emerald-900">${log.product}</td>
+              <td class="p-4 ${typeColor}">${log.type}</td>
+              <td class="p-4 text-center font-black text-lg">${log.qty > 0 ? '+' : ''}${log.qty}</td>
+              <td class="p-4">
+                <div class="text-xs text-gray-600">${log.user}</div>
+                <div class="text-[10px] text-gray-400 font-normal italic">${log.reason}</div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-red-500">❌ Error: ${err.message}</td></tr>`;
+      }
+    }
+  </script>
+</body>
+</html>
