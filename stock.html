@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Stock Management | TPN System</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700;800&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Sarabun', sans-serif; background-color: #f0fdf4; }
     .stock-card { transition: all 0.3s ease; border: 2px solid transparent; }
@@ -17,8 +17,6 @@
       100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
     }
     .modal { transition: opacity 0.25s ease; }
-    th { font-size: 14px !important; font-weight: 800 !important; }
-    td { font-size: 15px !important; vertical-align: middle !important; }
   </style>
 </head>
 <body class="p-4 md:p-8">
@@ -32,7 +30,7 @@
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10" id="stockGrid">
-      <div class="col-span-full p-10 text-center text-emerald-600 font-bold animate-pulse text-xl">⏳ กำลังโหลดสต็อกปัจจุบัน...</div>
+      <div class="col-span-full p-10 text-center text-emerald-600 font-bold animate-pulse text-xl">⏳ กำลังโหลดสต็อก...</div>
     </div>
 
     <div class="bg-white p-6 rounded-3xl shadow-sm border border-emerald-50 mb-8">
@@ -66,7 +64,7 @@
     <div class="overflow-hidden rounded-3xl border border-emerald-50 shadow-sm bg-white">
       <table class="w-full text-left border-collapse">
         <thead>
-          <tr class="bg-emerald-900 text-white uppercase tracking-widest">
+          <tr class="bg-emerald-900 text-white uppercase tracking-widest text-xs">
             <th class="p-6">วัน-เวลา</th>
             <th class="p-6">รายการ (คนไข้ / กิจกรรม)</th>
             <th class="p-6 text-center">ประเภท</th>
@@ -75,8 +73,8 @@
             <th class="p-6">ผู้ทำรายการ</th>
           </tr>
         </thead>
-        <tbody id="historyBody" class="font-bold">
-          <tr><td colspan="6" class="p-20 text-center text-gray-400 font-bold text-xl">กรุณากดปุ่ม "ดูประวัติ"</td></tr>
+        <tbody id="historyBody" class="font-bold text-sm">
+          <tr><td colspan="6" class="p-20 text-center text-gray-400 font-bold text-xl italic">กรุณากดปุ่ม "ดูประวัติ Stock Card"</td></tr>
         </tbody>
       </table>
     </div>
@@ -109,7 +107,7 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxj_WIdnONQi-II06cLE3GYbk1VxAbXMWxqcC4Gwe0tqlZfFOIe3GzExM2m92zBmT-g/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw_mMmOMxEEqjmK1MHCYEUl6iBvpjCyQ1VF_mQC3at1ogYqCvhsS73vZGn3yekzURVF/exec";
 
     window.onload = () => {
       const today = new Date().toISOString().split('T')[0];
@@ -145,7 +143,7 @@
       document.getElementById('targetProduct').value = name;
       document.getElementById('updateType').value = type;
       document.getElementById('modalProductName').textContent = name;
-      document.getElementById('modalTitle').textContent = type === 'IN' ? '➕ เติมสต็อก (Stock In)' : '🛠️ ปรับปรุง (Adjust)';
+      document.getElementById('modalTitle').textContent = type === 'IN' ? '➕ เติมสต็อก' : '🛠️ ADJUST';
       document.getElementById('updateReason').value = type === 'IN' ? 'รับสินค้าเข้าคลัง' : '';
       document.getElementById('stockModal').classList.remove('opacity-0', 'pointer-events-none');
     }
@@ -178,16 +176,12 @@
       const end = document.getElementById('endDate').value;
       const selectedProduct = document.getElementById('filterProduct').value;
       const tbody = document.getElementById('historyBody');
-      
       tbody.innerHTML = '<tr><td colspan="6" class="p-20 text-center font-black text-emerald-600 animate-pulse text-xl">⏳ กำลังดึงข้อมูล...</td></tr>';
 
       try {
         const res = await fetch(`${SCRIPT_URL}?action=getStockLog&start=${start}&end=${end}`);
         let data = await res.json();
-        
-        if (selectedProduct !== "") {
-          data = data.filter(log => log.product === selectedProduct);
-        }
+        if (selectedProduct !== "") { data = data.filter(log => log.product === selectedProduct); }
 
         if (!data || data.length === 0) {
           tbody.innerHTML = '<tr><td colspan="6" class="p-20 text-center text-gray-400 font-bold text-lg italic">❌ ไม่พบประวัติรายการ</td></tr>';
@@ -195,20 +189,15 @@
         }
 
         tbody.innerHTML = data.map(log => {
-          let typeColor = "text-emerald-600";
-          if (log.type === "OUT") typeColor = "text-red-500";
-          if (log.type === "ADJUST") typeColor = "text-orange-500";
-
-          // *** แก้ไขตำแหน่ง Mapping ใหม่ที่นี่ ***
+          let typeColor = (log.type === "OUT") ? "text-red-500" : (log.type === "IN" ? "text-emerald-600" : "text-orange-500");
           return `
             <tr class="hover:bg-emerald-50/50 transition-all border-b border-emerald-50">
-              <td class="p-6 text-gray-500 text-[12px] font-bold">${log.timestamp}</td>
+              <td class="p-6 text-gray-500 text-[11px] font-bold">${log.timestamp}</td>
               <td class="p-6 text-emerald-900 font-black text-lg">${log.reason}</td> <td class="p-6 text-center"><span class="px-3 py-1 rounded-lg bg-gray-100 ${typeColor} font-black text-xs">${log.type}</span></td>
-              <td class="p-6 text-center font-black text-xl">${log.qty > 0 ? '+' : ''}${log.qty}</td>
-              <td class="p-6 text-center font-black text-2xl text-emerald-800 bg-emerald-50/30">${log.balance}</td> <td class="p-6 text-sm font-black text-gray-600">${log.user}</td> </tr>
-          `;
+              <td class="p-6 text-center font-black text-lg">${log.qty > 0 ? '+' : ''}${log.qty}</td>
+              <td class="p-6 text-center font-black text-2xl text-emerald-800 bg-emerald-50/30">${log.balance}</td> <td class="p-6 text-sm font-black text-gray-600">${log.user}</td> </tr>`;
         }).join('');
-      } catch (err) { tbody.innerHTML = `<tr><td colspan="6" class="p-20 text-center text-red-500 font-black">❌ Error: ${err.message}</td></tr>`; }
+      } catch (err) { tbody.innerHTML = `<tr><td colspan="6" class="p-20 text-center text-red-500">❌ Error: ${err.message}</td></tr>`; }
     }
   </script>
 </body>
