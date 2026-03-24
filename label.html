@@ -109,21 +109,18 @@
     }
 
     function renderLabels() {
-     const params = new URLSearchParams(window.location.search);
-  
-  // สร้าง Object o โดยบังคับถอดรหัส (Decode) ทุกตัว
-  const o = {};
-  params.forEach((value, key) => {
-    o[key] = value; // URLSearchParams จะ decode ค่าให้อัตโนมัติอยู่แล้ว
-  });
+      const params = new URLSearchParams(window.location.search);
+      const o = {};
+      params.forEach((value, key) => { o[key] = value; });
+
       if (!o.hn) return;
 
       const expDate = new Date(o.orderDate);
       expDate.setDate(expDate.getDate() + 1);
 
-      // กรองรายการที่มีค่าจริง
-      const rows = [];
-      const addRow = (label, val) => { if (val && parseFloat(val) > 0) rows.push({label, val}); };
+      // --- 1. เตรียมข้อมูลแถวทั้งหมด (แบบจัดเต็ม) ---
+      const allRows = [];
+      const addRow = (label, val) => { if (val && parseFloat(val) > 0) allRows.push({label, val}); };
       
       addRow(o.productName, o.productVol);
       addRow('Addamel-N', o.addamel);
@@ -135,26 +132,40 @@
       addRow(o.other3Name, o.other3Vol);
       addRow(o.other4Name, o.other4Vol);
 
-      const rowCount = rows.length;
-      const modeClass = rowCount <= 5 ? 'large-mode' : 'compact-mode';
-      document.getElementById('mode-hint').innerText = rowCount <= 5 ? '✨ LARGE MODE active' : '✨ COMPACT MODE active';
-
-      const routeLabel = (o.route || "").includes('Central') ? 'C-line' : 'P-line';
       const qty = parseInt(o.quantity) || 1;
+      const routeLabel = (o.route || "").includes('Central') ? 'C-line' : 'P-line';
       let pnHTML = '';
 
+      // --- 2. ลูปสร้างฉลากตามจำนวนถุง ---
       for (let i = 1; i <= qty; i++) {
         let tableBody = '';
-        rows.forEach((row, index) => {
+        let currentTotalVol = 0;
+        let displayRows = [];
+
+        if (i === 1) {
+          // ถุงที่ 1: เอามาทุกรายการที่กรอก
+          displayRows = allRows;
+          currentTotalVol = o.totalVol;
+        } else {
+          // ถุงที่ 2 เป็นต้นไป: เอาเฉพาะรายการแรก (Product หลัก) รายการเดียว
+          displayRows = [allRows[0]];
+          currentTotalVol = allRows[0].val; // Total Vol จะเหลือแค่ปริมาตรถุงหลัก
+        }
+
+        // สร้างเนื้อหาตาราง
+        displayRows.forEach((row, index) => {
           let labelText = index === 0 ? splitProductName(row.label) : row.label;
           tableBody += `<tr><td>${index + 1}. ${labelText}</td><td class="text-right">${row.val}</td></tr>`;
         });
+
+        // กำหนดโหมดความสวยงาม (ถ้าถุง 2-3 มีรายการเดียว จะใช้ large-mode เสมอ)
+        const modeClass = displayRows.length <= 5 ? 'large-mode' : 'compact-mode';
 
         pnHTML += `
           <div class="sticker sticker-pn ${modeClass}">
             <div class="header-info flex justify-between" contenteditable="true">
               <span>HN: ${o.hn} - ${o.patientName}</span>
-              <span>${i}/${qty}</span>
+              <span class="bg-black text-white px-2 rounded-sm">ถุงที่ ${i}/${qty}</span>
             </div>
             <div class="flex justify-between text-[14px] font-bold mb-1" contenteditable="true">
               <span>Ward: ${o.ward}</span>
@@ -170,7 +181,7 @@
                   ${tableBody}
                   <tr style="background:#eee; font-weight:800;">
                     <td class="text-right">Total Volume (ml)</td>
-                    <td class="text-right">${o.totalVol}</td>
+                    <td class="text-right">${currentTotalVol}</td>
                   </tr>
                 </tbody>
               </table>
@@ -187,7 +198,9 @@
         `;
       }
       document.getElementById('pn-area').innerHTML = pnHTML;
+      document.getElementById('mode-hint').innerText = qty > 1 ? `✨ MULTI-BAG MODE (${qty} bags)` : `✨ SINGLE BAG MODE`;
 
+      // ส่วนของฉลากหน้าถุง (Bag Area) ยังคงเดิม
       document.getElementById('bag-area').innerHTML = `
         <div class="sticker sticker-pn flex flex-col items-center justify-center text-center" style="width:3.75in; height:2.48in; padding:1.1cm 0.25in 0.1in 0.25in;" contenteditable="true">
           <div style="font-size: 52px; font-weight: 900; line-height: 1;">${o.ward}</div>
@@ -200,7 +213,6 @@
         </div>
       `;
     }
-
     // จุดสำคัญ: สั่งให้ทำงานทันทีที่โหลดหน้าเสร็จ
     window.onload = renderLabels;
   </script>
