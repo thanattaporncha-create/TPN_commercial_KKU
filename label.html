@@ -109,8 +109,13 @@
     }
 
     function renderLabels() {
-      const params = new URLSearchParams(window.location.search);
-      const o = Object.fromEntries(params.entries());
+     const params = new URLSearchParams(window.location.search);
+  
+  // สร้าง Object o โดยบังคับถอดรหัส (Decode) ทุกตัว
+  const o = {};
+  params.forEach((value, key) => {
+    o[key] = value; // URLSearchParams จะ decode ค่าให้อัตโนมัติอยู่แล้ว
+  });
       if (!o.hn) return;
 
       const expDate = new Date(o.orderDate);
