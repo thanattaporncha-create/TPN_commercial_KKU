@@ -113,17 +113,17 @@
 
         <section class="bg-white p-6 rounded-2xl card-shadow space-y-4 border-t-8 border-emerald-600">
           <h2 class="section-title">📦 เลือกผลิตภัณฑ์และจำนวน</h2>
-        <select id="productSelect" class="w-full p-4 border-2 border-emerald-100 rounded-xl bg-emerald-50 text-xl font-black text-emerald-900 outline-none text-center" onchange="updateProductDetails()">
+      <select id="productSelect" class="w-full p-4 border-2 border-emerald-100 rounded-xl bg-emerald-50 text-xl font-black text-emerald-900 outline-none text-center" onchange="updateProductDetails()">
   <option value="">-- คลิกเลือกสารอาหาร --</option>
-  <option value="smof_c_1477" class="route-c" data-vol="1477" data-kcal="1600">SMOF kabiven (C-line) 1,477 ml / 1600 kcal</option>
-  <option value="smof_c_986" class="route-c" data-vol="986" data-kcal="1100">SMOF kabiven (C-line) 986 ml / 1100 kcal</option>
-  <option value="oli_n7" class="route-c" data-vol="1500" data-kcal="1800">Oliclinomel N/7 (C-line) 1,500 ml / 1800 kcal</option>
-  <option value="nutri_vr" class="route-c" data-vol="1250" data-kcal="1475">Nutriflex lipid VR 1,250 ml / 1475 kcal</option>
-  
   <option value="smof_p_1904" class="route-p" data-vol="1904" data-kcal="1300">SMOF kabiven (P-line) 1,904 ml / 1300 kcal</option>
   <option value="oli_n4" class="route-p" data-vol="1500" data-kcal="910">Oliclinomel N/4 (P-line) 1,500 ml / 910 kcal</option>
   <option value="nutri_p" class="route-p" data-vol="1875" data-kcal="1435">Nutriflex lipid peri 1,875 ml / 1435 kcal</option>
   <option value="bfluid" class="route-p" data-vol="1000" data-kcal="420">B-Fluid 1,000 ml / 420 kcal</option>
+
+  <option value="smof_c_1477" data-vol="1477" data-kcal="1600">SMOF kabiven (C-line) 1,477 ml / 1600 kcal</option>
+  <option value="smof_c_986" data-vol="986" data-kcal="1100">SMOF kabiven (C-line) 986 ml / 1100 kcal</option>
+  <option value="oli_n7" data-vol="1500" data-kcal="1800">Oliclinomel N/7 (C-line) 1,500 ml / 1800 kcal</option>
+  <option value="nutri_vr" data-vol="1250" data-kcal="1475">Nutriflex lipid VR 1,250 ml / 1475 kcal</option>
 </select>
 
           <div class="bg-emerald-50 p-4 rounded-2xl border border-emerald-100 text-center">
@@ -232,11 +232,15 @@
       document.getElementById('mainApp').classList.remove('hidden');
       document.getElementById('displayUserName').textContent = sessionStorage.getItem('tpnUser');
       document.getElementById('orderDate').valueAsDate = new Date();
-      // เพิ่มบรรทัดนี้เข้าไปค่ะ:
+     // --- ส่วนที่เพิ่มใหม่ ---
+  // 1. สั่งให้เวลาเปลี่ยน Route แล้วทำการกรองสินค้าทันที
   document.querySelectorAll('input[name="route"]').forEach(radio => {
     radio.addEventListener('change', filterProductsByRoute);
   });
-  filterProductsByRoute(); // สั่งให้กรองครั้งแรกตอนเปิดโปรแกรม
+  
+  // 2. รันการกรองครั้งแรก (เพราะค่าเริ่มต้นเป็น Central)
+  filterProductsByRoute(); 
+  // ----------------------
       calculateAll();
     }
 
@@ -354,24 +358,45 @@
 
     let currentVitType = '';
     function selectVitamin(type) {
-      const vitVol = document.getElementById('vitVol');
-      const vitalipid = document.getElementById('vitalipid');
-      const vitHint = document.getElementById('vit-hint');
-      currentVitType = type;
-      document.getElementById('btn-cernevit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-white text-gray-400";
-      document.getElementById('btn-soluvit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-white text-gray-400";
-      if (type === 'cernevit') {
-        document.getElementById('btn-cernevit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-emerald-600 text-white shadow-md";
-        vitVol.value = 5; vitHint.innerHTML = "⚠️ MAX CERNEVIT = 5 ML";
-        vitalipid.value = 0; vitalipid.readOnly = true; vitalipid.classList.add('opacity-30', 'bg-gray-200');
-      } else {
-        document.getElementById('btn-soluvit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-yellow-400 text-black shadow-md";
-        vitVol.value = 10; vitHint.innerHTML = "⚠️ MAX SOLUVIT-N = 10 ML";
-        vitalipid.value = 10; vitalipid.readOnly = false; vitalipid.classList.remove('opacity-30', 'bg-gray-200');
-      }
-      calculateAll();
-    }
+  const vitVol = document.getElementById('vitVol');
+  const vitalipid = document.getElementById('vitalipid');
+  const vitHint = document.getElementById('vit-hint');
+  const productSelect = document.getElementById('productSelect'); // เพิ่มบรรทัดนี้เพื่อเช็กสินค้า
 
+  currentVitType = type;
+  
+  // ล้างสีปุ่มเดิม
+  document.getElementById('btn-cernevit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-white text-gray-400";
+  document.getElementById('btn-soluvit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-white text-gray-400";
+
+  if (type === 'cernevit') {
+    document.getElementById('btn-cernevit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-emerald-600 text-white shadow-md";
+    vitVol.value = 5; 
+    vitHint.innerHTML = "⚠️ MAX CERNEVIT = 5 ML";
+    
+    // เคส Cernevit: ล็อค Vitalipid เสมอ (ตาม Logic เดิม)
+    vitalipid.value = 0; 
+    vitalipid.readOnly = true; 
+    vitalipid.classList.add('opacity-30', 'bg-gray-200');
+  } else {
+    document.getElementById('btn-soluvit').className = "flex-1 py-4 rounded-xl border-2 font-black text-xs uppercase bg-yellow-400 text-black shadow-md";
+    vitVol.value = 10; 
+    vitHint.innerHTML = "⚠️ MAX SOLUVIT-N = 10 ML";
+
+    // --- ส่วนที่แก้ไข: เช็กก่อนว่าถ้าเป็น B-Fluid ต่อให้กด Soluvit ก็ต้องห้ามปลดล็อค Vitalipid ---
+    if (productSelect.value === "bfluid") {
+      vitalipid.value = 0;
+      vitalipid.readOnly = true;
+      vitalipid.classList.add('opacity-30', 'bg-red-50'); // ให้เป็นสีแดงค้างไว้
+    } else {
+      // ถ้าไม่ใช่ B-Fluid ถึงจะยอมให้เติม Vitalipid ได้
+      vitalipid.value = 10; 
+      vitalipid.readOnly = false; 
+      vitalipid.classList.remove('opacity-30', 'bg-gray-200', 'bg-red-50');
+    }
+  }
+  calculateAll();
+}
     function checkBcoLimit() {
       const bco = document.getElementById('bco');
       if (parseFloat(bco.value) > 2) bco.classList.add('text-red-700', 'bg-red-50');
@@ -384,46 +409,47 @@ function filterProductsByRoute() {
   const select = document.getElementById('productSelect');
   const options = select.options;
 
-  // ล้างค่าที่เลือกอยู่ก่อนหน้าเพื่อป้องกันการเลือกผิดสาย
+  // ล้างค่าเลือกเดิมทุกครั้งที่เปลี่ยนสาย เพื่อความปลอดภัย
   select.value = ""; 
   updateProductDetails();
 
   for (let i = 1; i < options.length; i++) {
     const opt = options[i];
     if (isPeripheral) {
-      // ถ้าติ๊ก Peripheral: ให้โชว์เฉพาะตัวที่เป็น class route-p (ที่ขิมลิสต์ไว้ให้)
+      // ถ้าเลือก Peripheral: โชว์เฉพาะตัวที่มี class route-p (4 ตัวนั้น)
       opt.style.display = opt.classList.contains('route-p') ? "block" : "none";
     } else {
-      // ถ้าติ๊ก Central: ให้โชว์เฉพาะตัวที่เป็น class route-c
-      opt.style.display = opt.classList.contains('route-c') ? "block" : "none";
+      // ถ้าเลือก Central: โชว์ "ทุกตัว" (ไม่มีการซ่อน)
+      opt.style.display = "block";
     }
   }
 }
-   function updateProductDetails() {
+  function updateProductDetails() {
   const s = document.getElementById('productSelect');
   const o = s.options[s.selectedIndex];
   const vitalipidInput = document.getElementById('vitalipid');
   
-  // อัปเดตตัวเลข Vol และ Kcal ตามปกติ
+  // อัปเดตตัวเลข Vol และ Kcal
   document.getElementById('prodVol').textContent = o.getAttribute('data-vol') || 0;
   document.getElementById('prodKcal').textContent = o.getAttribute('data-kcal') || 0;
 
-  // --- ส่วนที่เพิ่มใหม่: เช็ค B-Fluid ---
+  // เงื่อนไขล็อค Vitalipid เมื่อเลือก B-Fluid
   if (s.value === "bfluid") {
-    vitalipidInput.value = 0; // เซ็ตเป็น 0
-    vitalipidInput.readOnly = true; // ห้ามพิมพ์
-    vitalipidInput.style.backgroundColor = "#fee2e2"; // เปลี่ยนสีพื้นหลังเป็นแดงอ่อนๆ ให้รู้ว่าโดนบล็อก
+    vitalipidInput.value = 0;
+    vitalipidInput.readOnly = true;
+    vitalipidInput.style.backgroundColor = "#fee2e2"; // พื้นหลังแดงอ่อน
+    vitalipidInput.style.border = "2px solid #ef4444"; // ขอบแดง
   } else {
-    // ถ้าไม่ใช่ B-Fluid และไม่ได้เลือก Cernevit อยู่ ให้ปลดล็อค
+    // ถ้าไม่ใช่ B-fluid และไม่ได้เลือก Cernevit ไว้ (Cernevit ล็อค Vitalipid อยู่แล้วในฟังก์ชัน selectVitamin)
     if (currentVitType !== 'cernevit') {
       vitalipidInput.readOnly = false;
-      vitalipidInput.style.backgroundColor = ""; 
+      vitalipidInput.style.backgroundColor = "";
+      vitalipidInput.style.border = "";
     }
   }
   
   calculateAll();
 }
-
     function calculateAll() {
       const v = (id) => parseFloat(document.getElementById(id).value) || 0;
       const prodVol = parseFloat(document.getElementById('prodVol').textContent) || 0;
