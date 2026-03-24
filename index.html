@@ -246,11 +246,19 @@
       display.textContent = newValue;
     }
 
-    const wards = ["2ค", "2ง", "3ก", "3ค", "3ง", "3ฉ", "4ก", "4ค", "5ข", "6ก", "6ข", 
-      "AE1", "AE2", "AE3", "CCU", "CVT-ICU", "HOME PN", "IMC2ง", "IMC3ข", "IMC4ข", 
-      "MICU 1", "MICU 2", "NICU", "PICU", "PICU ศสก.", "SCTU", "SICU 1", "SICU 2", 
-      "กว.6/1", "กว.6/2", "กว.7/1", "กว.7/2", "สว.1/11", "สว.1/12", "สว.1/13", 
-      "สว.1/14", "สว.1/15", "สว.1/8B", "สว.1/8C", "สว.1/9A", "สว.1/9B", "สว.1/9C"];
+    const wards = [
+  "2ก", "2ข", "2ค", "2ง", "2จ", "2ฉ", 
+  "3ก", "3ข", "3ค", "3ง", "3จ", "3ฉ", 
+  "4ก", "4ข", "4ค", "4ง", 
+  "5ก", "5ข", "5ค", "5ง", "5จ", 
+  "6ก", "6ข", "6ฉ", 
+  "8A (ACRO)", "AE1", "AE2", "AE3", "AE4", "Burn Unit",
+  "CVT ICU", "LR", "MICU 1", "MICU 2", "MICU 3", "NSICU", "NICU", "PICU", "SCTU",
+  "SICU 1", "SICU 2", "SICU 3", "IMC 2ง", "IMC 3ข", "IMC 3จ", "IMC 4ก", "IMC 4ข", "IMC 4ค",
+  "กว.6/1", "กว.6/2", "กว.7/1", "สว.1/8B", "สว.1/8C", "สว.1/9A", "สว.1/9B", "สว.1/9C",
+  "สว.1/11", "สว.1/12", "สว.1/13", "สว.1/14", "สว.1/15",
+  "จิตเวช", "สงฆ์อาพาธ", "Nursing home", "HOME PN"
+];
 
     function showWards() { document.getElementById('wardList').classList.remove('hidden'); renderWards(wards); }
     function renderWards(items) { document.getElementById('wardList').innerHTML = items.map(w => `<div class="p-4 hover:bg-emerald-50 cursor-pointer border-b font-black text-gray-700 text-center" onclick="selectWard('${w}')">${w}</div>`).join(''); }
