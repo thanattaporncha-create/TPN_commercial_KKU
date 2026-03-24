@@ -108,7 +108,7 @@
       return `<span>${name}</span>`;
     }
 
-    function renderLabels() {
+   function renderLabels() {
       const params = new URLSearchParams(window.location.search);
       const o = {};
       params.forEach((value, key) => { o[key] = value; });
@@ -143,29 +143,26 @@
         let displayRows = [];
 
         if (i === 1) {
-          // ถุงที่ 1: เอามาทุกรายการที่กรอก
           displayRows = allRows;
           currentTotalVol = o.totalVol;
         } else {
-          // ถุงที่ 2 เป็นต้นไป: เอาเฉพาะรายการแรก (Product หลัก) รายการเดียว
           displayRows = [allRows[0]];
-          currentTotalVol = allRows[0].val; // Total Vol จะเหลือแค่ปริมาตรถุงหลัก
+          // คำนวณยอดรวมใหม่สำหรับถุงที่ไม่มีวิตามิน (เอาแค่ปริมาตรสารอาหารหลัก)
+          currentTotalVol = allRows[0].val; 
         }
 
-        // สร้างเนื้อหาตาราง
         displayRows.forEach((row, index) => {
           let labelText = index === 0 ? splitProductName(row.label) : row.label;
           tableBody += `<tr><td>${index + 1}. ${labelText}</td><td class="text-right">${row.val}</td></tr>`;
         });
 
-        // กำหนดโหมดความสวยงาม (ถ้าถุง 2-3 มีรายการเดียว จะใช้ large-mode เสมอ)
         const modeClass = displayRows.length <= 5 ? 'large-mode' : 'compact-mode';
 
         pnHTML += `
           <div class="sticker sticker-pn ${modeClass}">
             <div class="header-info flex justify-between" contenteditable="true">
               <span>HN: ${o.hn} - ${o.patientName}</span>
-              <span class="bg-black text-white px-2 rounded-sm">ถุงที่ ${i}/${qty}</span>
+              <span class="font-bold text-black">ถุงที่ ${i}/${qty}</span>
             </div>
             <div class="flex justify-between text-[14px] font-bold mb-1" contenteditable="true">
               <span>Ward: ${o.ward}</span>
