@@ -19,7 +19,12 @@
         margin: 3mm auto 0 auto !important; page-break-after: always;
         overflow: hidden; 
       }
+      /* เพิ่มบรรทัดนี้: ใบสุดท้ายไม่ต้องตัดหน้า จะได้ไม่มีหน้าว่าง */
+      .sticker:last-child {
+        page-break-after: auto !important;
+      }
     }
+    
 
     /* โครงสร้างหลักล็อคระยะ 12.9cm */
     .sticker-pn { 
