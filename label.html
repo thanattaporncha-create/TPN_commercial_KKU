@@ -9,21 +9,32 @@
     /* พื้นฐานคงเดิมที่คุณขิมชอบ */
     * { font-family: 'Sarabun', sans-serif; color: #000; line-height: 1.1; font-weight: 700; }
     
-    @media print {
-      @page { margin: 0; size: auto; }
-      body { background: #fff; margin: 0; padding: 0; }
-      .no-print { display: none !important; }
-      .print-area:not(.active) { display: none !important; }
-      .sticker { 
-        box-shadow: none !important; border: none !important; 
-        margin: 3mm auto 0 auto !important; page-break-after: always;
-        overflow: hidden; 
-      }
-      /* เพิ่มบรรทัดนี้: ใบสุดท้ายไม่ต้องตัดหน้า จะได้ไม่มีหน้าว่าง */
-      .sticker:last-child {
-        page-break-after: auto !important;
-      }
+   @media print {
+    @page { margin: 0; size: auto; }
+    body { background: transparent; margin: 0; padding: 0; }
+    .no-print { display: none !important; }
+    .print-area:not(.active) { display: none !important; }
+    
+    .sticker { 
+      box-shadow: none !important; border: none !important; 
+      margin: 3mm auto 0 auto !important; 
+      page-break-after: always; /* ตัดหน้าสำหรับใบปกติ */
+      overflow: hidden; 
+      background: transparent !important;
     }
+
+    /* --- ส่วนที่แก้หน้าว่างหน้าสุดท้าย --- */
+    .sticker:last-child {
+      page-break-after: avoid !important; /* เปลี่ยนเป็น avoid เพื่อห้ามตัดหน้า */
+      margin-bottom: 0 !important;        /* ล้าง margin ล่างสุดออก */
+    }
+    
+    /* ล้างระยะห่างของ container ไม่ให้เหลือเศษไปหน้าใหม่ */
+    #pn-area, #bag-area {
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+  }
     
 
     /* โครงสร้างหลักล็อคระยะ 12.9cm */
