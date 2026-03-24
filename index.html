@@ -113,17 +113,18 @@
 
         <section class="bg-white p-6 rounded-2xl card-shadow space-y-4 border-t-8 border-emerald-600">
           <h2 class="section-title">📦 เลือกผลิตภัณฑ์และจำนวน</h2>
-          <select id="productSelect" class="w-full p-4 border-2 border-emerald-100 rounded-xl bg-emerald-50 text-xl font-black text-emerald-900 outline-none text-center" onchange="updateProductDetails()">
-            <option value="">-- คลิกเลือกสารอาหาร --</option>
-            <option value="smof_c_1477" data-vol="1477" data-kcal="1600">SMOF kabiven (C-line) 1,477 ml / 1600 kcal</option>
-            <option value="smof_c_986" data-vol="986" data-kcal="1100">SMOF kabiven (C-line) 986 ml / 1100 kcal</option>
-            <option value="smof_p_1904" data-vol="1904" data-kcal="1300">SMOF kabiven (P-line) 1,904 ml / 1300 kcal</option>
-            <option value="oli_n7" data-vol="1500" data-kcal="1800">Oliclinomel N/7 (C-line) 1,500 ml / 1800 kcal</option>
-            <option value="oli_n4" data-vol="1500" data-kcal="910">Oliclinomel N/4 (P-line) 1,500 ml / 910 kcal</option>
-            <option value="nutri_p" data-vol="1875" data-kcal="1435">Nutriflex lipid peri 1,875 ml / 1435 kcal</option>
-            <option value="nutri_vr" data-vol="1250" data-kcal="1475">Nutriflex lipid VR 1,250 ml / 1475 kcal</option>
-            <option value="bfluid" data-vol="1000" data-kcal="420">B-Fluid 1,000 ml / 420 kcal</option>
-          </select>
+        <select id="productSelect" class="w-full p-4 border-2 border-emerald-100 rounded-xl bg-emerald-50 text-xl font-black text-emerald-900 outline-none text-center" onchange="updateProductDetails()">
+  <option value="">-- คลิกเลือกสารอาหาร --</option>
+  <option value="smof_c_1477" class="route-c" data-vol="1477" data-kcal="1600">SMOF kabiven (C-line) 1,477 ml / 1600 kcal</option>
+  <option value="smof_c_986" class="route-c" data-vol="986" data-kcal="1100">SMOF kabiven (C-line) 986 ml / 1100 kcal</option>
+  <option value="oli_n7" class="route-c" data-vol="1500" data-kcal="1800">Oliclinomel N/7 (C-line) 1,500 ml / 1800 kcal</option>
+  <option value="nutri_vr" class="route-c" data-vol="1250" data-kcal="1475">Nutriflex lipid VR 1,250 ml / 1475 kcal</option>
+  
+  <option value="smof_p_1904" class="route-p" data-vol="1904" data-kcal="1300">SMOF kabiven (P-line) 1,904 ml / 1300 kcal</option>
+  <option value="oli_n4" class="route-p" data-vol="1500" data-kcal="910">Oliclinomel N/4 (P-line) 1,500 ml / 910 kcal</option>
+  <option value="nutri_p" class="route-p" data-vol="1875" data-kcal="1435">Nutriflex lipid peri 1,875 ml / 1435 kcal</option>
+  <option value="bfluid" class="route-p" data-vol="1000" data-kcal="420">B-Fluid 1,000 ml / 420 kcal</option>
+</select>
 
           <div class="bg-emerald-50 p-4 rounded-2xl border border-emerald-100 text-center">
             <label class="block text-xs font-black text-emerald-600 uppercase mb-2 tracking-widest">จำนวนถุงที่เบิก (Stock Out)</label>
@@ -231,6 +232,11 @@
       document.getElementById('mainApp').classList.remove('hidden');
       document.getElementById('displayUserName').textContent = sessionStorage.getItem('tpnUser');
       document.getElementById('orderDate').valueAsDate = new Date();
+      // เพิ่มบรรทัดนี้เข้าไปค่ะ:
+  document.querySelectorAll('input[name="route"]').forEach(radio => {
+    radio.addEventListener('change', filterProductsByRoute);
+  });
+  filterProductsByRoute(); // สั่งให้กรองครั้งแรกตอนเปิดโปรแกรม
       calculateAll();
     }
 
@@ -372,14 +378,51 @@
       else bco.classList.remove('text-red-700', 'bg-red-50');
       calculateAll();
     }
+// ฟังก์ชันสำหรับ "ซ่อน/แสดง" สินค้าตาม Route ที่เลือก
+function filterProductsByRoute() {
+  const isPeripheral = document.getElementById('route-peripheral').checked;
+  const select = document.getElementById('productSelect');
+  const options = select.options;
 
-    function updateProductDetails() {
-      const s = document.getElementById('productSelect');
-      const o = s.options[s.selectedIndex];
-      document.getElementById('prodVol').textContent = o.getAttribute('data-vol') || 0;
-      document.getElementById('prodKcal').textContent = o.getAttribute('data-kcal') || 0;
-      calculateAll();
+  // ล้างค่าที่เลือกอยู่ก่อนหน้าเพื่อป้องกันการเลือกผิดสาย
+  select.value = ""; 
+  updateProductDetails();
+
+  for (let i = 1; i < options.length; i++) {
+    const opt = options[i];
+    if (isPeripheral) {
+      // ถ้าติ๊ก Peripheral: ให้โชว์เฉพาะตัวที่เป็น class route-p (ที่ขิมลิสต์ไว้ให้)
+      opt.style.display = opt.classList.contains('route-p') ? "block" : "none";
+    } else {
+      // ถ้าติ๊ก Central: ให้โชว์เฉพาะตัวที่เป็น class route-c
+      opt.style.display = opt.classList.contains('route-c') ? "block" : "none";
     }
+  }
+}
+   function updateProductDetails() {
+  const s = document.getElementById('productSelect');
+  const o = s.options[s.selectedIndex];
+  const vitalipidInput = document.getElementById('vitalipid');
+  
+  // อัปเดตตัวเลข Vol และ Kcal ตามปกติ
+  document.getElementById('prodVol').textContent = o.getAttribute('data-vol') || 0;
+  document.getElementById('prodKcal').textContent = o.getAttribute('data-kcal') || 0;
+
+  // --- ส่วนที่เพิ่มใหม่: เช็ค B-Fluid ---
+  if (s.value === "bfluid") {
+    vitalipidInput.value = 0; // เซ็ตเป็น 0
+    vitalipidInput.readOnly = true; // ห้ามพิมพ์
+    vitalipidInput.style.backgroundColor = "#fee2e2"; // เปลี่ยนสีพื้นหลังเป็นแดงอ่อนๆ ให้รู้ว่าโดนบล็อก
+  } else {
+    // ถ้าไม่ใช่ B-Fluid และไม่ได้เลือก Cernevit อยู่ ให้ปลดล็อค
+    if (currentVitType !== 'cernevit') {
+      vitalipidInput.readOnly = false;
+      vitalipidInput.style.backgroundColor = ""; 
+    }
+  }
+  
+  calculateAll();
+}
 
     function calculateAll() {
       const v = (id) => parseFloat(document.getElementById(id).value) || 0;
