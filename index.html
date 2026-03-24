@@ -441,7 +441,9 @@
       saveBtn.innerHTML = "⏳ กำลังบันทึก...";
       try {
         await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: formData });
-        window.open(`label.html?${formData.toString()}`, '_blank');
+       // ใช้ URLSearchParams ตรงๆ หรือบังคับ Encode ตัวแปรทั้งหมด
+const queryString = formData.toString();
+window.open("label.html?" + queryString, "_blank");
         alert("✅ บันทึกข้อมูลเรียบร้อยแล้วค่ะ!");
         location.reload(); 
       } catch (e) {
