@@ -29,7 +29,7 @@
 
     .pn-table { width: 100%; border-collapse: collapse; border: 2px solid #000; table-layout: fixed; }
     .pn-table td { border: 1px solid #000; vertical-align: middle; word-wrap: break-word; }
-    .pn-table th { border: 2px solid #000; padding: 4px; font-size: 14px; **background: #fff;** }
+    .pn-table th { border: 2px solid #000; padding: 4px; font-size: 14px; background: #fff; }
 
     /* โหมด 1: สารน้อย (<= 5 รายการ) - ขยายใหญ่สะใจ */
     .large-mode .pn-table td { padding: 8px 6px; font-size: 18px; }
@@ -176,7 +176,7 @@
                 </thead>
                 <tbody contenteditable="true">
                   ${tableBody}
-                  <tr style="**background:#fff;** font-weight:800;">
+                  <tr style="background:#fff; font-weight:800;">
                     <td class="text-right">Total Volume (ml)</td>
                     <td class="text-right">${currentTotalVol}</td>
                   </tr>
@@ -202,7 +202,7 @@
         <div class="sticker sticker-pn flex flex-col items-center justify-center text-center" style="width:3.75in; height:2.48in; padding:1.1cm 0.25in 0.1in 0.25in;" contenteditable="true">
           <div style="font-size: 52px; font-weight: 900; line-height: 1;">${o.ward}</div>
           <div style="border-top: 4px solid #000; border-bottom: 4px solid #000; width: 100%; padding: 8px 0; margin: 8px 0;">
-           <span style="**font-size: 28px;** font-weight: 900; display: block; line-height: 1.1; white-space: nowrap; overflow: hidden; **text-overflow: ellipsis;**">${o.patientName}</span>
+           <span style="**font-size: 30px;** font-weight: 900; display: block; line-height: 1.1; white-space: nowrap; overflow: hidden; **text-overflow: ellipsis;**">${o.patientName}</span>
           </div>
           <div style="font-size: 22px; font-weight: 800; margin-bottom: 4px;">${o.hn}</div>
           <div style="font-size: 16px; font-weight: 700;">เตรียมวันที่: ${formatThaiDate(o.orderDate)}</div>
