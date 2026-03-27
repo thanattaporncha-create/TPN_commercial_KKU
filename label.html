@@ -6,8 +6,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700;800&display=swap" rel="stylesheet">
   <style>
-    /* พื้นฐานคงเดิมที่คุณขิมชอบ */
-    * { font-family: 'Sarabun', sans-serif; color: #000; line-height: 1.1; font-weight: 700; }
+    /* ปรับ line-height เป็น 1.2 เพื่อแก้ปัญหาสระ อุ/อู หาย */
+    * { font-family: 'Sarabun', sans-serif; color: #000; line-height: 1.2; font-weight: 700; }
     
     @media print {
       @page { margin: 0; size: auto; }
@@ -21,7 +21,6 @@
       }
     }
 
-    /* โครงสร้างหลักล็อคระยะ 12.9cm */
     .sticker-pn { 
       width: 9.1cm; height: 12.9cm; padding: 1.45cm 0.3cm 0.5cm 0.3cm; 
       box-sizing: border-box; background: white; position: relative; display: flex; flex-direction: column;
@@ -31,18 +30,16 @@
     .pn-table td { border: 1px solid #000; vertical-align: middle; word-wrap: break-word; }
     .pn-table th { border: 2px solid #000; padding: 4px; font-size: 14px; background: #fff; }
 
-    /* โหมด 1: สารน้อย */
+    /* ปรับระยะขอบบน-ล่างให้ชื่อมีพื้นที่สำหรับสระ */
     .large-mode .pn-table td { padding: 8px 6px; font-size: 18px; }
-    .large-mode .header-info { font-size: 16px; }
+    .large-mode .header-info { font-size: 16px; padding-bottom: 4px; }
 
-    /* โหมด 2: สารเยอะ */
     .compact-mode .pn-table td { padding: 2.2px 6px; font-size: 14.5px; }
-    .compact-mode .header-info { font-size: 14px; }
+    .compact-mode .header-info { font-size: 14px; padding-bottom: 2px; }
     .compact-mode .table-container { max-height: 7.2cm; overflow: hidden; }
 
-    .header-info { border-bottom: 2.5px solid #000; margin-bottom: 4px; padding-bottom: 2px; }
+    .header-info { border-bottom: 2.5px solid #000; margin-bottom: 4px; }
     
-    /* Footer ล็อคตำแหน่ง 1.05cm */
     .footer-container { 
       position: absolute; bottom: 1.05cm; left: 0.3cm; right: 0.3cm;
       border-top: 2px solid #000; padding-top: 6px; display: grid; grid-template-columns: 1fr 1fr;
@@ -71,12 +68,12 @@
         <h3 class="font-black text-lg text-emerald-900">ฉลากหน้าถุง</h3>
       </div>
     </div>
-    <div id="action-btns" class="hidden">
+    <div id="action-btns">
       <button onclick="window.print()" class="bg-slate-900 text-white py-5 px-14 rounded-3xl font-black text-2xl shadow-xl active:scale-95 uppercase">Print labels</button>
     </div>
   </div>
 
-  <div id="pn-area" class="print-area"></div>
+  <div id="pn-area" class="print-area active"></div>
   <div id="bag-area" class="print-area"></div>
 
   <script>
@@ -92,7 +89,6 @@
       document.getElementById(`${type}-area`).classList.add('active');
       document.querySelectorAll('.bg-white').forEach(el => el.style.borderColor = '#ecfdf5');
       document.getElementById(`card-${type}`).style.borderColor = '#10b981'; 
-      document.getElementById('action-btns').classList.remove('hidden');
     }
 
     function splitProductName(name) {
@@ -157,9 +153,9 @@
 
         pnHTML += `
           <div class="sticker sticker-pn ${modeClass}">
-            <div class="header-info flex justify-between" contenteditable="true">
-              <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${o.hn} ${o.patientName}</span>
-              <span class="font-bold text-black">${i}/${qty}</span>
+            <div class="header-info flex justify-between items-baseline" contenteditable="true">
+              <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-bottom: 3px;">${o.hn} ${o.patientName}</span>
+              <span class="font-bold text-black flex-shrink-0 ml-1">${i}/${qty}</span>
             </div>
             <div class="flex justify-between text-[14px] font-bold mb-1" contenteditable="true">
               <span>Ward: ${o.ward}</span>
@@ -194,18 +190,22 @@
       document.getElementById('pn-area').innerHTML = pnHTML;
       document.getElementById('mode-hint').innerText = qty > 1 ? `✨ MULTI-BAG MODE (${qty} bags)` : `✨ SINGLE BAG MODE`;
 
-      // ปรับปรุงฉลากหน้าถุง: ฟอนต์ใหญ่สะใจ และ ลบ Background เรียบร้อย
       document.getElementById('bag-area').innerHTML = `
         <div class="sticker sticker-pn flex flex-col items-center justify-center text-center" style="width:3.75in; height:2.48in; padding:1.1cm 0.25in 0.1in 0.25in; background: #fff;" contenteditable="true">
           <div style="font-size: 52px; font-weight: 900; line-height: 1;">${o.ward}</div>
-          <div style="border-top: 4px solid #000; border-bottom: 4px solid #000; width: 100%; padding: 8px 0; margin: 8px 0; background: #fff;">
-            <span style="font-size: 32px; font-weight: 900; display: block; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${o.patientName}</span>
+          <div style="border-top: 4px solid #000; border-bottom: 4px solid #000; width: 100%; padding: 12px 0; margin: 8px 0;">
+            <span style="font-size: 32px; font-weight: 900; display: block; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-bottom: 5px;">${o.patientName}</span>
           </div>
           <div style="font-size: 22px; font-weight: 800; margin-bottom: 4px;">${o.hn}</div>
           <div style="font-size: 16px; font-weight: 700;">เตรียมวันที่: ${formatThaiDate(o.orderDate)}</div>
           <div style="font-size: 15px; font-weight: 800; color: #000; margin-top: 6px;">(เก็บในตู้เย็น 2-8° C)</div>
         </div>
       `;
+
+      // คำสั่งสั่ง Print อัตโนมัติเมื่อสร้างข้อมูลเสร็จ
+      setTimeout(() => {
+        window.print();
+      }, 500);
     }
     window.onload = renderLabels;
   </script>
