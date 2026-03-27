@@ -37,7 +37,7 @@
     .compact-mode .pn-table td { padding: 2px 6px; font-size: 14.5px; }
     .compact-mode .header-info { font-size: 14px; padding-bottom: 2px; }
     /* ขยายพื้นที่ตารางเพิ่มขึ้นอีกนิดเพื่อไม่ให้ Total Volume หาย */
-    .compact-mode .table-container { max-height: 7.5cm; overflow: hidden; }
+    .compact-mode .table-container { max-height: 7.8cm; overflow: hidden; }
 
     .header-info { border-bottom: 2.5px solid #000; margin-bottom: 4px; }
     
@@ -150,12 +150,12 @@
           tableBody += `<tr><td>${index + 1}. ${labelText}</td><td class="text-right">${row.val}</td></tr>`;
         });
 
-        const modeClass = displayRows.length <= 5 ? 'large-mode' : 'compact-mode';
+        const modeClass = displayRows.length <= 4 ? 'large-mode' : 'compact-mode';
 
         pnHTML += `
           <div class="sticker sticker-pn ${modeClass}">
             <div class="header-info flex justify-between items-baseline" contenteditable="true">
-              <span style="white-space: nowrap; text-overflow: ellipsis; padding-top: 5px; padding-bottom: 5px;">${o.hn} ${o.patientName}</span>
+              <span style="white-space: nowrap; text-overflow: ellipsis; padding-top: 4px; padding-bottom: 4px;">${o.hn} ${o.patientName}</span>
               <span class="font-bold text-black flex-shrink-0 ml-1">${i}/${qty}</span>
             </div>
             <div class="flex justify-between text-[14px] font-bold mb-1" contenteditable="true">
@@ -198,7 +198,7 @@
         <div class="sticker sticker-pn flex flex-col items-center justify-center text-center" style="width:3.75in; height:2.48in; padding:1.4cm 0.25in 0.1in 0.25in; background: #fff !important;" contenteditable="true">
           <div style="font-size: 46px; font-weight: 900; line-height: 1;">${o.ward}</div>
           <div style="border-top: 4px solid #000; border-bottom: 4px solid #000; width: 100%; padding: 8px 0; margin: 6px 0;">
-           <span style="font-size: 22px; font-weight: 900; display: block; line-height: 1.4; white-space: nowrap; text-overflow: ellipsis; padding-top: 5px; padding-bottom: 5px;">${o.patientName}</span>
+           <span style="font-size: 22px; font-weight: 900; display: block; line-height: 1.4; white-space: nowrap; text-overflow: ellipsis; padding-top: 4px; padding-bottom: 4px;">${o.patientName}</span>
           </div>
         <div style="font-size: 22px; font-weight: 800; margin-bottom: 4px; margin-top: -1.5mm;">${o.hn}</div>
           <div style="font-size: 16px; font-weight: 700;">เตรียมวันที่: ${formatThaiDate(o.orderDate)}</div>
